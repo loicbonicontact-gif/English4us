@@ -2,8 +2,24 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- viewport-fit=cover : le contenu passe sous l'encoche, les marges sont gerees en CSS.
+       Jamais de maximum-scale ni user-scalable=no : cela empecherait de zoomer. -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="description" content="Apprends l'anglais gratuitement, du niveau A1 au niveau C2. Exercices, series et progression." />
+
   <title>English4us — Apprends l'anglais gratuitement, de A1 à C2</title>
+
+  <!-- Installation sur ecran d'accueil (Android / Chrome) -->
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <meta name="theme-color" content="#58cc02" />
+
+  <!-- Installation sur ecran d'accueil (iOS) -->
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="English4us" />
+
+  <link rel="icon" type="image/svg+xml" href="/icon.svg" />
 </head>
 <body>
   <div id="root"></div>
