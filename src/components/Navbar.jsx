@@ -1,5 +1,6 @@
 import { NavLink } from 'react-router-dom'
 import { MAX_HEARTS } from '../lib/gamification'
+import Mascot from './Mascot'
 
 // Barre supérieure : identité du produit, statistiques de jeu, navigation.
 // Les statistiques viennent du profil remonté par App.jsx, qui écoute
@@ -14,7 +15,7 @@ export default function Navbar({ profile, onSignOut }) {
     <header className="navbar">
       <div className="navbar-inner">
         <NavLink to="/dashboard" className="navbar-brand">
-          <span aria-hidden="true">🐘</span>
+          <Mascot size={34} />
           <span className="navbar-brand-name">English4us</span>
         </NavLink>
 

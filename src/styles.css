@@ -21,6 +21,24 @@
 
 * { box-sizing: border-box; }
 
+/* Accessibilité : un anneau de focus visible sur TOUT élément interactif.
+   Sans lui, une personne qui navigue au clavier ne sait pas où elle est. */
+:where(a, button, input, select, textarea):focus-visible {
+  outline: 3px solid var(--blue);
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+
+/* Coupe toutes les transitions/animations si le système le demande */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
 body {
   margin: 0;
   font-family: var(--font);
@@ -55,6 +73,119 @@ h1 { font-size: 1.6rem; margin: 0 0 0.25rem; }
 .auth-brand { margin-bottom: 1.5rem; }
 .auth-logo { font-size: 3rem; display: block; }
 .auth-tagline { color: var(--text-muted); font-size: 0.95rem; margin: 0; }
+
+/* ---------- Mascotte éléphant ---------- */
+
+:root {
+  --mascot-skin: #a8b0cc;
+  --mascot-skin-dark: #8d95b5;
+  --mascot-ear-inner: #e8b3bd;
+}
+
+.mascot { display: block; margin: 0 auto; overflow: visible; }
+
+/* Respiration : très léger, sinon la mascotte « vibre » et fatigue l'œil */
+.mascot-body {
+  transform-origin: 100px 95px;
+  animation: mascot-breathe 4s ease-in-out infinite;
+}
+
+@keyframes mascot-breathe {
+  0%, 100% { transform: scale(1) translateY(0); }
+  50%      { transform: scale(1.02) translateY(-2px); }
+}
+
+/* Clignement : rapide et espacé, comme un vrai clignement */
+.mascot-eyes {
+  transform-origin: 100px 72px;
+  animation: mascot-blink 5.5s infinite;
+}
+
+@keyframes mascot-blink {
+  0%, 92%, 100% { transform: scaleY(1); }
+  95%           { transform: scaleY(0.08); }
+}
+
+/* Oreilles : battement décalé entre gauche et droite, plus naturel */
+.mascot-ear-left  { transform-origin: 84px 76px; animation: mascot-ear-l 3.2s ease-in-out infinite; }
+.mascot-ear-right { transform-origin: 116px 76px; animation: mascot-ear-r 3.2s ease-in-out infinite 0.4s; }
+
+@keyframes mascot-ear-l {
+  0%, 100% { transform: rotate(0deg); }
+  50%      { transform: rotate(-5deg); }
+}
+@keyframes mascot-ear-r {
+  0%, 100% { transform: rotate(0deg); }
+  50%      { transform: rotate(5deg); }
+}
+
+/* Trompe : balancement lent */
+.mascot-trunk {
+  transform-origin: 100px 112px;
+  animation: mascot-trunk-sway 4.5s ease-in-out infinite;
+}
+
+@keyframes mascot-trunk-sway {
+  0%, 100% { transform: rotate(0deg); }
+  50%      { transform: rotate(4deg); }
+}
+
+/* Les paupières ne servent qu'aux expressions : cachées au repos */
+.mascot-lids { opacity: 0; transition: opacity 0.2s ease-out; }
+
+/* --- Expression : bonne réponse --- */
+.mascot-happy .mascot-body { animation: mascot-bounce 0.6s ease-out; }
+.mascot-happy .mascot-lids { opacity: 1; }
+.mascot-happy .mascot-eyes { animation: none; transform: scaleY(0.55); transform-origin: 100px 76px; }
+.mascot-happy .mascot-trunk { animation: mascot-trunk-up 0.6s ease-out forwards; }
+
+@keyframes mascot-bounce {
+  0%   { transform: scale(1) translateY(0); }
+  35%  { transform: scale(1.08) translateY(-10px); }
+  60%  { transform: scale(0.97) translateY(2px); }
+  100% { transform: scale(1) translateY(0); }
+}
+@keyframes mascot-trunk-up {
+  to { transform: rotate(-22deg); }
+}
+
+/* --- Expression : mauvaise réponse --- */
+.mascot-sad .mascot-body { animation: mascot-shake 0.5s ease-in-out; }
+.mascot-sad .mascot-eyes { animation: none; }
+.mascot-sad .mascot-pupil { transform: translateY(3px); }
+.mascot-sad .mascot-trunk { animation: mascot-trunk-down 0.5s ease-out forwards; }
+.mascot-sad .mascot-ear-left,
+.mascot-sad .mascot-ear-right { animation: none; }
+
+@keyframes mascot-shake {
+  0%, 100% { transform: translateX(0) rotate(0deg); }
+  25%      { transform: translateX(-6px) rotate(-3deg); }
+  75%      { transform: translateX(6px) rotate(3deg); }
+}
+@keyframes mascot-trunk-down {
+  to { transform: rotate(-10deg) translateY(4px); }
+}
+
+/* --- Expression : réflexion (chargement) --- */
+.mascot-thinking .mascot-pupil { animation: mascot-look 2s ease-in-out infinite; }
+
+@keyframes mascot-look {
+  0%, 100% { transform: translateX(-3px); }
+  50%      { transform: translateX(3px); }
+}
+
+/* Accessibilité : certaines personnes ont des nausées avec le mouvement.
+   Le système le signale, on coupe tout — la mascotte reste dessinée. */
+@media (prefers-reduced-motion: reduce) {
+  .mascot-body,
+  .mascot-eyes,
+  .mascot-ear-left,
+  .mascot-ear-right,
+  .mascot-trunk,
+  .mascot-pupil {
+    animation: none !important;
+  }
+}
 
 /* ---------- Navbar ---------- */
 
@@ -110,6 +241,10 @@ h1 { font-size: 1.6rem; margin: 0 0 0.25rem; }
 
 .navbar-link {
   font: inherit;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  touch-action: manipulation;
   font-size: 0.85rem;
   font-weight: 800;
   text-transform: uppercase;
@@ -157,7 +292,8 @@ h1 { font-size: 1.6rem; margin: 0 0 0.25rem; }
 
 .field input {
   font-family: inherit;
-  font-size: 1rem;
+  font-size: 16px;   /* en dessous de 16px, iOS zoome tout seul sur le champ */
+  min-height: 44px;
   padding: 0.8rem 0.9rem;
   border: 2px solid var(--border);
   border-radius: 12px;
@@ -171,6 +307,8 @@ h1 { font-size: 1.6rem; margin: 0 0 0.25rem; }
 
 .btn {
   font-family: inherit;
+  min-height: 44px;          /* cible tactile minimale (Apple HIG) */
+  touch-action: manipulation; /* supprime le delai de 300ms au tap */
   font-weight: 800;
   font-size: 0.95rem;
   text-transform: uppercase;
@@ -201,6 +339,7 @@ h1 { font-size: 1.6rem; margin: 0 0 0.25rem; }
 }
 
 .btn-link {
+  min-height: 44px;
   background: none;
   border: none;
   padding: 0;
@@ -315,7 +454,32 @@ h1 { font-size: 1.6rem; margin: 0 0 0.25rem; }
 .path-node.is-done .path-node-btn { background: var(--yellow); box-shadow: 0 4px 0 #d9a900; }
 .path-node.is-locked .path-node-btn { cursor: not-allowed; opacity: 0.55; }
 
+.path-node-btn:not(:disabled):hover { transform: translateY(-2px); }
 .path-node-btn:not(:disabled):active { transform: translateY(3px); box-shadow: none; }
+
+/* Apparition en cascade des lecons : 40ms d'ecart, assez pour etre percu
+   sans donner l'impression que la page rame */
+.path-node {
+  animation: node-in 0.32s ease-out backwards;
+}
+@keyframes node-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.path-node:nth-child(1) { animation-delay: 0.00s; }
+.path-node:nth-child(2) { animation-delay: 0.04s; }
+.path-node:nth-child(3) { animation-delay: 0.08s; }
+.path-node:nth-child(4) { animation-delay: 0.12s; }
+.path-node:nth-child(5) { animation-delay: 0.16s; }
+
+/* La lecon en cours respire doucement pour attirer l'oeil */
+.path-node.is-current .path-node-btn {
+  animation: pulse-current 2.4s ease-in-out infinite;
+}
+@keyframes pulse-current {
+  0%, 100% { box-shadow: 0 4px 0 var(--green-dark), 0 0 0 0 rgba(28,176,246,0.45); }
+  50%      { box-shadow: 0 4px 0 var(--green-dark), 0 0 0 10px rgba(28,176,246,0); }
+}
 
 .path-node.is-current .path-node-btn {
   outline: 3px solid var(--blue);

@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { supabase } from '../supabaseClient'
+import Mascot from './Mascot'
 
 // Traduit les erreurs Supabase (anglais) en messages clairs en français.
 function translateAuthError(message = '') {
@@ -74,7 +75,7 @@ export default function Auth() {
     <div className="auth-screen">
       <div className="auth-card">
         <div className="auth-brand">
-          <span className="auth-logo" aria-hidden="true">🐘</span>
+          <Mascot mood={loading ? 'thinking' : 'idle'} size={110} />
           <h1>English4us</h1>
           <p className="auth-tagline">Apprends l'anglais gratuitement, de A1 à C2.</p>
         </div>
