@@ -3,6 +3,7 @@ import { supabase } from './supabaseClient'
 import { ensureProfile } from './lib/profile'
 import Auth from './components/Auth'
 import Navbar from './components/Navbar'
+import LessonPath from './components/LessonPath'
 
 export default function App() {
   const [session, setSession] = useState(null)
@@ -81,30 +82,15 @@ export default function App() {
   return (
     <>
       <Navbar profile={profile} onSignOut={handleSignOut} />
-      <main className="screen-center">
-        <div className="auth-card">
-          <h1>Connecté 🎉</h1>
+      <main>
         {profileError && (
           <p className="alert alert-error" role="alert">
             Profil indisponible : {profileError}
           </p>
         )}
-        {profile ? (
-          <ul className="profile-summary">
-            <li><strong>Pseudo</strong><span>{profile.username}</span></li>
-            <li><strong>Niveau</strong><span>{profile.level}</span></li>
-            <li><strong>XP</strong><span>{profile.xp}</span></li>
-            <li><strong>Cœurs</strong><span>{'❤️'.repeat(profile.hearts)}</span></li>
-            <li><strong>Série</strong><span>{profile.streak_count} jour(s)</span></li>
-          </ul>
-        ) : (
-          !profileError && <p>Préparation de ton profil…</p>
-        )}
-          <p className="field-hint">Le parcours de leçons arrive à la prochaine étape.</p>
-          <button className="btn btn-secondary btn-block" onClick={handleSignOut}>
-            Se déconnecter
-          </button>
-        </div>
+        {profile
+          ? <LessonPath userId={profile.id} />
+          : !profileError && <p className="path-status">Préparation de ton profil…</p>}
       </main>
     </>
   )

@@ -226,6 +226,107 @@ h1 { font-size: 1.6rem; margin: 0 0 0.25rem; }
 
 .auth-switch { margin: 1.25rem 0 0; font-size: 0.9rem; color: var(--text-muted); }
 
+/* ---------- Écran de configuration manquante ---------- */
+
+.config-error p { font-size: 0.92rem; line-height: 1.5; }
+
+.config-missing {
+  list-style: none;
+  padding: 0.75rem;
+  margin: 1rem 0;
+  background: #fff4e5;
+  border-radius: 12px;
+  text-align: left;
+}
+
+.config-missing li { padding: 0.2rem 0; }
+
+.config-error code {
+  font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+  font-size: 0.85em;
+  background: var(--bg-soft);
+  padding: 0.1rem 0.35rem;
+  border-radius: 5px;
+}
+
+/* ---------- Parcours de leçons ---------- */
+
+.path { max-width: 640px; margin: 0 auto; padding: 1.25rem 1rem 3rem; }
+
+.path-status { text-align: center; color: var(--text-muted); padding: 2rem 0; }
+
+.path-header { margin-bottom: 1.5rem; }
+.path-header h2 { margin: 0 0 0.25rem; font-size: 1.4rem; }
+.path-progress { margin: 0 0 0.5rem; color: var(--text-muted); font-size: 0.9rem; }
+
+.path-bar {
+  height: 12px;
+  background: var(--border);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.path-bar span {
+  display: block;
+  height: 100%;
+  background: var(--green);
+  border-radius: 999px;
+  transition: width 0.4s ease;
+}
+
+.path-level { margin-bottom: 2rem; }
+
+.path-level-title {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 1rem;
+  margin: 0 0 0.9rem;
+}
+
+.path-level-badge {
+  background: var(--green);
+  color: #fff;
+  font-weight: 900;
+  padding: 0.2rem 0.6rem;
+  border-radius: 8px;
+  letter-spacing: 0.5px;
+}
+
+.path-level-done { color: var(--green); font-size: 0.8rem; font-weight: 700; }
+
+.path-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.6rem; }
+
+.path-node { display: flex; align-items: center; gap: 0.9rem; }
+
+.path-node-btn {
+  flex: 0 0 auto;
+  width: 56px; height: 56px;
+  border-radius: 50%;
+  border: none;
+  font-size: 1.4rem;
+  cursor: pointer;
+  background: var(--border);
+  color: #fff;
+  box-shadow: 0 4px 0 #cfcfcf;
+  transition: transform 0.12s ease;
+}
+
+.path-node.is-open .path-node-btn { background: var(--green); box-shadow: 0 4px 0 var(--green-dark); }
+.path-node.is-done .path-node-btn { background: var(--yellow); box-shadow: 0 4px 0 #d9a900; }
+.path-node.is-locked .path-node-btn { cursor: not-allowed; opacity: 0.55; }
+
+.path-node-btn:not(:disabled):active { transform: translateY(3px); box-shadow: none; }
+
+.path-node.is-current .path-node-btn {
+  outline: 3px solid var(--blue);
+  outline-offset: 3px;
+}
+
+.path-node-text { display: flex; flex-direction: column; }
+.path-node-title { font-weight: 800; }
+.path-node-meta { font-size: 0.82rem; color: var(--text-muted); }
+.path-node.is-done .path-node-meta { color: var(--green); font-weight: 700; }
+
 /* ---------- Résumé de profil (provisoire) ---------- */
 
 .profile-summary { list-style: none; padding: 0; margin: 1rem 0; }
