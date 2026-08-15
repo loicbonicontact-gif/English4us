@@ -14,7 +14,7 @@ export default function Navbar({ profile, onSignOut }) {
     <header className="navbar">
       <div className="navbar-inner">
         <NavLink to="/dashboard" className="navbar-brand">
-          <span aria-hidden="true">🦉</span>
+          <span aria-hidden="true">🐘</span>
           <span className="navbar-brand-name">English4us</span>
         </NavLink>
 
