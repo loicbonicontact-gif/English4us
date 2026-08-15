@@ -1,5 +1,5 @@
 -- ============================================
--- SCHEMA SUPABASE — LinguaFree
+-- SCHEMA SUPABASE — English4us
 -- À exécuter dans Supabase SQL Editor
 -- ============================================
 

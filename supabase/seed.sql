@@ -1,5 +1,5 @@
 -- ============================================
--- SEED — LinguaFree
+-- SEED — English4us
 -- 30 leçons (A1 -> C2), 3 exercices par leçon.
 -- Rejouable : on vide d'abord les tables de contenu.
 -- À exécuter dans Supabase SQL Editor APRÈS schema.sql

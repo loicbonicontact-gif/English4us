@@ -75,7 +75,7 @@ export default function Auth() {
       <div className="auth-card">
         <div className="auth-brand">
           <span className="auth-logo" aria-hidden="true">🦉</span>
-          <h1>LinguaFree</h1>
+          <h1>English4us</h1>
           <p className="auth-tagline">Apprends l'anglais gratuitement, de A1 à C2.</p>
         </div>
 

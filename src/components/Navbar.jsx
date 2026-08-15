@@ -15,7 +15,7 @@ export default function Navbar({ profile, onSignOut }) {
       <div className="navbar-inner">
         <NavLink to="/dashboard" className="navbar-brand">
           <span aria-hidden="true">🦉</span>
-          <span className="navbar-brand-name">LinguaFree</span>
+          <span className="navbar-brand-name">English4us</span>
         </NavLink>
 
         <ul className="navbar-stats" aria-label="Tes statistiques">
