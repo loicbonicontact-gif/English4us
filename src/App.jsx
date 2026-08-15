@@ -1,9 +1,11 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
+import { Navigate, Route, Routes } from 'react-router-dom'
 import { supabase } from './supabaseClient'
-import { ensureProfile } from './lib/profile'
+import { ensureProfile, fetchProfile } from './lib/profile'
 import Auth from './components/Auth'
 import Navbar from './components/Navbar'
 import LessonPath from './components/LessonPath'
+import Exercise from './components/Exercise'
 
 export default function App() {
   const [session, setSession] = useState(null)
@@ -48,9 +50,8 @@ export default function App() {
     return () => { active = false }
   }, [session])
 
-  // Écoute en temps réel les modifications du profil (XP, cœurs, série).
-  // Ainsi la Navbar se met à jour toute seule après une leçon terminée,
-  // sans rechargement de page.
+  // Écoute en temps réel les modifications du profil (XP, cœurs, série),
+  // pour que la Navbar se mette à jour sans rechargement de page.
   useEffect(() => {
     const userId = session?.user?.id
     if (!userId) return
@@ -65,6 +66,13 @@ export default function App() {
       .subscribe()
 
     return () => { supabase.removeChannel(channel) }
+  }, [session?.user?.id])
+
+  // Rechargement manuel : filet de sécurité si le temps réel n'est pas actif
+  // (la table doit être ajoutée à la publication supabase_realtime).
+  const refreshProfile = useCallback(async () => {
+    if (!session?.user) return
+    try { setProfile(await fetchProfile(session.user.id)) } catch { /* silencieux */ }
   }, [session?.user?.id])
 
   async function handleSignOut() {
@@ -84,13 +92,22 @@ export default function App() {
       <Navbar profile={profile} onSignOut={handleSignOut} />
       <main>
         {profileError && (
-          <p className="alert alert-error" role="alert">
-            Profil indisponible : {profileError}
-          </p>
+          <p className="alert alert-error" role="alert">Profil indisponible : {profileError}</p>
         )}
-        {profile
-          ? <LessonPath userId={profile.id} />
-          : !profileError && <p className="path-status">Préparation de ton profil…</p>}
+
+        {!profile && !profileError && <p className="path-status">Préparation de ton profil…</p>}
+
+        {profile && (
+          <Routes>
+            <Route path="/dashboard" element={<LessonPath userId={profile.id} />} />
+            <Route
+              path="/lesson/:id"
+              element={<Exercise profile={profile} onProfileChange={refreshProfile} />}
+            />
+            <Route path="/leaderboard" element={<p className="path-status">Le classement arrive bientôt.</p>} />
+            <Route path="*" element={<Navigate to="/dashboard" replace />} />
+          </Routes>
+        )}
       </main>
     </>
   )
