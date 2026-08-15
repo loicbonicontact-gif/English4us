@@ -83,3 +83,10 @@ alter table lessons enable row level security;
 alter table exercises enable row level security;
 create policy "Lecture publique des leçons" on lessons for select using (true);
 create policy "Lecture publique des exercices" on exercises for select using (true);
+
+-- ============================================
+-- TEMPS RÉEL
+-- Sans cette ligne, la Navbar ne se met pas à jour toute seule
+-- après une leçon : il faudrait recharger la page.
+-- ============================================
+alter publication supabase_realtime add table profiles;

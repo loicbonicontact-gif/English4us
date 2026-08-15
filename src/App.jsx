@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { supabase } from './supabaseClient'
 import { ensureProfile } from './lib/profile'
 import Auth from './components/Auth'
+import Navbar from './components/Navbar'
 
 export default function App() {
   const [session, setSession] = useState(null)
@@ -46,6 +47,25 @@ export default function App() {
     return () => { active = false }
   }, [session])
 
+  // Écoute en temps réel les modifications du profil (XP, cœurs, série).
+  // Ainsi la Navbar se met à jour toute seule après une leçon terminée,
+  // sans rechargement de page.
+  useEffect(() => {
+    const userId = session?.user?.id
+    if (!userId) return
+
+    const channel = supabase
+      .channel(`profile-${userId}`)
+      .on(
+        'postgres_changes',
+        { event: 'UPDATE', schema: 'public', table: 'profiles', filter: `id=eq.${userId}` },
+        (payload) => setProfile(payload.new)
+      )
+      .subscribe()
+
+    return () => { supabase.removeChannel(channel) }
+  }, [session?.user?.id])
+
   async function handleSignOut() {
     await supabase.auth.signOut()
   }
@@ -59,9 +79,11 @@ export default function App() {
   }
 
   return (
-    <div className="screen-center">
-      <div className="auth-card">
-        <h1>Connecté 🎉</h1>
+    <>
+      <Navbar profile={profile} onSignOut={handleSignOut} />
+      <main className="screen-center">
+        <div className="auth-card">
+          <h1>Connecté 🎉</h1>
         {profileError && (
           <p className="alert alert-error" role="alert">
             Profil indisponible : {profileError}
@@ -78,11 +100,12 @@ export default function App() {
         ) : (
           !profileError && <p>Préparation de ton profil…</p>
         )}
-        <p className="field-hint">Le parcours de leçons arrive à la prochaine étape.</p>
-        <button className="btn btn-secondary btn-block" onClick={handleSignOut}>
-          Se déconnecter
-        </button>
-      </div>
-    </div>
+          <p className="field-hint">Le parcours de leçons arrive à la prochaine étape.</p>
+          <button className="btn btn-secondary btn-block" onClick={handleSignOut}>
+            Se déconnecter
+          </button>
+        </div>
+      </main>
+    </>
   )
 }

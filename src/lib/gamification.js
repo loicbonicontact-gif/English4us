@@ -1,5 +1,9 @@
 import { supabase } from '../supabaseClient'
 
+// Nombre de cœurs maximum. Centralisé ici pour éviter les valeurs
+// codées en dur qui finiraient par diverger entre composants.
+export const MAX_HEARTS = 5
+
 // Met à jour le streak selon la date de dernière activité
 export function computeStreak(lastActivityDate, currentStreak) {
   const today = new Date().toISOString().split('T')[0]
@@ -60,5 +64,5 @@ export async function loseHeart(userId, currentHearts) {
 }
 
 export async function refillHearts(userId) {
-  await supabase.from('profiles').update({ hearts: 5 }).eq('id', userId)
+  await supabase.from('profiles').update({ hearts: MAX_HEARTS }).eq('id', userId)
 }

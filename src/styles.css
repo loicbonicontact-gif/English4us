@@ -56,6 +56,95 @@ h1 { font-size: 1.6rem; margin: 0 0 0.25rem; }
 .auth-logo { font-size: 3rem; display: block; }
 .auth-tagline { color: var(--text-muted); font-size: 0.95rem; margin: 0; }
 
+/* ---------- Navbar ---------- */
+
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: var(--bg);
+  border-bottom: 2px solid var(--border);
+}
+
+.navbar-inner {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0.6rem 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 1rem;
+}
+
+.navbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-weight: 900;
+  font-size: 1.1rem;
+  color: var(--green);
+  text-decoration: none;
+}
+
+.navbar-stats {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  margin-left: auto;
+}
+
+.stat { display: flex; align-items: center; gap: 0.25rem; font-weight: 800; }
+.stat-icon { font-size: 1.1rem; line-height: 1; }
+.stat-value { font-size: 0.95rem; }
+
+.stat-level .stat-value { color: var(--green); }
+.stat-streak .stat-value { color: #ff9600; }
+.stat-xp .stat-value { color: var(--yellow); }
+.stat-hearts .stat-value { color: var(--red); }
+.stat-hearts.is-empty { opacity: 0.55; }
+
+.navbar-links { display: flex; align-items: center; gap: 0.25rem; }
+
+.navbar-link {
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  color: var(--text-muted);
+  text-decoration: none;
+  background: none;
+  border: none;
+  padding: 0.45rem 0.7rem;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.navbar-link:hover { background: var(--bg-soft); color: var(--text); }
+.navbar-link.active { color: var(--blue); background: #e5f4ff; }
+.navbar-signout { color: var(--red); }
+
+/* Masque un texte à l'écran tout en le gardant pour les lecteurs d'écran */
+.sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Sur mobile, le titre passe en icône seule pour laisser la place aux stats */
+@media (max-width: 480px) {
+  .navbar-brand-name { display: none; }
+  .navbar-inner { gap: 0.5rem; }
+  .navbar-stats { gap: 0.6rem; }
+}
+
 /* ---------- Formulaires ---------- */
 
 .auth-form { display: flex; flex-direction: column; gap: 1rem; text-align: left; }
