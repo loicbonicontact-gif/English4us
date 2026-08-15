@@ -110,3 +110,21 @@ export function IconClose({ size = 24, ...rest }) {
     </svg>
   )
 }
+
+export function IconSoundOn({ size = 24, ...rest }) {
+  return (
+    <svg {...base} width={size} height={size} {...rest}>
+      <path d="M4 9.5h3.5L12 5.5v13L7.5 14.5H4z" />
+      <path d="M16 9.2a4 4 0 0 1 0 5.6M18.6 6.6a7.6 7.6 0 0 1 0 10.8" />
+    </svg>
+  )
+}
+
+export function IconSoundOff({ size = 24, ...rest }) {
+  return (
+    <svg {...base} width={size} height={size} {...rest}>
+      <path d="M4 9.5h3.5L12 5.5v13L7.5 14.5H4z" />
+      <path d="M16.5 9.5l5 5M21.5 9.5l-5 5" />
+    </svg>
+  )
+}

@@ -49,6 +49,53 @@ Ne jamais s'arrêter pour dire "voulez-vous que je continue ?" — enchaîner ju
 
 Une fois ce fichier lu, démarrer immédiatement la boucle sur la première fonctionnalité non cochée, sans demander de validation préalable.
 
+## IDENTITE VISUELLE (non negociable)
+
+Le produit sera presente a des etablissements scolaires. Il ne doit ressembler
+a aucun concurrent existant : c'est un enjeu commercial et juridique.
+
+INTERDIT : reprendre les couleurs de Duolingo (#58cc02 et derives), son hibou,
+sa mise en page ou ses formulations. Aucune couleur de marque tierce.
+
+Palette English4us (toutes les paires texte/fond verifiees >= 4.5:1 WCAG AA) :
+- Indigo  #4338CA  marque, actions principales, bandeaux
+- Sarcelle #0F766E  reussite, progression
+- Ambre   #B45309  recompense, serie, XP
+- Rose    #BE123C  erreur, coeurs
+- Violet  #6D28D9  degrade du bandeau
+- Niveaux CECRL : A1 sarcelle, A2 bleu, B1 indigo, B2 violet, C1 magenta, C2 rose
+
+Polices : Nunito 800/900 (titres) + DM Sans 400/500/700 (texte).
+Mascotte : elephant SVG maison (src/components/Mascot.jsx), 4 expressions.
+
+## REGLES D'INTERFACE (verifiees a chaque livraison)
+
+1. JAMAIS d'emoji comme icone -> src/components/Icons.jsx (SVG, grille 24, trait 2px)
+2. Toute paire texte/fond doit atteindre 4.5:1 -> calculer, ne pas estimer a l'oeil
+3. Cible tactile >= 44px, champs de saisie a 16px minimum (sinon iOS zoome)
+4. Anneau de focus visible sur tout element interactif
+5. prefers-reduced-motion respecte : toute animation coupee si le systeme le demande
+6. Animations : 150-300ms, uniquement transform/opacity (jamais width/height)
+7. Chaque animation doit informer, pas decorer
+8. Tester a 375px, 768px et 1280px, plus le mode paysage
+9. Sons generes par Web Audio (src/lib/sounds.js), jamais de fichier audio
+10. Toujours un bouton pour couper le son, choix retenu entre les sessions
+
+## FEUILLE DE ROUTE (par ordre de valeur)
+
+Fait : auth, navbar, parcours, moteur d'exercices, 30 lecons / 90 exercices,
+responsive, installable, mascotte animee, sons, palette propre.
+
+A faire, par priorite :
+- [ ] Onboarding : 3 ecrans (niveau de depart, objectif quotidien, presentation)
+- [ ] Prononciation : lecture audio des phrases anglaises (SpeechSynthesis, gratuit)
+- [ ] Exercice "remets les mots dans l'ordre" (etiquettes a cliquer)
+- [ ] Fiche de lecon consultable avant de commencer (regle + exemples)
+- [ ] Classement entre apprenants
+- [ ] Recharge automatique des coeurs (1 par 4h)
+- [ ] Objectif quotidien + defis
+- [ ] Mode enseignant : suivi d'une classe (argument cle pour les ecoles)
+
 
 ---
 

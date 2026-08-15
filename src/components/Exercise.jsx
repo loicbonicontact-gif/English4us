@@ -6,6 +6,7 @@ import { isCorrect } from '../lib/answers'
 import Mascot from './Mascot'
 import Hearts from './Hearts'
 import XpCounter from './XpCounter'
+import { soundComplete, soundCorrect, soundHeart, soundTap, soundWrong } from '../lib/sounds'
 
 const LABELS = {
   qcm: 'Choisis la bonne réponse',
@@ -67,12 +68,15 @@ export default function Exercise({ profile, onProfileChange }) {
       : isCorrect(answer, current.correct_answer)
 
     if (right) {
+      soundCorrect()
       setVerdict('right')
       setCorrectCount((n) => n + 1)
       return
     }
 
     // Mauvaise réponse : secousse du champ + cœur qui se brise
+    soundWrong()
+    setTimeout(soundHeart, 180)   // le coeur tombe apres l'erreur, pas en meme temps
     setVerdict('wrong')
     setShake(true)
     setTimeout(() => setShake(false), 500)
@@ -100,6 +104,7 @@ export default function Exercise({ profile, onProfileChange }) {
 
     // Dernière question : on enregistre le résultat
     const score = Math.round((correctCount / exercises.length) * 100)
+    if (score >= 60) soundComplete()
     setFinished(true)
 
     if (!profile) return
@@ -194,7 +199,7 @@ export default function Exercise({ profile, onProfileChange }) {
                 className={`option ${answer === option ? 'is-picked' : ''} ${
                   verdict && option === current.correct_answer ? 'is-right' : ''
                 } ${verdict === 'wrong' && answer === option ? 'is-wrong' : ''}`}
-                onClick={() => !verdict && setAnswer(option)}
+                onClick={() => { if (!verdict) { soundTap(); setAnswer(option) } }}
                 disabled={Boolean(verdict)}
               >
                 {option}
