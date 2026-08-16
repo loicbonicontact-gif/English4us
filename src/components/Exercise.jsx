@@ -3,25 +3,21 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { supabase } from '../supabaseClient'
 import { completeLesson, loseHeart, MAX_HEARTS } from '../lib/gamification'
 import { isCorrect } from '../lib/answers'
+import { speak } from '../lib/speech'
 import Mascot from './Mascot'
-import Hearts from './Hearts'
-import XpCounter from './XpCounter'
+import ExerciseView from './ExerciseView'
+import LessonEnd from './LessonEnd'
 import { soundComplete, soundCorrect, soundHeart, soundTap, soundWrong } from '../lib/sounds'
 
-const LABELS = {
-  qcm: 'Choisis la bonne réponse',
-  trous: 'Complète la phrase',
-  traduction: 'Traduis en anglais',
-  ecoute: 'Écoute et réponds',
-  oral: 'Prononce la phrase'
-}
-
+// Conteneur de la lecon : chargement, score, coeurs, enregistrement.
+// L'affichage est delegue a ExerciseView et LessonEnd.
 export default function Exercise({ profile, onProfileChange }) {
   const { id } = useParams()
   const navigate = useNavigate()
 
   const [lesson, setLesson] = useState(null)
   const [exercises, setExercises] = useState([])
+  const [nextLesson, setNextLesson] = useState(null)
   const [index, setIndex] = useState(0)
   const [answer, setAnswer] = useState('')
   const [verdict, setVerdict] = useState(null)   // null | 'right' | 'wrong'
@@ -29,6 +25,7 @@ export default function Exercise({ profile, onProfileChange }) {
   const [hearts, setHearts] = useState(profile?.hearts ?? MAX_HEARTS)
   const [breakingIndex, setBreakingIndex] = useState(null)
   const [correctCount, setCorrectCount] = useState(0)
+  const [results, setResults] = useState([])     // une entree par question, pour « A revoir »
   const [finished, setFinished] = useState(false)
   const [reward, setReward] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -57,6 +54,25 @@ export default function Exercise({ profile, onProfileChange }) {
     return () => { active = false }
   }, [id])
 
+  // Leçon suivante du même niveau : sert la carte « Débloqué » de l'écran de fin.
+  // Chargée à part pour ne pas retarder l'affichage de la première question.
+  useEffect(() => {
+    if (!lesson) return
+    let active = true
+
+    supabase
+      .from('lessons')
+      .select('id, title, level, unit_order')
+      .eq('level', lesson.level)
+      .gt('unit_order', lesson.unit_order)
+      .order('unit_order', { ascending: true })
+      .limit(1)
+      .maybeSingle()
+      .then(({ data }) => { if (active) setNextLesson(data) })
+
+    return () => { active = false }
+  }, [lesson])
+
   const current = exercises[index]
   const isLast = index === exercises.length - 1
 
@@ -66,6 +82,12 @@ export default function Exercise({ profile, onProfileChange }) {
     const right = current.type === 'qcm'
       ? answer === current.correct_answer
       : isCorrect(answer, current.correct_answer)
+
+    setResults((list) => [...list, {
+      question: current.question,
+      answer: current.correct_answer,
+      right
+    }])
 
     if (right) {
       soundCorrect()
@@ -117,9 +139,21 @@ export default function Exercise({ profile, onProfileChange }) {
     }
   }
 
+  // Reprend la leçon depuis le début : la seule façon de revoir les mots
+  // ratés tant qu'il n'existe pas de mode révision dédié.
+  function handleRetry() {
+    setIndex(0)
+    setAnswer('')
+    setVerdict(null)
+    setCorrectCount(0)
+    setResults([])
+    setFinished(false)
+    setReward(null)
+  }
+
   if (loading) {
     return (
-      <div className="exercise-screen">
+      <div className="lesson-screen lesson-screen-center">
         <Mascot mood="thinking" size={90} />
         <p className="path-status">Chargement de la leçon…</p>
       </div>
@@ -128,127 +162,52 @@ export default function Exercise({ profile, onProfileChange }) {
 
   if (error && !finished) {
     return (
-      <div className="exercise-screen">
+      <div className="lesson-screen lesson-screen-center">
         <p className="alert alert-error" role="alert">{error}</p>
-        <button className="btn btn-secondary" onClick={() => navigate('/dashboard')}>
+        <button type="button" className="btn-wide is-dark" onClick={() => navigate('/dashboard')}>
           Retour au parcours
         </button>
       </div>
     )
   }
 
-  // ---------- Écran de fin ----------
   if (finished) {
     const score = Math.round((correctCount / exercises.length) * 100)
     return (
-      <div className="exercise-screen exercise-end">
-        <Mascot mood={score >= 60 ? 'happy' : 'sad'} size={130} />
-        <h2>{score >= 60 ? 'Leçon terminée !' : 'Presque !'}</h2>
-        <p className="end-score">{correctCount} bonne{correctCount > 1 ? 's' : ''} réponse{correctCount > 1 ? 's' : ''} sur {exercises.length}</p>
-
-        {reward && (
-          <div className="end-rewards">
-            <div className="end-reward">
-              <XpCounter value={lesson.xp_reward} className="end-xp" />
-              <span className="end-reward-label">XP gagnés</span>
-            </div>
-            <div className="end-reward">
-              <span className="end-streak">🔥 {reward.newStreak}</span>
-              <span className="end-reward-label">jour{reward.newStreak > 1 ? 's' : ''} de série</span>
-            </div>
-          </div>
-        )}
-
+      <>
         {error && <p className="alert alert-error" role="alert">{error}</p>}
-
-        <button className="btn btn-primary btn-block" onClick={() => navigate('/dashboard')}>
-          Continuer
-        </button>
-      </div>
+        <LessonEnd
+          lesson={lesson}
+          score={score}
+          correctCount={correctCount}
+          total={exercises.length}
+          xpReward={lesson.xp_reward}
+          streak={reward?.newStreak}
+          results={results}
+          nextLesson={nextLesson}
+          onNext={() => navigate(nextLesson ? `/lesson/${nextLesson.id}` : '/dashboard')}
+          onRetryMissed={handleRetry}
+        />
+      </>
     )
   }
 
-  // ---------- Écran d'exercice ----------
-  const progress = ((index + (verdict ? 1 : 0)) / exercises.length) * 100
-
   return (
-    <div className="exercise-screen">
-      <header className="exercise-top">
-        <button
-          className="exercise-quit"
-          onClick={() => navigate('/dashboard')}
-          aria-label="Quitter la leçon"
-        >
-          ✕
-        </button>
-        <div className="exercise-bar" role="progressbar" aria-valuenow={index + 1} aria-valuemin={1} aria-valuemax={exercises.length}>
-          <span style={{ width: `${progress}%` }} />
-        </div>
-        <Hearts hearts={hearts} breakingIndex={breakingIndex} />
-      </header>
-
-      <p className="exercise-kind">{LABELS[current.type] || 'Exercice'}</p>
-      <h2 className="exercise-question">{current.question}</h2>
-
-      {current.type === 'qcm' ? (
-        <ul className="options">
-          {current.options.map((option) => (
-            <li key={option}>
-              <button
-                type="button"
-                className={`option ${answer === option ? 'is-picked' : ''} ${
-                  verdict && option === current.correct_answer ? 'is-right' : ''
-                } ${verdict === 'wrong' && answer === option ? 'is-wrong' : ''}`}
-                onClick={() => { if (!verdict) { soundTap(); setAnswer(option) } }}
-                disabled={Boolean(verdict)}
-              >
-                {option}
-              </button>
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <input
-          className={`exercise-input ${shake ? 'is-shaking' : ''} ${verdict === 'wrong' ? 'is-wrong' : ''} ${verdict === 'right' ? 'is-right' : ''}`}
-          value={answer}
-          onChange={(e) => setAnswer(e.target.value)}
-          onKeyDown={(e) => e.key === 'Enter' && (verdict ? handleNext() : handleValidate())}
-          placeholder="Ta réponse…"
-          disabled={Boolean(verdict)}
-          autoComplete="off"
-          autoCapitalize="off"
-          spellCheck="false"
-          aria-label="Ta réponse"
-        />
-      )}
-
-      {verdict && (
-        <div className={`feedback feedback-${verdict}`} role="status">
-          <Mascot mood={verdict === 'right' ? 'happy' : 'sad'} size={64} />
-          <div className="feedback-text">
-            <strong>{verdict === 'right' ? 'Correct !' : 'Pas tout à fait.'}</strong>
-            {verdict === 'wrong' && (
-              <p className="feedback-answer">Réponse : <b>{current.correct_answer}</b></p>
-            )}
-            {current.explanation && <p className="feedback-why">{current.explanation}</p>}
-            {hearts === 0 && (
-              <p className="feedback-why"><b>Plus de cœurs.</b> La leçon s'arrête ici, mais tu peux la refaire.</p>
-            )}
-          </div>
-        </div>
-      )}
-
-      <div className="exercise-actions">
-        {verdict ? (
-          <button className="btn btn-primary btn-block" onClick={handleNext} autoFocus>
-            {hearts === 0 ? 'Retour au parcours' : isLast ? 'Terminer' : 'Continuer'}
-          </button>
-        ) : (
-          <button className="btn btn-primary btn-block" onClick={handleValidate} disabled={!answer.trim()}>
-            Vérifier
-          </button>
-        )}
-      </div>
-    </div>
+    <ExerciseView
+      exercise={current}
+      index={index}
+      total={exercises.length}
+      answer={answer}
+      verdict={verdict}
+      shake={shake}
+      hearts={hearts}
+      breakingIndex={breakingIndex}
+      isLast={isLast}
+      onAnswer={(value) => { if (!verdict) { if (current.type === 'qcm') soundTap(); setAnswer(value) } }}
+      onValidate={handleValidate}
+      onNext={handleNext}
+      onQuit={() => navigate('/dashboard')}
+      onSpeak={speak}
+    />
   )
 }

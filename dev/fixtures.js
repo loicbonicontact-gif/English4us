@@ -31,3 +31,21 @@ export const demoProfile = {
   level: 'A1',
   created_at: '2026-08-01T09:00:00Z'
 }
+
+export const demoLesson = { id: 2, title: 'La famille', level: 'A1', unit_order: 2, xp_reward: 10 }
+
+export const demoExercise = {
+  id: 12,
+  type: 'qcm',
+  question: 'Comment dit-on « ma tante » ?',
+  options: ['My uncle', 'My cousin', 'My aunt', 'My niece'],
+  correct_answer: 'My aunt',
+  explanation: "« Aunt » désigne la sœur de ton père ou de ta mère. À ne pas confondre avec « uncle », son équivalent masculin."
+}
+
+export const demoResults = [
+  { question: 'ma tante', answer: 'My aunt', right: false },
+  { question: 'mon frère', answer: 'My brother', right: true },
+  { question: 'ma sœur', answer: 'My sister', right: true },
+  { question: 'mes parents', answer: 'My parents', right: false }
+]

@@ -4,29 +4,97 @@
 // Sert a verifier le rendu et les points de rupture pendant la refonte.
 // Ce fichier n'est jamais inclus dans le build de production.
 
-import { StrictMode } from 'react'
+import { StrictMode, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import { MemoryRouter } from 'react-router-dom'
 import '../src/styles.css'
 
 import AppShell from '../src/components/AppShell'
 import PathView from '../src/components/PathView'
-import { demoPath, demoProfile } from './fixtures'
+import ExerciseView from '../src/components/ExerciseView'
+import LessonEnd from '../src/components/LessonEnd'
+import { demoExercise, demoLesson, demoPath, demoProfile, demoResults } from './fixtures'
+
+const SCREENS = [
+  { key: 'parcours', label: '01 Parcours' },
+  { key: 'question', label: '02 Question' },
+  { key: 'juste', label: '03 Juste' },
+  { key: 'faux', label: '03 Faux' },
+  { key: 'vide', label: '03 Sans cœur' },
+  { key: 'fin', label: '04 Fin' }
+]
 
 function Preview() {
+  const [screen, setScreen] = useState('parcours')
+  const [answer, setAnswer] = useState('')
+
+  const verdict = screen === 'juste' ? 'right' : (screen === 'faux' || screen === 'vide') ? 'wrong' : null
+  const hearts = screen === 'vide' ? 0 : screen === 'faux' ? 1 : 2
+
+  const exerciseProps = {
+    exercise: demoExercise,
+    index: 1,
+    total: 8,
+    // Juste : on choisit la bonne reponse. Faux : une autre, sinon l'ecran
+    // afficherait une reponse a la fois juste et fausse.
+    answer: verdict === 'right'
+      ? demoExercise.correct_answer
+      : verdict ? demoExercise.options[0] : answer,
+    verdict,
+    shake: false,
+    hearts,
+    breakingIndex: null,
+    isLast: false,
+    onAnswer: setAnswer,
+    onValidate: () => {},
+    onNext: () => {},
+    onQuit: () => {},
+    onSpeak: (t) => console.log('lire :', t)
+  }
+
   return (
     <MemoryRouter initialEntries={['/dashboard']}>
-      <AppShell profile={demoProfile}>
-        <PathView
-          path={demoPath}
-          hearts={demoProfile.hearts}
-          onOpen={(id) => console.log('ouvrir la leçon', id)}
+      <nav className="preview-switch">
+        {SCREENS.map((s) => (
+          <button
+            key={s.key}
+            type="button"
+            onClick={() => setScreen(s.key)}
+            className={screen === s.key ? 'is-on' : ''}
+          >
+            {s.label}
+          </button>
+        ))}
+      </nav>
+
+      {screen === 'parcours' && (
+        <AppShell profile={demoProfile}>
+          <PathView path={demoPath} hearts={demoProfile.hearts} onOpen={() => {}} />
+        </AppShell>
+      )}
+
+      {['question', 'juste', 'faux', 'vide'].includes(screen) && <ExerciseView {...exerciseProps} />}
+
+      {screen === 'fin' && (
+        <LessonEnd
+          lesson={demoLesson}
+          score={88}
+          correctCount={7}
+          total={8}
+          xpReward={10}
+          streak={1}
+          results={demoResults}
+          nextLesson={{ id: 3, title: 'Les nombres' }}
+          onNext={() => {}}
+          onRetryMissed={() => {}}
         />
-      </AppShell>
+      )}
     </MemoryRouter>
   )
 }
 
-createRoot(document.getElementById('root')).render(
-  <StrictMode><Preview /></StrictMode>
-)
+// La racine est conservee entre deux rechargements a chaud : sans cela,
+// Vite rappelle createRoot sur le meme noeud et React proteste.
+const container = document.getElementById('root')
+const root = (window.__previewRoot ??= createRoot(container))
+root.render(<StrictMode><Preview /></StrictMode>)
