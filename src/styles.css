@@ -741,6 +741,19 @@ html, body { max-width: 100%; overflow-x: hidden; }
 .hearts-card-value { margin: 0 0 6px; font-family: var(--font-title); font-size: 28px; color: var(--error-dark); }
 .hearts-card-hint { margin: 0; font-size: 13px; line-height: 1.45; color: var(--ink-2); }
 
+/* Compte a rebours du prochain coeur. Detache du reste par un filet :
+   c'est une information qui change, pas une consigne fixe. */
+.hearts-card-timer {
+  margin: 10px 0 0; padding-top: 10px;
+  border-top: 1px solid var(--border);
+  font-size: 13px; color: var(--ink-2);       /* 9.8:1 sur blanc */
+}
+
+.hearts-card-timer b {
+  color: var(--error-dark);                   /* 8.7:1 sur blanc */
+  font-variant-numeric: tabular-nums;
+}
+
 /* ---------- Tablette (>= 768px) ---------- */
 @media (min-width: 768px) {
   .app-header-inner, .path { max-width: 900px; margin-inline: auto; }

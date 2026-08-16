@@ -10,6 +10,7 @@ create table profiles (
   level text default 'A1' check (level in ('A1','A2','B1','B2','C1','C2')),
   xp integer default 0,
   hearts integer default 5,
+  hearts_updated_at timestamp with time zone,   -- instant du dernier coeur perdu (recharge 1/4h)
   streak_count integer default 0,
   last_activity_date date default current_date,
   created_at timestamp with time zone default now()

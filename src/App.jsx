@@ -4,6 +4,7 @@ import { supabase } from './supabaseClient'
 import { ensureProfile, fetchProfile } from './lib/profile'
 import { countDueReviews } from './lib/reviews'
 import { primeVoices } from './lib/speech'
+import { applyRefill, computeRefill, formatWait } from './lib/hearts'
 import Auth from './components/Auth'
 import AppShell from './components/AppShell'
 import LessonPath from './components/LessonPath'
@@ -55,7 +56,12 @@ export default function App() {
     let active = true
     setProfileError(null)
 
+    // La recharge des coeurs est appliquee ICI, a l'ouverture : le temps
+    // passe pendant que l'application est fermee, c'est donc au retour
+    // qu'il faut en tenir compte. Si la colonne n'existe pas encore, on
+    // garde le profil tel quel plutot que de bloquer l'ecran.
     ensureProfile(session.user, session.user.user_metadata?.username)
+      .then((data) => applyRefill(data).catch(() => data))
       .then((data) => { if (active) setProfile(data) })
       .catch((err) => { if (active) setProfileError(err.message) })
 
@@ -103,6 +109,24 @@ export default function App() {
     return () => { active = false }
   }, [session?.user?.id])
 
+  // Temps restant avant le prochain coeur. Recalcule chaque minute : sans
+  // cela, le compte a rebours resterait fige sur la valeur du chargement et
+  // donnerait l'impression que rien n'avance.
+  const [nextHeartIn, setNextHeartIn] = useState(null)
+
+  useEffect(() => {
+    if (!profile) { setNextHeartIn(null); return }
+
+    const tick = () => {
+      const { msUntilNext } = computeRefill(profile.hearts, profile.hearts_updated_at)
+      setNextHeartIn(formatWait(msUntilNext))
+    }
+
+    tick()
+    const timer = setInterval(tick, 60000)
+    return () => clearInterval(timer)
+  }, [profile?.hearts, profile?.hearts_updated_at])
+
   async function handleSignOut() {
     await supabase.auth.signOut()
   }
@@ -127,7 +151,7 @@ export default function App() {
         <Routes>
           <Route
             path="/dashboard"
-            element={<LessonPath userId={profile.id} hearts={profile.hearts} />}
+            element={<LessonPath userId={profile.id} hearts={profile.hearts} nextHeartIn={nextHeartIn} />}
           />
           <Route
             path="/lesson/:id"

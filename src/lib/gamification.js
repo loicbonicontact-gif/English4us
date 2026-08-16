@@ -80,13 +80,27 @@ export async function completeLesson(userId, lessonId, score, xpReward, profile)
   return { newXP, newLevel, newStreak }
 }
 
-// Gestion des coeurs (vie) : perdue en cas d'erreur
+// Gestion des coeurs (vie) : perdue en cas d'erreur.
+//
+// Le compteur de recharge ne demarre qu'a la PREMIERE perte, quand on
+// quitte le maximum. Le remettre a zero a chaque erreur repousserait
+// indefiniment le retour du coeur suivant : trois erreurs d'affilee
+// annuleraient les heures deja attendues.
 export async function loseHeart(userId, currentHearts) {
   const newHearts = Math.max(0, currentHearts - 1)
-  await supabase.from('profiles').update({ hearts: newHearts }).eq('id', userId)
+
+  const patch = { hearts: newHearts }
+  if (currentHearts >= MAX_HEARTS) patch.hearts_updated_at = new Date().toISOString()
+
+  await supabase.from('profiles').update(patch).eq('id', userId)
   return newHearts
 }
 
+// Remise a plein immediate. Le champ de date repasse a null : plus rien
+// n'est en attente tant qu'un coeur n'a pas ete reperdu.
 export async function refillHearts(userId) {
-  await supabase.from('profiles').update({ hearts: MAX_HEARTS }).eq('id', userId)
+  await supabase
+    .from('profiles')
+    .update({ hearts: MAX_HEARTS, hearts_updated_at: null })
+    .eq('id', userId)
 }

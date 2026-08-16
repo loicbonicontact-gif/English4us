@@ -8,7 +8,7 @@ import Mascot from './Mascot'
 // Conteneur : charge les lecons, les ecoutes et la progression, puis delegue
 // l'affichage a PathView. Aucune mise en forme ici — c'est ce qui permet de
 // previsualiser l'ecran avec des donnees de test sans toucher a Supabase.
-export default function LessonPath({ userId, hearts }) {
+export default function LessonPath({ userId, hearts, nextHeartIn }) {
   const navigate = useNavigate()
   const [path, setPath] = useState(null)
   const [error, setError] = useState(null)
@@ -55,6 +55,7 @@ export default function LessonPath({ userId, hearts }) {
     <PathView
       path={path}
       hearts={hearts}
+      nextHeartIn={nextHeartIn}
       onOpen={(id) => navigate(`/lesson/${id}`)}
       onOpenListening={(id) => navigate(`/listening/${id}`)}
     />
