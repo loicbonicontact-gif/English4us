@@ -4,77 +4,126 @@
 
 :root {
   /* ============================================
-     IDENTITE English4us
-     Indigo profond = serieux, scolaire, credible aupres des etablissements
-     Ambre          = chaleur, recompense, jeu
-     Sarcelle       = reussite (remplace le vert, trop connote concurrence)
+     IDENTITE English4us — direction « App moderne »
+     Bleu sobre = serieux, scolaire, credible aupres des etablissements.
+     Vert = reussite. Framboise = erreur et coeurs.
      Aucune couleur reprise d'un produit existant.
-     Toutes les paires texte/fond sont verifiees >= 4.5:1 (WCAG AA).
+
+     Contraste : trois valeurs de la maquette echouaient au seuil 4.5:1.
+     Elles sont dedoublees ici — une teinte decorative (fonds, pastilles,
+     bordures, puces) et une teinte porteuse de texte, plus foncee.
+     Ne jamais poser de texte sur les variables marquees « deco ».
      ============================================ */
 
-  /* --- Marque --- */
-  --indigo: #4338ca;
-  --indigo-dark: #3730a3;
-  --indigo-soft: #eef2ff;
-  --indigo-text: #3730a3;
+  /* --- Surfaces --- */
+  --bg: #f6f7f9;           /* fond d'ecran de l'app */
+  --surface: #ffffff;      /* cartes */
+  --surface-off: #f0f1f4;  /* carte inactive (lecon verrouillee) */
+
+  /* --- Encres --- */
+  --ink: #14161a;          /* titres            18.1:1 sur surface */
+  --ink-2: #3f444d;        /* corps de texte     9.8:1 sur surface */
+  --ink-3: #6b7280;        /* labels, meta       4.8:1 sur surface */
+  --ink-disabled: #676e7a; /* texte desactive    4.6:1 sur surface-off
+                              (maquette : #9aa1ad, 2.3:1 — refuse) */
+  --chevron: #b9bec8;      /* deco : chevrons et glyphes, jamais de texte */
+
+  /* --- Traits --- */
+  --border: #e7e9ee;
+  --separator: #f0f1f4;
+  --track: #e7e9ee;        /* piste de barre de progression */
+
+  /* --- Accent (bleu) --- */
+  --accent: #4a7fd0;         /* deco : bordures, pistes, pastilles */
+  --accent-solid: #4276c8;   /* porte du texte blanc  4.5:1 */
+  --accent-dark: #2f57a8;    /* texte sur blanc/tinte 6.9:1 */
+  --accent-tint: #e6ecf9;
+  --grad-accent: linear-gradient(160deg, #4276c8, #2f57a8);
+  --grad-hero: linear-gradient(155deg, #4276c8, #33529b);
+  --grad-hero-end: linear-gradient(160deg, #4276c8, #2b3f7a);
+  --grad-progress: linear-gradient(90deg, #4a7fd0, #7a9de0);
 
   /* --- Reussite --- */
-  --teal: #0f766e;
-  --teal-soft: #e6f5f3;
-  --teal-text: #0b5f58;
+  --success: #3f9d6b;       /* deco : puces, pastilles */
+  --success-solid: #347f57; /* porte du texte blanc  4.9:1 */
+  --success-tint: #e3f5ea;
+  --success-dark: #1f5b3f;  /* texte  8.0:1 sur blanc, 7.1:1 sur tinte */
 
-  /* --- Recompense / serie --- */
+  /* --- Erreur / coeurs --- */
+  --error: #d1435b;         /* deco : bordures, coeurs pleins */
+  --error-text: #c53d54;    /* texte  4.7:1 sur fond app */
+  --error-tint: #fdeaed;
+  --error-dark: #8e2233;    /* texte  8.7:1 sur blanc */
+
+  /* --- Couleur par niveau CECRL --- */
+  --lvl-A1: #2f57a8;
+  --lvl-A2: #1f5b3f;
+  --lvl-B1: #5b3fa8;
+  --lvl-B2: #7a3f9d;
+  --lvl-C1: #9d3f7a;
+  --lvl-C2: #8e2233;
+
+  /* --- Avatars du classement (rotation) --- */
+  --av-1: #4276c8;
+  --av-2: #347f57;
+  --av-3: #7355c0;
+  --av-4: #c53d54;
+
+  /* --- Compatibilite : anciens noms, le temps de la refonte ecran par ecran --- */
+  --text: var(--ink);
+  --text-muted: var(--ink-3);
+  --bg-soft: var(--bg);
+  --border-strong: var(--chevron);
+  --indigo: var(--accent-solid);
+  --indigo-dark: var(--accent-dark);
+  --indigo-soft: var(--accent-tint);
+  --indigo-text: var(--accent-dark);
+  --teal: var(--success-solid);
+  --teal-soft: var(--success-tint);
+  --teal-text: var(--success-dark);
   --amber: #b45309;
   --amber-soft: #fef3e2;
   --gold: #d97706;
-
-  /* --- Erreur / coeurs --- */
-  --rose: #be123c;
-  --rose-soft: #ffe9ee;
-
-  --violet: #6d28d9;
-
-  /* --- Couleur par niveau CECRL : progression du clair au profond --- */
-  --lvl-A1: #0f766e;
-  --lvl-A2: #0369a1;
-  --lvl-B1: #4338ca;
-  --lvl-B2: #6d28d9;
-  --lvl-C1: #a21caf;
-  --lvl-C2: #be123c;
-
-  /* --- Texte et surfaces --- */
-  --text: #1e1b36;
-  --text-muted: #5b5870;
-  --border: #e6e6f0;
-  --border-strong: #cdcddd;
-  --bg: #ffffff;
-  --bg-soft: #f6f6fb;
-
-  /* --- Compatibilite : anciens noms rediriges vers la nouvelle palette --- */
-  --green: var(--teal);
-  --green-dark: #0b5f58;
-  --green-soft: var(--teal-soft);
-  --green-text: var(--teal-text);
-  --blue: var(--indigo);
-  --blue-soft: var(--indigo-soft);
-  --red: var(--rose);
-  --red-soft: var(--rose-soft);
+  --rose: var(--error);
+  --rose-soft: var(--error-tint);
+  --violet: #5b3fa8;
+  --green: var(--success-solid);
+  --green-dark: var(--success-dark);
+  --green-soft: var(--success-tint);
+  --green-text: var(--success-dark);
+  --blue: var(--accent-solid);
+  --blue-soft: var(--accent-tint);
+  --red: var(--error);
+  --red-soft: var(--error-tint);
   --orange: var(--amber);
 
-  /* --- Espacement : multiples de 4 --- */
+  /* --- Espacement : gouttieres de la maquette --- */
   --sp-1: 4px;  --sp-2: 8px;  --sp-3: 12px; --sp-4: 16px;
   --sp-5: 24px; --sp-6: 32px; --sp-7: 48px; --sp-8: 64px;
 
-  /* --- Elevation : 3 niveaux, jamais d'ombre inventee au cas par cas --- */
-  --e1: 0 1px 2px rgba(30,27,54,.06);
-  --e2: 0 4px 12px rgba(30,27,54,.09);
-  --e3: 0 12px 28px rgba(30,27,54,.14);
+  /* --- Rayons --- */
+  --r-pill: 999px;
+  --r-sm: 12px;
+  --r-md: 16px;
+  --r-lg: 20px;
+  --r-xl: 22px;
+  --r-2xl: 24px;
+  --radius: var(--r-md);
+  --radius-lg: var(--r-lg);
 
-  --radius: 16px;
-  --radius-lg: 20px;
+  /* --- Elevation --- */
+  --e-rest: 0 1px 3px rgba(20,22,26,.08);      /* carte au repos */
+  --e-active: 0 8px 22px rgba(74,127,208,.22);  /* element en cours */
+  --e-primary: 0 10px 24px rgba(58,92,170,.34); /* bouton primaire */
+  --e-hero: 0 12px 28px rgba(58,92,170,.32);
+  --e-hero-lg: 0 18px 40px rgba(58,92,170,.30);
+  --e-success: 0 10px 22px rgba(63,157,107,.32);
+  --e1: var(--e-rest);
+  --e2: var(--e-active);
+  --e3: var(--e-hero);
 
-  --font-title: 'Nunito', system-ui, -apple-system, sans-serif;
-  --font: 'DM Sans', system-ui, -apple-system, sans-serif;
+  --font-title: 'Barlow Condensed', 'Barlow', system-ui, -apple-system, sans-serif;
+  --font: 'Barlow', system-ui, -apple-system, sans-serif;
 }
 
 * { box-sizing: border-box; }
@@ -82,9 +131,8 @@
 /* Accessibilité : un anneau de focus visible sur TOUT élément interactif.
    Sans lui, une personne qui navigue au clavier ne sait pas où elle est. */
 :where(a, button, input, select, textarea):focus-visible {
-  outline: 3px solid var(--blue);
+  outline: 2px solid var(--accent);
   outline-offset: 2px;
-  border-radius: 8px;
 }
 
 /* Coupe toutes les transitions/animations si le système le demande */
@@ -100,15 +148,17 @@
 body {
   margin: 0;
   font-family: var(--font);
-  font-weight: 500;
+  font-weight: 400;
   line-height: 1.55;
-  color: var(--text);
-  background: var(--bg-soft);
+  color: var(--ink);
+  background: var(--bg);
   -webkit-font-smoothing: antialiased;
 }
 
-h1, h2, h3 { font-family: var(--font-title); font-weight: 900; letter-spacing: -0.02em; line-height: 1.2; }
-h1 { font-size: 1.6rem; margin: 0 0 var(--sp-1); }
+/* Barlow Condensed n'est chargee qu'en 600 : pas de 900 ici, sinon le
+   navigateur fabrique un faux gras epais et deforme les titres. */
+h1, h2, h3 { font-family: var(--font-title); font-weight: 600; letter-spacing: 0; line-height: 1.12; }
+h1 { font-size: 30px; margin: 0 0 var(--sp-1); }
 
 /* ---------- Mises en page ---------- */
 
