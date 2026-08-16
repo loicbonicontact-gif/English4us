@@ -42,7 +42,8 @@ export default function ReviewEnd({ correctCount, total, xpEarned, remaining, on
         </p>
       ) : (
         <p className="review-end-note">
-          Plus rien à revoir aujourd'hui. Les prochains reviendront d'eux-mêmes.
+          Plus rien à revoir aujourd'hui. Les prochains reviendront d'eux-mêmes,
+          à intervalle de plus en plus long.
         </p>
       )}
 

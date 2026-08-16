@@ -144,8 +144,10 @@ export default function Review({ profile, onProfileChange }) {
         <Mascot mood="happy" size={96} />
         <h1 className="review-end-title">Rien à revoir</h1>
         <p className="review-end-sub">
-          Tes erreurs passées sont à jour. Fais une leçon : ce que tu rateras
-          reviendra ici demain, puis de plus en plus rarement.
+          Tout est à jour pour aujourd'hui. Chaque exercice que tu fais
+          revient ici plus tard : le lendemain s'il t'a résisté, une semaine
+          après s'il est passé du premier coup. C'est cet espacement qui fait
+          que ça reste.
         </p>
         <button type="button" className="btn-wide is-primary" onClick={() => navigate('/dashboard')}>
           Aller au parcours

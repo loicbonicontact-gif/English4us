@@ -24,6 +24,25 @@ export const BOX_INTERVALS = [1, 3, 7, 14, 30]
 // Palier atteint = acquis, l'exercice sort de la file.
 export const MASTERED_BOX = BOX_INTERVALS.length
 
+// Palier d'entrée d'un exercice RÉUSSI du premier coup.
+//
+// Pourquoi le faire entrer dans la file alors qu'il a été réussi : sans
+// cela, un exercice juste du premier coup ne revenait jamais. Or sur un
+// QCM à quatre choix, une bonne réponse sur quatre tombe juste par hasard —
+// le système déclarait « acquis » ce que l'apprenant ne savait pas.
+// Chaque contenu passait donc par UNE seule rencontre, quand il en faut
+// huit à douze pour qu'un mot soit vraiment retenu.
+//
+// Il entre au palier 2 (revu à J+7) et non au palier 0 (J+1) : ce qui est
+// su n'a pas besoin d'être revu dès demain, et la file resterait
+// impraticable si tout y entrait au premier palier.
+export const FIRST_BOX_WHEN_CORRECT = 2
+
+// Palier d'entrée dans la file, selon le résultat de la première rencontre.
+export function initialBox(right) {
+  return right ? FIRST_BOX_WHEN_CORRECT : 0
+}
+
 // XP gagnés par bonne réponse en révision. Volontairement faible face aux
 // 10-35 XP d'une leçon : réviser doit récompenser sans permettre de monter
 // de niveau en boucle sur les mêmes exercices.
@@ -62,10 +81,10 @@ export function boxLabel(box) {
 
 // Enregistre le résultat d'un exercice et met la file à jour.
 //
-// Règle : un exercice n'entre dans la file que lorsqu'il est raté. Une bonne
-// réponse en leçon sur un exercice jamais raté ne crée rien — sinon la file
-// contiendrait les 270 exercices dès le premier jour et deviendrait un
-// deuxième parcours, pas une révision.
+// Règle : TOUT exercice rencontré entre dans la file, réussi ou raté. Seul
+// le palier d'entrée diffère — raté, il revient demain ; réussi, dans une
+// semaine. C'est ce qui fait passer chaque contenu d'une rencontre unique à
+// cinq rencontres étalées sur environ deux mois.
 export async function recordAnswer(userId, exerciseId, right) {
   if (!userId || !exerciseId) return { status: 'none' }
 
@@ -78,20 +97,18 @@ export async function recordAnswer(userId, exerciseId, right) {
 
   if (error) throw error
 
-  // Réponse juste sur un exercice absent de la file : rien à faire.
-  if (right && !existing) return { status: 'none' }
-
-  // Première erreur : l'exercice entre dans la file, revu demain.
+  // Première rencontre : l'exercice entre dans la file.
   if (!existing) {
+    const box = initialBox(right)
     const { error: insertError } = await supabase.from('review_items').insert({
       user_id: userId,
       exercise_id: exerciseId,
-      box: 0,
-      due_date: dueDateForBox(0),
-      wrong_count: 1
+      box,
+      due_date: dueDateForBox(box),
+      wrong_count: right ? 0 : 1
     })
     if (insertError) throw insertError
-    return { status: 'added', box: 0 }
+    return { status: right ? 'scheduled' : 'added', box }
   }
 
   const box = nextBox(existing.box, right)

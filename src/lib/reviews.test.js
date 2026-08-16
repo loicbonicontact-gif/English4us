@@ -1,10 +1,12 @@
 import { describe, expect, it } from 'vitest'
 import {
   BOX_INTERVALS,
+  FIRST_BOX_WHEN_CORRECT,
   MASTERED_BOX,
   addDays,
   boxLabel,
   dueDateForBox,
+  initialBox,
   nextBox
 } from './reviews'
 
@@ -96,6 +98,34 @@ describe('parcours complet d\'un exercice raté', () => {
     box = nextBox(box, false)  // raté : retour au premier palier
     expect(box).toBe(0)
     expect(dueDateForBox(box, '2026-08-16')).toBe('2026-08-17')
+  })
+})
+
+// Un exercice réussi du premier coup entre AUSSI dans la file. Sans cela,
+// une bonne réponse tombée au hasard sur un QCM (une chance sur quatre)
+// était comptée comme acquise et n'était jamais revérifiée.
+describe('initialBox — entrée dans la file', () => {
+  it('fait entrer un exercice raté au premier palier', () => {
+    expect(initialBox(false)).toBe(0)
+    expect(dueDateForBox(initialBox(false), '2026-08-16')).toBe('2026-08-17')
+  })
+
+  it('fait entrer un exercice réussi plus loin, pas dès demain', () => {
+    expect(initialBox(true)).toBe(FIRST_BOX_WHEN_CORRECT)
+    expect(dueDateForBox(initialBox(true), '2026-08-16')).toBe('2026-08-23')
+  })
+
+  it('n\'entre jamais un exercice réussi au palier « acquis »', () => {
+    // Sinon il sortirait de la file aussitôt entré, et on n'aurait rien
+    // gagné : le contenu ne serait toujours vu qu'une fois.
+    expect(FIRST_BOX_WHEN_CORRECT).toBeLessThan(MASTERED_BOX)
+  })
+
+  it('laisse quatre rencontres à venir après une première réussite', () => {
+    let box = initialBox(true)
+    let rencontres = 0
+    while (box < MASTERED_BOX) { box = nextBox(box, true); rencontres += 1 }
+    expect(rencontres).toBe(3)
   })
 })
 
