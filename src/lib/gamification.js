@@ -80,27 +80,18 @@ export async function completeLesson(userId, lessonId, score, xpReward, profile)
   return { newXP, newLevel, newStreak }
 }
 
-// Gestion des coeurs (vie) : perdue en cas d'erreur.
+// Les coeurs ne sont plus enregistres en base.
 //
-// Le compteur de recharge ne demarre qu'a la PREMIERE perte, quand on
-// quitte le maximum. Le remettre a zero a chaque erreur repousserait
-// indefiniment le retour du coeur suivant : trois erreurs d'affilee
-// annuleraient les heures deja attendues.
-export async function loseHeart(userId, currentHearts) {
-  const newHearts = Math.max(0, currentHearts - 1)
-
-  const patch = { hearts: newHearts }
-  if (currentHearts >= MAX_HEARTS) patch.hearts_updated_at = new Date().toISOString()
-
-  await supabase.from('profiles').update(patch).eq('id', userId)
-  return newHearts
-}
-
-// Remise a plein immediate. Le champ de date repasse a null : plus rien
-// n'est en attente tant qu'un coeur n'a pas ete reperdu.
-export async function refillHearts(userId) {
-  await supabase
-    .from('profiles')
-    .update({ hearts: MAX_HEARTS, hearts_updated_at: null })
-    .eq('id', userId)
-}
+// Ils valaient autrefois pour tout le compte et se rechargeaient avec le
+// temps : arrive a zero, l'apprenant devait attendre. Une application
+// scolaire ne peut pas mettre un eleve en attente — il est maitre de sa
+// progression, et rien ne doit dependre de l'heure qu'il est.
+//
+// Ce sont desormais les vies de la lecon en cours, remises a
+// MAX_HEARTS au debut de chacune. Elles vivent dans Exercise.jsx, en
+// memoire, et disparaissent avec l'ecran.
+//
+// Les colonnes profiles.hearts et profiles.hearts_updated_at existent
+// toujours en base mais ne sont plus ni lues ni ecrites. Elles sont
+// laissees en place : les supprimer casserait les anciens deploiements
+// sans rien apporter.

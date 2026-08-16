@@ -177,7 +177,7 @@ export default function ExerciseView({
                 {isReview
                   ? ' Pas de cœur perdu : cet exercice te sera reproposé demain.'
                   : outOfHearts
-                    ? " Plus de cœurs. La leçon s'arrête ici, mais tu peux la refaire."
+                    ? ' Cinq erreurs : on reprend la leçon depuis le début, tout de suite.'
                     : ` Un cœur en moins, il t'en reste ${hearts}.`}
               </p>
             )}
@@ -195,7 +195,7 @@ export default function ExerciseView({
             onClick={onNext}
             autoFocus
           >
-            {outOfHearts ? 'Retour au parcours' : isLast ? 'Terminer' : 'Continuer'}
+            {outOfHearts ? 'Reprendre la leçon' : isLast ? 'Terminer' : 'Continuer'}
           </button>
         ) : (
           <button

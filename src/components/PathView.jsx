@@ -14,7 +14,7 @@ export const LEVEL_BLURB = {
 // Affichage pur du parcours : aucune requete, tout arrive en props.
 // Le chargement vit dans LessonPath.jsx — cette separation permet de
 // verifier l'ecran avec des donnees de test (voir dev/preview.jsx).
-export default function PathView({ path, hearts = 0, nextHeartIn = null, onOpen, onOpenListening = () => {} }) {
+export default function PathView({ path, onOpen, onOpenListening = () => {} }) {
   const done = path.decorated.filter((l) => l.completed).length
   const total = path.decorated.length
   const percent = total > 0 ? Math.round((done / total) * 100) : 0
@@ -150,21 +150,12 @@ export default function PathView({ path, hearts = 0, nextHeartIn = null, onOpen,
 
         <section className="hearts-card">
           <p className="hearts-card-title">Cœurs</p>
-          <p className="hearts-card-value">{hearts} restants</p>
+          <p className="hearts-card-value">5 par leçon</p>
           <p className="hearts-card-hint">
-            {hearts === 0
-              ? 'Plus de cœur pour les leçons. Les révisions et les écoutes restent ouvertes : elles n\'en coûtent aucun.'
-              : 'Chaque erreur coûte un cœur. Refais une leçon terminée pour t\'entraîner sans risque.'}
+            Chaque leçon commence avec cinq cœurs. Cinq erreurs et elle
+            repart du début, immédiatement — il n'y a jamais rien à
+            attendre. Les révisions et les écoutes n'en coûtent aucun.
           </p>
-
-          {/* Sans ce compte a rebours, l'apprenant arrive a zero et croit
-              l'application cassee : rien ne lui dit que les coeurs
-              reviennent, ni quand. */}
-          {nextHeartIn && (
-            <p className="hearts-card-timer">
-              Prochain cœur dans <b>{nextHeartIn}</b>
-            </p>
-          )}
         </section>
       </aside>
     </div>

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { computeStreak, levelFromXP, levelProgress } from './gamification'
+import { MAX_HEARTS, computeStreak, levelFromXP, levelProgress } from './gamification'
 import { addDays, todayISO } from './dates'
 
 // La série quotidienne se casse silencieusement : personne ne s'en aperçoit
@@ -60,5 +60,20 @@ describe('levelProgress', () => {
     expect(p.current).toBe('C2')
     expect(p.next).toBeNull()
     expect(p.percent).toBe(100)
+  })
+})
+
+// Les cœurs sont désormais les vies de la leçon en cours. Rien ne les
+// enregistre en base, rien ne dépend de l'heure. Ce qui compte, c'est
+// qu'aucun état ne puisse laisser l'apprenant bloqué.
+describe('cœurs — vies de la leçon', () => {
+  it('la gamification n\'expose plus aucune fonction de cœurs', async () => {
+    const module = await import('./gamification')
+    expect(module.loseHeart).toBeUndefined()
+    expect(module.refillHearts).toBeUndefined()
+  })
+
+  it('garde une réserve de cinq vies par leçon', () => {
+    expect(MAX_HEARTS).toBe(5)
   })
 })

@@ -84,7 +84,7 @@ function Preview() {
 
       {screen === 'parcours' && (
         <AppShell profile={demoProfile}>
-          <PathView path={demoPath} hearts={demoProfile.hearts} onOpen={() => {}} />
+          <PathView path={demoPath} onOpen={() => {}} onOpenListening={() => {}} />
         </AppShell>
       )}
 

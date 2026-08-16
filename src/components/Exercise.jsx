@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { supabase } from '../supabaseClient'
-import { completeLesson, loseHeart, MAX_HEARTS } from '../lib/gamification'
+import { completeLesson, MAX_HEARTS } from '../lib/gamification'
 import { isCorrect } from '../lib/answers'
 import { recordAnswer } from '../lib/reviews'
 import { speak, stopSpeaking } from '../lib/speech'
@@ -24,7 +24,10 @@ export default function Exercise({ profile, onProfileChange }) {
   const [answer, setAnswer] = useState('')
   const [verdict, setVerdict] = useState(null)   // null | 'right' | 'wrong'
   const [shake, setShake] = useState(false)
-  const [hearts, setHearts] = useState(profile?.hearts ?? MAX_HEARTS)
+  // Vies de CETTE lecon, remises a plein a chaque debut. Elles ne sont ni
+  // lues ni enregistrees en base : rien ne doit survivre a l'ecran, sinon
+  // l'apprenant se retrouverait bloque en arrivant.
+  const [hearts, setHearts] = useState(MAX_HEARTS)
   const [breakingIndex, setBreakingIndex] = useState(null)
   const [correctCount, setCorrectCount] = useState(0)
   const [results, setResults] = useState([])     // une entree par question, pour « A revoir »
@@ -120,14 +123,13 @@ export default function Exercise({ profile, onProfileChange }) {
     setHearts(remaining)
     setTimeout(() => setBreakingIndex(null), 700)
 
-    if (profile) {
-      try { await loseHeart(profile.id, hearts) } catch { /* la partie continue même hors ligne */ }
-    }
   }
 
   async function handleNext() {
-    // Plus de cœurs : la leçon s'arrête
-    if (hearts === 0) { navigate('/dashboard'); return }
+    // Cinq erreurs : la lecon recommence TOUT DE SUITE, au meme endroit.
+    // Aucune attente, aucun retour force au parcours : l'apprenant decide
+    // quand il arrete, jamais l'application.
+    if (hearts === 0) { handleRetry(); return }
 
     if (!isLast) {
       setIndex((i) => i + 1)
@@ -151,8 +153,11 @@ export default function Exercise({ profile, onProfileChange }) {
     }
   }
 
-  // Reprend la leçon depuis le début : la seule façon de revoir les mots
-  // ratés tant qu'il n'existe pas de mode révision dédié.
+  // Reprend la leçon depuis le début, cœurs remis à plein.
+  //
+  // C'est aussi ce qui se passe après cinq erreurs : la leçon repart,
+  // immédiatement. Sans la remise à plein, on repartirait à zéro cœur et la
+  // première erreur relancerait tout — une boucle sans issue.
   function handleRetry() {
     setIndex(0)
     setAnswer('')
@@ -161,6 +166,8 @@ export default function Exercise({ profile, onProfileChange }) {
     setResults([])
     setFinished(false)
     setReward(null)
+    setHearts(MAX_HEARTS)
+    setBreakingIndex(null)
   }
 
   if (loading) {

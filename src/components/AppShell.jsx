@@ -1,17 +1,20 @@
 import { NavLink } from 'react-router-dom'
-import { IconHeart, IconPath, IconReview, IconTrophy, IconUser } from './Icons'
+import { IconPath, IconReview, IconTrophy, IconUser } from './Icons'
 
 // Coque de l'application : en-tete de marque en haut, barre d'onglets en bas.
 //
 // Sur telephone, l'ancienne barre affichait quatre pastilles (niveau, serie,
-// XP, coeurs) : trop d'information pour une largeur de 390 px. Il n'en reste
-// que deux — XP et coeurs, les seules qui changent pendant une lecon. Le
-// niveau et la serie ont rejoint l'ecran de profil et la carte de progression.
+// XP, coeurs) : trop d'information pour une largeur de 390 px. Il ne reste
+// que l'XP, la seule valeur du compte qui change pendant une lecon.
+//
+// Les coeurs ont disparu d'ici : ils appartiennent desormais a la lecon en
+// cours, pas au compte. Les afficher en permanence laisserait croire qu'on
+// peut en manquer avant meme d'avoir commence. Ils restent visibles dans
+// l'ecran d'exercice, la ou ils ont un sens.
 //
 // L'onglet actif se deduit de la route : aucun etat a maintenir ici.
 export default function AppShell({ profile, dueCount = 0, children }) {
   const xp = profile?.xp ?? 0
-  const hearts = profile?.hearts ?? 0
 
   return (
     <div className="app-shell">
@@ -61,11 +64,6 @@ export default function AppShell({ profile, dueCount = 0, children }) {
               <span className="stat-pill-value">{xp}</span>
               <span className="stat-pill-unit">XP</span>
               <span className="sr-only">points d'expérience</span>
-            </span>
-            <span className="stat-pill stat-pill-hearts">
-              <IconHeart size={15} fill="currentColor" strokeWidth={0} />
-              <span className="stat-pill-value">{hearts}</span>
-              <span className="sr-only">cœurs restants</span>
             </span>
           </div>
         </div>
