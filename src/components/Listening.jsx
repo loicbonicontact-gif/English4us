@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { completeListening, fetchPassage } from '../lib/listening'
 import { recordAnswer } from '../lib/reviews'
 import { stopSpeaking } from '../lib/speech'
+import { isMissingTable, missingTableMessage } from '../lib/dbErrors'
 import { soundComplete, soundCorrect, soundTap, soundWrong } from '../lib/sounds'
 import Mascot from './Mascot'
 import ListeningView from './ListeningView'
@@ -43,8 +44,8 @@ export default function Listening({ profile, onProfileChange }) {
       })
       .catch((err) => {
         if (!active) return
-        setError(err.code === '42P01'
-          ? "Le module d'écoute n'existe pas encore en base. Lance supabase/migration-listening.sql puis supabase/seed-listening.sql."
+        setError(isMissingTable(err)
+          ? missingTableMessage('migration-listening.sql puis seed-listening.sql')
           : err.message)
       })
       .finally(() => { if (active) setLoading(false) })

@@ -9,6 +9,7 @@ import {
 import { isCorrect } from '../lib/answers'
 import { speak, stopSpeaking } from '../lib/speech'
 import { usableReviewRows } from '../lib/exercises'
+import { isMissingTable, missingTableMessage } from '../lib/dbErrors'
 import { soundComplete, soundCorrect, soundTap, soundWrong } from '../lib/sounds'
 import Mascot from './Mascot'
 import ExerciseView from './ExerciseView'
@@ -49,10 +50,10 @@ export default function Review({ profile, onProfileChange }) {
       setCorrectCount(0)
       setFinished(false)
     } catch (err) {
-      // 42P01 = la table n'existe pas : la migration n'a pas encore été
-      // lancée. Message explicite plutôt qu'une erreur Postgres brute.
-      setError(err.code === '42P01'
-        ? "La file de révision n'existe pas encore en base. Lance supabase/migration-review-queue.sql dans l'éditeur SQL Supabase."
+      // Table absente = migration pas encore lancée. Message qui dit quoi
+      // faire, plutôt qu'une erreur Postgres brute.
+      setError(isMissingTable(err)
+        ? missingTableMessage('migration-review-queue.sql')
         : err.message)
     } finally {
       setLoading(false)
