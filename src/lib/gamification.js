@@ -1,20 +1,19 @@
 import { supabase } from '../supabaseClient'
+import { addDays, todayISO } from './dates'
 
 // Nombre de cœurs maximum. Centralisé ici pour éviter les valeurs
 // codées en dur qui finiraient par diverger entre composants.
 export const MAX_HEARTS = 5
 
-// Met à jour le streak selon la date de dernière activité
+// Met à jour le streak selon la date de dernière activité.
+// Les dates viennent de dates.js : calculées en UTC, elles décalaient la
+// journée d'un cran pour tout apprenant hors du fuseau de Greenwich.
 export function computeStreak(lastActivityDate, currentStreak) {
-  const today = new Date().toISOString().split('T')[0]
+  const today = todayISO()
   const last = lastActivityDate
   if (last === today) return currentStreak // déjà compté aujourd'hui
 
-  const yesterday = new Date()
-  yesterday.setDate(yesterday.getDate() - 1)
-  const yStr = yesterday.toISOString().split('T')[0]
-
-  if (last === yStr) return currentStreak + 1 // continuité
+  if (last === addDays(today, -1)) return currentStreak + 1 // continuité
   return 1 // streak cassé, on repart à 1
 }
 
@@ -70,7 +69,7 @@ export async function completeLesson(userId, lessonId, score, xpReward, profile)
     xp: newXP,
     level: newLevel,
     streak_count: newStreak,
-    last_activity_date: new Date().toISOString().split('T')[0]
+    last_activity_date: todayISO()
   }).eq('id', userId)
 
   await supabase.from('streak_log').insert({

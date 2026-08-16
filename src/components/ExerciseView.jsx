@@ -29,10 +29,15 @@ export default function ExerciseView({
   onNext,
   onQuit,
   onSpeak,
-  isLast
+  isLast,
+  mode = 'lesson'
 }) {
   const progress = ((index + (verdict ? 1 : 0)) / total) * 100
-  const outOfHearts = hearts === 0
+  // En révision, aucun cœur n'est perdu : on revient justement sur ce qu'on
+  // avait raté, punir une deuxième fois découragerait la seule activité qui
+  // répare l'oubli.
+  const isReview = mode === 'review'
+  const outOfHearts = !isReview && hearts === 0
   // La phrase a lire est en anglais : c'est la reponse attendue pour une
   // traduction, la question elle-meme sinon.
   const spoken = exercise.type === 'traduction' ? exercise.correct_answer : exercise.question
@@ -40,7 +45,12 @@ export default function ExerciseView({
   return (
     <div className="lesson-screen">
       <header className="lesson-top">
-        <button type="button" className="lesson-close" onClick={onQuit} aria-label="Quitter la leçon">
+        <button
+          type="button"
+          className="lesson-close"
+          onClick={onQuit}
+          aria-label={isReview ? 'Quitter la révision' : 'Quitter la leçon'}
+        >
           <IconClose size={18} strokeWidth={2.25} />
         </button>
 
@@ -55,7 +65,12 @@ export default function ExerciseView({
           <span className="lesson-progress-fill" style={{ width: `${progress}%` }} />
         </div>
 
-        {/* Telephone : un compteur chiffre. Grand ecran : les cinq coeurs. */}
+        {/* Telephone : un compteur chiffre. Grand ecran : les cinq coeurs.
+            En revision, ni l'un ni l'autre : il n'y a rien a perdre. */}
+        {isReview ? (
+          <span className="lesson-mode-tag">Révision</span>
+        ) : (
+        <>
         <span className="lesson-hearts-count">
           <svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true">
             <path fill="currentColor" d="M12 21s-7.5-4.7-9.4-9.2C1 8.4 3 5 6.4 5c2.2 0 3.9 1.3 5.6 3.4C13.7 6.3 15.4 5 17.6 5 21 5 23 8.4 21.4 11.8 19.5 16.3 12 21 12 21z" />
@@ -66,6 +81,8 @@ export default function ExerciseView({
         <span className="lesson-hearts-full">
           <Hearts hearts={hearts} breakingIndex={breakingIndex} />
         </span>
+        </>
+        )}
       </header>
 
       {/* --- Bulle de question --- */}
@@ -129,9 +146,11 @@ export default function ExerciseView({
             {verdict === 'wrong' && (
               <p className="verdict-answer">
                 C'était <b>{exercise.correct_answer}</b>.
-                {outOfHearts
-                  ? " Plus de cœurs. La leçon s'arrête ici, mais tu peux la refaire."
-                  : ` Un cœur en moins, il t'en reste ${hearts}.`}
+                {isReview
+                  ? ' Pas de cœur perdu : cet exercice te sera reproposé demain.'
+                  : outOfHearts
+                    ? " Plus de cœurs. La leçon s'arrête ici, mais tu peux la refaire."
+                    : ` Un cœur en moins, il t'en reste ${hearts}.`}
               </p>
             )}
             {exercise.explanation && <p className="verdict-why">{exercise.explanation}</p>}

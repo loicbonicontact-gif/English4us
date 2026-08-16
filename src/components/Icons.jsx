@@ -14,6 +14,7 @@ import {
   Flame,
   Heart,
   GraduationCap,
+  History,
   Lock,
   LogOut,
   Play,
@@ -42,6 +43,7 @@ export const IconRedo = wrap(RotateCw)
 export const IconFlame = wrap(Flame)
 export const IconHeart = wrap(Heart)
 export const IconCap = wrap(GraduationCap)
+export const IconReview = wrap(History)
 export const IconLock = wrap(Lock)
 export const IconLogout = wrap(LogOut)
 export const IconPlay = wrap(Play)

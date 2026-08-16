@@ -2,18 +2,21 @@ import { useCallback, useEffect, useState } from 'react'
 import { Navigate, Route, Routes } from 'react-router-dom'
 import { supabase } from './supabaseClient'
 import { ensureProfile, fetchProfile } from './lib/profile'
+import { countDueReviews } from './lib/reviews'
 import Auth from './components/Auth'
 import AppShell from './components/AppShell'
 import LessonPath from './components/LessonPath'
 import Exercise from './components/Exercise'
 import Profile from './components/Profile'
 import Leaderboard from './components/Leaderboard'
+import Review from './components/Review'
 
 export default function App() {
   const [session, setSession] = useState(null)
   const [profile, setProfile] = useState(null)
   const [booting, setBooting] = useState(true)
   const [profileError, setProfileError] = useState(null)
+  const [dueCount, setDueCount] = useState(0)
 
   // Récupère la session au démarrage puis écoute les changements (login/logout).
   useEffect(() => {
@@ -75,6 +78,22 @@ export default function App() {
   const refreshProfile = useCallback(async () => {
     if (!session?.user) return
     try { setProfile(await fetchProfile(session.user.id)) } catch { /* silencieux */ }
+    // Une leçon ou une révision terminée change la file : le compteur de
+    // l'onglet doit suivre, sinon la pastille ment jusqu'au rechargement.
+    try { setDueCount(await countDueReviews(session.user.id)) } catch { /* silencieux */ }
+  }, [session?.user?.id])
+
+  // Compte des révisions dues au démarrage.
+  useEffect(() => {
+    const userId = session?.user?.id
+    if (!userId) { setDueCount(0); return }
+
+    let active = true
+    countDueReviews(userId)
+      .then((count) => { if (active) setDueCount(count) })
+      .catch(() => { /* la table peut ne pas encore exister : pas de pastille */ })
+
+    return () => { active = false }
   }, [session?.user?.id])
 
   async function handleSignOut() {
@@ -90,7 +109,7 @@ export default function App() {
   }
 
   return (
-    <AppShell profile={profile}>
+    <AppShell profile={profile} dueCount={dueCount}>
       {profileError && (
         <p className="alert alert-error" role="alert">Profil indisponible : {profileError}</p>
       )}
@@ -106,6 +125,10 @@ export default function App() {
           <Route
             path="/lesson/:id"
             element={<Exercise profile={profile} onProfileChange={refreshProfile} />}
+          />
+          <Route
+            path="/reviews"
+            element={<Review profile={profile} onProfileChange={refreshProfile} />}
           />
           <Route path="/leaderboard" element={<Leaderboard profile={profile} />} />
           <Route path="/profile" element={<Profile profile={profile} onSignOut={handleSignOut} />} />

@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom'
-import { IconHeart, IconPath, IconTrophy, IconUser } from './Icons'
+import { IconHeart, IconPath, IconReview, IconTrophy, IconUser } from './Icons'
 
 // Coque de l'application : en-tete de marque en haut, barre d'onglets en bas.
 //
@@ -9,7 +9,7 @@ import { IconHeart, IconPath, IconTrophy, IconUser } from './Icons'
 // niveau et la serie ont rejoint l'ecran de profil et la carte de progression.
 //
 // L'onglet actif se deduit de la route : aucun etat a maintenir ici.
-export default function AppShell({ profile, children }) {
+export default function AppShell({ profile, dueCount = 0, children }) {
   const xp = profile?.xp ?? 0
   const hearts = profile?.hearts ?? 0
 
@@ -29,6 +29,22 @@ export default function AppShell({ profile, children }) {
             <NavLink to="/dashboard" className="tab">
               <IconPath size={20} />
               <span className="tab-label">Parcours</span>
+            </NavLink>
+            <NavLink to="/reviews" className="tab">
+              <span className="tab-icon">
+                <IconReview size={20} />
+                {/* Pastille de rappel : le seul endroit ou l'app reclame
+                    quelque chose. Elle disparait des que la file est vide. */}
+                {dueCount > 0 && (
+                  <span className="tab-badge" aria-hidden="true">
+                    {dueCount > 99 ? '99+' : dueCount}
+                  </span>
+                )}
+              </span>
+              <span className="tab-label">Révisions</span>
+              {dueCount > 0 && (
+                <span className="sr-only">{dueCount} exercices à revoir</span>
+              )}
             </NavLink>
             <NavLink to="/leaderboard" className="tab">
               <IconTrophy size={20} />

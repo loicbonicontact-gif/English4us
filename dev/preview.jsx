@@ -15,6 +15,8 @@ import ExerciseView from '../src/components/ExerciseView'
 import LessonEnd from '../src/components/LessonEnd'
 import ProfileView from '../src/components/ProfileView'
 import LeaderboardView from '../src/components/LeaderboardView'
+import ReviewEnd from '../src/components/ReviewEnd'
+import Mascot from '../src/components/Mascot'
 import { demoBoard, demoExercise, demoLesson, demoPath, demoProfile, demoResults } from './fixtures'
 
 const SCREENS = [
@@ -25,7 +27,10 @@ const SCREENS = [
   { key: 'vide', label: '03 Sans cœur' },
   { key: 'fin', label: '04 Fin' },
   { key: 'classement', label: '05 Classement' },
-  { key: 'profil', label: '06 Profil' }
+  { key: 'profil', label: '06 Profil' },
+  { key: 'revision', label: '07 Révision' },
+  { key: 'revision-fin', label: '07 Fin révision' },
+  { key: 'revision-vide', label: '07 Rien à revoir' }
 ]
 
 function Preview() {
@@ -79,6 +84,39 @@ function Preview() {
       )}
 
       {['question', 'juste', 'faux', 'vide'].includes(screen) && <ExerciseView {...exerciseProps} />}
+
+      {/* Revision : meme ecran d'exercice, mode « review » — ni coeurs, ni
+          menace de fin de lecon. */}
+      {screen === 'revision' && (
+        <ExerciseView {...exerciseProps} mode="review" verdict="wrong" answer={demoExercise.options[0]} />
+      )}
+
+      {screen === 'revision-fin' && (
+        <AppShell profile={demoProfile} dueCount={4}>
+          <ReviewEnd
+            correctCount={6}
+            total={8}
+            xpEarned={12}
+            remaining={4}
+            onBack={() => {}}
+            onAgain={() => {}}
+          />
+        </AppShell>
+      )}
+
+      {screen === 'revision-vide' && (
+        <AppShell profile={demoProfile} dueCount={0}>
+          <div className="review-empty">
+            <Mascot mood="happy" size={96} />
+            <h1 className="review-end-title">Rien à revoir</h1>
+            <p className="review-end-sub">
+              Tes erreurs passées sont à jour. Fais une leçon : ce que tu rateras
+              reviendra ici demain, puis de plus en plus rarement.
+            </p>
+            <button type="button" className="btn-wide is-primary">Aller au parcours</button>
+          </div>
+        </AppShell>
+      )}
 
       {screen === 'classement' && (
         <AppShell profile={demoProfile}>

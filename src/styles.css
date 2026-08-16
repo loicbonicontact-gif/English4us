@@ -542,7 +542,7 @@ html, body { max-width: 100%; overflow-x: hidden; }
 /* --- Barre d'onglets : detachee en bas de l'ecran sur telephone --- */
 .tabbar {
   position: fixed; bottom: 0; left: 0; right: 0; z-index: 40;
-  display: grid; grid-template-columns: repeat(3, 1fr);
+  display: grid; grid-template-columns: repeat(4, 1fr);
   padding: 8px 8px max(16px, env(safe-area-inset-bottom));
   background: rgba(255,255,255,.86);
   backdrop-filter: blur(14px);
@@ -565,6 +565,31 @@ html, body { max-width: 100%; overflow-x: hidden; }
 .tab.active .tab-label { font-weight: 700; }
 /* Onglet actif : icone pleine, pas seulement une couleur differente */
 .tab.active svg { fill: currentColor; fill-opacity: .18; }
+
+/* --- Pastille de rappel sur l'onglet Revisions --- */
+/* L'icone est enrobee pour que la pastille se positionne sur elle et non
+   sur la cellule entiere : sinon elle flotte au-dessus du libelle. */
+.tab-icon { position: relative; display: inline-grid; place-items: center; }
+
+.tab-badge {
+  position: absolute; top: -5px; left: 11px;
+  min-width: 17px; height: 17px; padding: 0 4px;
+  display: grid; place-items: center;
+  border-radius: 999px;
+  /* --error (#d1435b) donne exactement 4.50:1 avec du blanc : au seuil, sans
+     marge, pour un texte de 10,5 px. La teinte plus foncee monte a 5.0:1. */
+  background: var(--error-text);
+  color: #fff;                    /* 5.0:1 sur --error-text */
+  font-size: 10.5px; font-weight: 700; line-height: 1;
+  font-variant-numeric: tabular-nums;
+  box-shadow: 0 0 0 2px var(--surface);
+}
+
+/* Sur telephone, la barre est translucide : le halo blanc de la pastille
+   doit reprendre ce fond-la, pas le blanc plein des cartes. */
+@media (max-width: 767px) {
+  .tab-badge { box-shadow: 0 0 0 2px #fbfbfc; }
+}
 
 /* ============================================
    01 · PARCOURS
@@ -800,7 +825,7 @@ html, body { max-width: 100%; overflow-x: hidden; }
   /* La barre d'onglets rejoint l'en-tete : plus rien ne flotte en bas */
   .tabbar {
     position: static;
-    grid-template-columns: repeat(3, max-content);
+    grid-template-columns: repeat(4, max-content);
     gap: 4px;
     margin-left: var(--sp-5);
     border-top: none; background: none; backdrop-filter: none;
@@ -905,6 +930,17 @@ html, body { max-width: 100%; overflow-x: hidden; }
 /* Les cinq coeurs ne tiennent pas a 375 px : ils n'apparaissent qu'a partir
    de la tablette, ou l'animation de coeur brise redevient lisible. */
 .lesson-hearts-full { display: none; }
+
+/* En revision, l'emplacement des coeurs porte l'etiquette du mode : sans
+   elle, rien ne distinguerait une revision d'une lecon a l'ecran. */
+.lesson-mode-tag {
+  padding: 5px 10px;
+  border-radius: var(--r-pill);
+  background: var(--accent-tint);
+  color: var(--accent-dark);       /* 6.9:1 sur la teinte */
+  font-size: 12px; font-weight: 700;
+  white-space: nowrap;
+}
 
 /* --- Bulle de question --- */
 .question-row { display: flex; align-items: flex-start; gap: 12px; }
@@ -1375,6 +1411,66 @@ html, body { max-width: 100%; overflow-x: hidden; }
 .board-you { color: var(--accent-dark); font-weight: 600; }
 
 .board-note { margin: 0; font-size: 13.5px; color: var(--ink-3); text-align: center; }
+
+/* ============================================
+   07 · REVISION ESPACEE
+   Fin de session et file vide. L'exercice lui-meme reutilise les styles
+   de la lecon (section 02) : c'est le meme geste, seul le cadre change.
+   ============================================ */
+.review-empty,
+.review-end {
+  display: flex; flex-direction: column; align-items: center; text-align: center;
+  gap: 14px;
+  padding: var(--sp-6) var(--sp-4);
+}
+
+.review-end-title {
+  margin: 0;
+  font-family: var(--font-title);
+  font-size: 30px; font-weight: 600; line-height: 1.1;
+  color: var(--ink);
+}
+
+.review-end-sub {
+  margin: 0; max-width: 34ch;
+  font-size: 15px; color: var(--ink-2);
+}
+
+.review-tiles {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 10px; width: 100%; max-width: 420px;
+  margin-top: var(--sp-2);
+}
+
+.review-tile {
+  display: grid; justify-items: center; gap: 4px;
+  padding: 14px 8px;
+  border: 1px solid var(--border); border-radius: var(--r-lg);
+  background: var(--surface);
+  color: var(--accent-dark);
+}
+
+.review-tile-value {
+  font-family: var(--font-title);
+  font-size: 24px; font-weight: 600; line-height: 1;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.review-tile-label { font-size: 12px; color: var(--ink-3); }
+
+.review-end-note {
+  margin: 0; max-width: 36ch;
+  font-size: 13.5px; color: var(--ink-3);
+}
+
+.review-end-actions {
+  display: grid; gap: 10px;
+  width: 100%; max-width: 420px;
+  margin-top: var(--sp-2);
+}
+
+.review-empty .btn-wide { max-width: 420px; margin-top: var(--sp-2); }
 
 /* ============================================
    BARRE DE PREVISUALISATION (developpement seulement)

@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { supabase } from '../supabaseClient'
 import { completeLesson, loseHeart, MAX_HEARTS } from '../lib/gamification'
 import { isCorrect } from '../lib/answers'
+import { recordAnswer } from '../lib/reviews'
 import { speak } from '../lib/speech'
 import Mascot from './Mascot'
 import ExerciseView from './ExerciseView'
@@ -88,6 +89,12 @@ export default function Exercise({ profile, onProfileChange }) {
       answer: current.correct_answer,
       right
     }])
+
+    // Alimente la file de révision : un exercice raté y entre et reviendra
+    // demain. En arrière-plan — un échec réseau ne doit pas bloquer la leçon.
+    if (profile) {
+      recordAnswer(profile.id, current.id, right).catch(() => { /* silencieux */ })
+    }
 
     if (right) {
       soundCorrect()
