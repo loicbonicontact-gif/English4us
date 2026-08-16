@@ -2,7 +2,42 @@
 
 Dernière mise à jour : 16 août 2026
 
-## Fait dans cette session (2/2) — écoute et compréhension orale
+## Fait dans cette session (3/3) — expression orale
+
+Nouveau type d'exercice `oral` : la phrase anglaise est affichée ET lue
+automatiquement, l'apprenant appuie sur le micro et la répète. 60 exercices,
+2 par leçon (`supabase/seed-speaking.sql`), chacun visant une difficulté de
+prononciation propre aux francophones (le « th », le « -ed », l'accent
+mobile DE-sert / de-SER-ted).
+
+Le retour n'est pas une note seule : la phrase s'affiche **mot par mot**,
+les mots reconnus en vert, les manqués soulignés en rouge, avec ce que la
+machine a réellement entendu.
+
+### Ce que cette évaluation vaut, et ce qu'elle ne vaut pas
+
+`SpeechRecognition` **transcrit**, il n'évalue pas la prononciation. On ne
+saura jamais d'ici qu'un « th » a été prononcé « s ». Ce qui est mesuré est
+l'**intelligibilité** : si une machine entraînée sur de l'anglais natif ne
+reconnaît pas la phrase, un anglophone aura probablement du mal aussi.
+
+Une vraie note phonème par phonème demanderait Azure Pronunciation
+Assessment (payant). Le jour venu, elle remplacera `scoreSpeech()` sans
+toucher aux exercices.
+
+### Deux limites à annoncer aux écoles
+- **Firefox n'a pas de reconnaissance vocale.** Les exercices oraux y sont
+  automatiquement retirés plutôt qu'affichés et inutilisables.
+- **Sur Chrome, l'audio part chez Google** pour être transcrit. À signaler
+  dans tout dossier RGPD.
+
+### Cœurs redéfinis
+Ils ne valent plus pour le compte et ne se rechargent plus avec le temps :
+ce sont les **vies de la leçon en cours**, remises à cinq au début de
+chacune. Cinq erreurs et la leçon repart du début, immédiatement. Plus
+aucune attente : l'apprenant est maître de sa progression.
+
+## Fait dans cette session (2/3) — écoute et compréhension orale
 
 ### Dictée audio
 Nouveau type d'exercice `ecoute` : la phrase anglaise n'existe que sous
@@ -51,7 +86,7 @@ dans le quota gratuit mensuel de Google Cloud (1 M) ou d'Azure (500 k).
 Le frein n'est pas l'argent mais l'ouverture d'un compte avec carte
 bancaire — non fait, en attente de décision.
 
-## Fait dans cette session (1/2) — révision espacée
+## Fait dans cette session (1/3) — révision espacée
 
 La plus grosse lacune pédagogique de l'app est comblée : une leçon terminée
 n'était plus jamais revue, donc ce qui était appris s'oubliait.

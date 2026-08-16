@@ -18,7 +18,7 @@ import LeaderboardView from '../src/components/LeaderboardView'
 import ReviewEnd from '../src/components/ReviewEnd'
 import ListeningView from '../src/components/ListeningView'
 import Mascot from '../src/components/Mascot'
-import { demoBoard, demoDictation, demoExercise, demoLesson, demoListeningQuestions, demoPassage, demoPath, demoProfile, demoResults } from './fixtures'
+import { demoBoard, demoDictation, demoExercise, demoLesson, demoListeningQuestions, demoPassage, demoSpeaking, demoPath, demoProfile, demoResults } from './fixtures'
 
 const SCREENS = [
   { key: 'parcours', label: '01 Parcours' },
@@ -33,6 +33,8 @@ const SCREENS = [
   { key: 'revision-fin', label: '07 Fin révision' },
   { key: 'revision-vide', label: '07 Rien à revoir' },
   { key: 'dictee', label: '08 Dictée' },
+  { key: 'oral', label: '10 Oral' },
+  { key: 'oral-verdict', label: '10 Oral verdict' },
   { key: 'ecoute-intro', label: '09 Écoute intro' },
   { key: 'ecoute-question', label: '09 Écoute question' },
   { key: 'ecoute-verdict', label: '09 Écoute verdict' }
@@ -98,6 +100,34 @@ function Preview() {
 
       {screen === 'dictee' && (
         <ExerciseView {...exerciseProps} exercise={demoDictation} answer={answer} verdict={null} />
+      )}
+
+      {screen === 'oral' && (
+        <ExerciseView {...exerciseProps} exercise={demoSpeaking} verdict={null} onSpeechResult={() => {}} />
+      )}
+
+      {screen === 'oral-verdict' && (
+        <ExerciseView
+          {...exerciseProps}
+          exercise={demoSpeaking}
+          verdict="wrong"
+          onSpeechResult={() => {}}
+          speech={{
+            result: {
+              score: 67,
+              passed: false,
+              said: 'this is my mother and my fatter',
+              heard: true,
+              words: [
+                { word: 'this', ok: true }, { word: 'is', ok: true },
+                { word: 'my', ok: true }, { word: 'mother', ok: true },
+                { word: 'and', ok: true }, { word: 'my', ok: true },
+                { word: 'father', ok: false }
+              ]
+            },
+            feedback: 'Compris, à un mot près. Réécoute le modèle et refais la phrase entière.'
+          }}
+        />
       )}
 
       {['ecoute-intro', 'ecoute-question', 'ecoute-verdict'].includes(screen) && (

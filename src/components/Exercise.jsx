@@ -29,6 +29,7 @@ export default function Exercise({ profile, onProfileChange }) {
   // l'apprenant se retrouverait bloque en arrivant.
   const [hearts, setHearts] = useState(MAX_HEARTS)
   const [breakingIndex, setBreakingIndex] = useState(null)
+  const [speech, setSpeech] = useState(null)   // resultat du dernier essai oral
   const [correctCount, setCorrectCount] = useState(0)
   const [results, setResults] = useState([])     // une entree par question, pour « A revoir »
   const [finished, setFinished] = useState(false)
@@ -85,23 +86,26 @@ export default function Exercise({ profile, onProfileChange }) {
   const current = exercises[index]
   const isLast = index === exercises.length - 1
 
-  async function handleValidate() {
-    if (!current || verdict) return
+  // Expression orale : c'est la voix qui valide, il n'y a pas de bouton
+  // « Verifier ». Le resultat arrive du panneau micro, deja note.
+  function handleSpeechResult(result, feedback) {
+    if (verdict) return
+    setSpeech({ result, feedback })
+    applyVerdict(result.passed)
+  }
 
-    const right = current.type === 'qcm'
-      ? answer === current.correct_answer
-      : isCorrect(answer, current.correct_answer)
+  // Suite commune a toutes les validations : son, verdict, coeur, revision.
+  function applyVerdict(right) {
+    const exercise = exercises[index]
 
     setResults((list) => [...list, {
-      question: current.question,
-      answer: current.correct_answer,
+      question: exercise.question,
+      answer: exercise.correct_answer,
       right
     }])
 
-    // Alimente la file de révision : un exercice raté y entre et reviendra
-    // demain. En arrière-plan — un échec réseau ne doit pas bloquer la leçon.
     if (profile) {
-      recordAnswer(profile.id, current.id, right).catch(() => { /* silencieux */ })
+      recordAnswer(profile.id, exercise.id, right).catch(() => { /* silencieux */ })
     }
 
     if (right) {
@@ -111,18 +115,26 @@ export default function Exercise({ profile, onProfileChange }) {
       return
     }
 
-    // Mauvaise réponse : secousse du champ + cœur qui se brise
     soundWrong()
-    setTimeout(soundHeart, 180)   // le coeur tombe apres l'erreur, pas en meme temps
+    setTimeout(soundHeart, 180)
     setVerdict('wrong')
     setShake(true)
     setTimeout(() => setShake(false), 500)
 
     const remaining = Math.max(0, hearts - 1)
-    setBreakingIndex(remaining)        // l'index du cœur qui vient de tomber
+    setBreakingIndex(remaining)
     setHearts(remaining)
     setTimeout(() => setBreakingIndex(null), 700)
+  }
 
+  async function handleValidate() {
+    if (!current || verdict) return
+
+    const right = current.type === 'qcm'
+      ? answer === current.correct_answer
+      : isCorrect(answer, current.correct_answer)
+
+    applyVerdict(right)
   }
 
   async function handleNext() {
@@ -135,6 +147,7 @@ export default function Exercise({ profile, onProfileChange }) {
       setIndex((i) => i + 1)
       setAnswer('')
       setVerdict(null)
+      setSpeech(null)
       return
     }
 
@@ -168,6 +181,7 @@ export default function Exercise({ profile, onProfileChange }) {
     setReward(null)
     setHearts(MAX_HEARTS)
     setBreakingIndex(null)
+    setSpeech(null)
   }
 
   if (loading) {
@@ -227,6 +241,8 @@ export default function Exercise({ profile, onProfileChange }) {
       onNext={handleNext}
       onQuit={() => navigate('/dashboard')}
       onSpeak={speak}
+      onSpeechResult={handleSpeechResult}
+      speech={speech}
     />
   )
 }

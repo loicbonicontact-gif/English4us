@@ -18,6 +18,7 @@ import {
   GraduationCap,
   History,
   Lock,
+  Mic,
   LogOut,
   Play,
   RotateCw,
@@ -50,6 +51,7 @@ export const IconReview = wrap(History)
 export const IconHeadphones = wrap(Headphones)
 export const IconWave = wrap(AudioLines)
 export const IconSlow = wrap(Turtle)
+export const IconMic = wrap(Mic)
 export const IconLock = wrap(Lock)
 export const IconLogout = wrap(LogOut)
 export const IconPlay = wrap(Play)

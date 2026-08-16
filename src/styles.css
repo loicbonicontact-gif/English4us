@@ -1557,6 +1557,131 @@ html, body { max-width: 100%; overflow-x: hidden; }
 .review-empty .btn-wide { max-width: 420px; margin-top: var(--sp-2); }
 
 /* ============================================
+   10 · EXPRESSION ORALE
+   L'apprenant entend le modele, puis le repete au micro.
+   ============================================ */
+
+/* La phrase a prononcer. Elle EST affichee, contrairement a la dictee :
+   le travail n'est pas de la retrouver mais de la dire. */
+.speak-sentence {
+  margin: 0;
+  padding: 16px 18px;
+  border-radius: var(--r-lg);
+  background: var(--accent-tint);
+  color: var(--accent-dark);            /* 6.9:1 sur la teinte */
+  font-size: 21px; font-weight: 600; line-height: 1.35;
+  text-align: center;
+}
+
+.speak {
+  display: grid; justify-items: center; gap: 12px;
+  padding: var(--sp-5) var(--sp-4);
+  border: 1px solid var(--border); border-radius: var(--r-lg);
+  background: var(--surface);
+  box-shadow: var(--e-rest);
+}
+
+.speak-model {
+  display: inline-flex; align-items: center; gap: 7px;
+  min-height: 44px; padding: 9px 16px;
+  border: 1px solid var(--border); border-radius: var(--r-pill);
+  background: var(--surface);
+  color: var(--accent-dark);
+  font-family: var(--font); font-size: 14px; font-weight: 600;
+  cursor: pointer;
+}
+
+/* Le micro : rond, large, impossible a manquer. C'est le seul geste de
+   l'exercice, il n'a pas a partager la vedette. */
+.speak-mic {
+  display: grid; justify-items: center; align-content: center; gap: 7px;
+  width: 168px; min-height: 118px;
+  padding: 18px;
+  border: none; border-radius: var(--r-2xl);
+  background: var(--grad-accent);
+  color: #fff;                          /* 4.5:1 sur --accent-solid */
+  font-family: var(--font); font-size: 15px; font-weight: 700;
+  text-align: center;
+  cursor: pointer;
+  box-shadow: var(--e-primary);
+  transition: transform .18s ease, box-shadow .18s ease;
+}
+
+.speak-mic:disabled { opacity: .5; cursor: default; box-shadow: none; }
+.speak-mic-label { line-height: 1.25; }
+
+/* En ecoute : l'anneau pulse. C'est la seule preuve visible que le micro
+   est ouvert — sans elle, on parle sans savoir si on est entendu. */
+.speak-mic.is-listening {
+  background: var(--error);
+  box-shadow: 0 0 0 0 rgba(209, 67, 91, .55);
+  animation: speak-pulse 1.6s ease-out infinite;
+}
+
+@keyframes speak-pulse {
+  0%   { box-shadow: 0 0 0 0 rgba(209, 67, 91, .5); }
+  70%  { box-shadow: 0 0 0 18px rgba(209, 67, 91, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(209, 67, 91, 0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .speak-mic.is-listening { animation: none; box-shadow: 0 0 0 5px var(--error-tint); }
+}
+
+/* Transcription en direct pendant la parole. */
+.speak-partial {
+  margin: 0; min-height: 20px; max-width: 40ch;
+  text-align: center;
+  font-size: 14px; color: var(--ink-3);   /* 4.8:1 sur blanc */
+}
+
+.speak-error { margin: 0; }
+
+.speak-hint {
+  margin: 0; text-align: center;
+  font-size: 13.5px; color: var(--ink-3);
+}
+
+/* --- Retour apres l'essai --- */
+.speak-score { margin: 0 0 8px; font-size: 15px; color: var(--ink-2); }
+.speak-score b { font-size: 19px; color: var(--ink); font-variant-numeric: tabular-nums; }
+
+/* Detail mot par mot : montrer CE QUI n'est pas passe. Un score seul
+   n'apprend rien — on ne sait pas quoi retravailler. */
+.speak-words {
+  margin: 0 0 8px;
+  display: flex; flex-wrap: wrap; gap: 5px;
+  font-size: 15px;
+}
+
+.speak-word {
+  padding: 3px 9px;
+  border-radius: var(--r-pill);
+  font-weight: 600;
+}
+
+.speak-word.is-ok {
+  background: var(--success-tint);
+  color: var(--success-dark);           /* 7.1:1 sur la teinte */
+}
+
+/* Le mot manque n'est pas seulement d'une autre couleur : il est souligne.
+   La couleur seule exclurait les personnes qui la distinguent mal. */
+.speak-word.is-miss {
+  background: var(--error-tint);
+  color: var(--error-dark);             /* 8.7:1 sur la teinte */
+  text-decoration: underline wavy;
+  text-underline-offset: 3px;
+}
+
+.speak-heard { margin: 0 0 8px; font-size: 13.5px; color: var(--ink-3); }
+
+@media (hover: hover) {
+  .speak-mic:not(:disabled):hover { transform: translateY(-1px); }
+  .speak-model:hover { background: var(--surface-off); }
+}
+
+/* ============================================
    09 · COMPREHENSION ORALE
    ============================================ */
 

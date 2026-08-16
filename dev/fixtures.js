@@ -112,3 +112,12 @@ export const demoDictation = {
   correct_answer: 'I have two brothers and one sister',
   explanation: 'Piège d\'écoute : « brothers » porte un « s » sonore, « sister » est au singulier.'
 }
+
+export const demoSpeaking = {
+  id: 98,
+  type: 'oral',
+  question: 'Parle de ta famille.',
+  options: null,
+  correct_answer: 'This is my mother and my father',
+  explanation: 'Deux « th » différents : celui de « this » est sonore.'
+}

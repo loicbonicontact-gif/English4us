@@ -2,6 +2,7 @@ import { IconCheck, IconClose, IconSoundOn } from './Icons'
 import Mascot from './Mascot'
 import Hearts from './Hearts'
 import DictationPlayer from './DictationPlayer'
+import SpeakingPanel from './SpeakingPanel'
 
 const LETTERS = ['A', 'B', 'C', 'D', 'E', 'F']
 
@@ -10,7 +11,7 @@ const LABELS = {
   trous: 'Complète la phrase',
   traduction: 'Traduis en anglais',
   ecoute: 'Écoute et écris ce que tu entends',
-  oral: 'Prononce la phrase'
+  oral: 'Lis la phrase à voix haute'
 }
 
 // Affichage pur de l'ecran d'exercice : aucune requete, aucun calcul de score.
@@ -30,6 +31,8 @@ export default function ExerciseView({
   onNext,
   onQuit,
   onSpeak,
+  onSpeechResult,
+  speech = null,
   isLast,
   mode = 'lesson'
 }) {
@@ -45,6 +48,10 @@ export default function ExerciseView({
   // ne doit jamais s'afficher avant validation, sinon il n'y a plus rien a
   // ecouter.
   const isDictation = exercise.type === 'ecoute'
+
+  // Expression orale : la phrase EST affichee. Le travail n'est pas de la
+  // retrouver mais de la prononcer — la cacher n'aurait aucun sens.
+  const isSpeaking = exercise.type === 'oral'
 
   // La phrase a lire est en anglais : c'est la reponse attendue pour une
   // traduction et une dictee, la question elle-meme sinon.
@@ -114,8 +121,21 @@ export default function ExerciseView({
         />
       )}
 
+      {/* --- Expression orale : le micro remplace le clavier --- */}
+      {isSpeaking && (
+        <>
+          <p className="speak-sentence" lang="en">{exercise.correct_answer}</p>
+          <SpeakingPanel
+            sentence={exercise.correct_answer}
+            onSpeak={onSpeak}
+            onResult={onSpeechResult}
+            disabled={Boolean(verdict)}
+          />
+        </>
+      )}
+
       {/* --- Reponses --- */}
-      {exercise.type === 'qcm' ? (
+      {isSpeaking ? null : exercise.type === 'qcm' ? (
         <ul className="answers">
           {exercise.options.map((option, i) => {
             const picked = answer === option
@@ -163,6 +183,33 @@ export default function ExerciseView({
               {verdict === 'right' ? 'Bravo !' : 'Presque…'}
             </h2>
 
+            {/* Expression orale : le detail mot par mot. Un score seul
+                n'apprend rien — il faut voir QUELS mots ne sont pas passes
+                pour savoir quoi retravailler. */}
+            {speech && (
+              <>
+                <p className="speak-score">
+                  <b>{speech.result.score} %</b> de la phrase reconnue
+                </p>
+
+                <p className="speak-words" lang="en">
+                  {speech.result.words.map((w, i) => (
+                    <span key={i} className={w.ok ? 'speak-word is-ok' : 'speak-word is-miss'}>
+                      {w.word}
+                    </span>
+                  ))}
+                </p>
+
+                {speech.result.said && (
+                  <p className="speak-heard">
+                    Entendu : « <span lang="en">{speech.result.said}</span> »
+                  </p>
+                )}
+
+                <p className="verdict-why">{speech.feedback}</p>
+              </>
+            )}
+
             {/* Dictee reussie : on montre quand meme la phrase. L'oreille a
                 bien fait son travail, mais voir l'orthographe juste a cote
                 de ce qu'on a entendu est la moitie de l'apprentissage. */}
@@ -171,7 +218,7 @@ export default function ExerciseView({
                 Tu as bien entendu : <b>{exercise.correct_answer}</b>
               </p>
             )}
-            {verdict === 'wrong' && (
+            {verdict === 'wrong' && !speech && (
               <p className="verdict-answer">
                 C'était <b>{exercise.correct_answer}</b>.
                 {isReview
@@ -197,6 +244,10 @@ export default function ExerciseView({
           >
             {outOfHearts ? 'Reprendre la leçon' : isLast ? 'Terminer' : 'Continuer'}
           </button>
+        ) : isSpeaking ? (
+          // Pas de bouton « Verifier » : c'est la voix qui valide. En
+          // afficher un laisserait croire qu'il faut aussi taper la reponse.
+          <p className="speak-hint">Ta prononciation est évaluée dès que tu as fini de parler.</p>
         ) : (
           <button
             type="button"
