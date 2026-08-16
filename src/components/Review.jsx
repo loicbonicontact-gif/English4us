@@ -7,7 +7,8 @@ import {
   recordAnswer
 } from '../lib/reviews'
 import { isCorrect } from '../lib/answers'
-import { speak } from '../lib/speech'
+import { speak, stopSpeaking } from '../lib/speech'
+import { usableReviewRows } from '../lib/exercises'
 import { soundComplete, soundCorrect, soundTap, soundWrong } from '../lib/sounds'
 import Mascot from './Mascot'
 import ExerciseView from './ExerciseView'
@@ -41,7 +42,7 @@ export default function Review({ profile, onProfileChange }) {
     setError(null)
     try {
       const due = await fetchDueReviews(userId)
-      setItems(due)
+      setItems(usableReviewRows(due))
       setIndex(0)
       setAnswer('')
       setVerdict(null)
@@ -59,6 +60,9 @@ export default function Review({ profile, onProfileChange }) {
   }, [userId])
 
   useEffect(() => { load() }, [load])
+
+  // Quitter la revision coupe la voix restee en cours de lecture.
+  useEffect(() => stopSpeaking, [])
 
   const current = items[index]?.exercise
   const isLast = index === items.length - 1

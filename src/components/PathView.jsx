@@ -1,4 +1,4 @@
-import { IconCheck, IconChevron, IconPlay, IconRedo } from './Icons'
+import { IconCheck, IconChevron, IconHeadphones, IconPlay, IconRedo } from './Icons'
 import Mascot from './Mascot'
 
 // Description courte de chaque niveau : donne un but, au lieu d'un simple code.
@@ -14,7 +14,7 @@ export const LEVEL_BLURB = {
 // Affichage pur du parcours : aucune requete, tout arrive en props.
 // Le chargement vit dans LessonPath.jsx — cette separation permet de
 // verifier l'ecran avec des donnees de test (voir dev/preview.jsx).
-export default function PathView({ path, hearts = 0, onOpen }) {
+export default function PathView({ path, hearts = 0, onOpen, onOpenListening = () => {} }) {
   const done = path.decorated.filter((l) => l.completed).length
   const total = path.decorated.length
   const percent = total > 0 ? Math.round((done / total) * 100) : 0
@@ -66,6 +66,20 @@ export default function PathView({ path, hearts = 0, onOpen }) {
             <Mascot mood="happy" size={86} className="resume-mascot" />
           </section>
         )}
+
+        {/* Acces a la comprehension orale. Elle n'a pas d'onglet a elle :
+            cinq onglets ne tiennent pas a 375 px. Elle vit donc ici, juste
+            sous la lecon en cours, la ou le regard passe deja. */}
+        <button type="button" className="listen-entry" onClick={onOpenListening}>
+          <span className="listen-entry-icon"><IconHeadphones size={22} /></span>
+          <span className="listen-entry-text">
+            <span className="listen-entry-title">Compréhension orale</span>
+            <span className="listen-entry-sub">
+              Conversations et annonces, sans texte à l'écran
+            </span>
+          </span>
+          <IconChevron size={18} className="listen-entry-chevron" />
+        </button>
 
         {/* La progression apparait ici sur telephone, dans la colonne de
             droite sur grand ecran — d'ou le duplicata masque en CSS. */}

@@ -9,8 +9,10 @@
 // existants pendant la refonte ecran par ecran.
 
 import {
+  AudioLines,
   Check,
   ChevronRight,
+  Headphones,
   Flame,
   Heart,
   GraduationCap,
@@ -20,6 +22,7 @@ import {
   Play,
   RotateCw,
   Route,
+  Turtle,
   Trophy,
   User,
   Volume2,
@@ -44,6 +47,9 @@ export const IconFlame = wrap(Flame)
 export const IconHeart = wrap(Heart)
 export const IconCap = wrap(GraduationCap)
 export const IconReview = wrap(History)
+export const IconHeadphones = wrap(Headphones)
+export const IconWave = wrap(AudioLines)
+export const IconSlow = wrap(Turtle)
 export const IconLock = wrap(Lock)
 export const IconLogout = wrap(LogOut)
 export const IconPlay = wrap(Play)

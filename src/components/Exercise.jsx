@@ -4,7 +4,8 @@ import { supabase } from '../supabaseClient'
 import { completeLesson, loseHeart, MAX_HEARTS } from '../lib/gamification'
 import { isCorrect } from '../lib/answers'
 import { recordAnswer } from '../lib/reviews'
-import { speak } from '../lib/speech'
+import { speak, stopSpeaking } from '../lib/speech'
+import { usableExercises } from '../lib/exercises'
 import Mascot from './Mascot'
 import ExerciseView from './ExerciseView'
 import LessonEnd from './LessonEnd'
@@ -47,13 +48,17 @@ export default function Exercise({ profile, onProfileChange }) {
         if (exRes.error) throw exRes.error
         if (!exRes.data?.length) throw new Error("Cette leçon ne contient aucun exercice.")
         setLesson(lessonRes.data)
-        setExercises(exRes.data)
+        setExercises(usableExercises(exRes.data))
       })
       .catch((err) => { if (active) setError(err.message) })
       .finally(() => { if (active) setLoading(false) })
 
     return () => { active = false }
   }, [id])
+
+  // Quitter la lecon coupe la voix : sans cela, la phrase continue de se lire
+  // sur l'ecran du parcours.
+  useEffect(() => stopSpeaking, [])
 
   // Leçon suivante du même niveau : sert la carte « Débloqué » de l'écran de fin.
   // Chargée à part pour ne pas retarder l'affichage de la première question.

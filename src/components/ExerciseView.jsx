@@ -1,6 +1,7 @@
 import { IconCheck, IconClose, IconSoundOn } from './Icons'
 import Mascot from './Mascot'
 import Hearts from './Hearts'
+import DictationPlayer from './DictationPlayer'
 
 const LETTERS = ['A', 'B', 'C', 'D', 'E', 'F']
 
@@ -8,7 +9,7 @@ const LABELS = {
   qcm: 'Choisis la bonne réponse',
   trous: 'Complète la phrase',
   traduction: 'Traduis en anglais',
-  ecoute: 'Écoute et réponds',
+  ecoute: 'Écoute et écris ce que tu entends',
   oral: 'Prononce la phrase'
 }
 
@@ -38,9 +39,18 @@ export default function ExerciseView({
   // répare l'oubli.
   const isReview = mode === 'review'
   const outOfHearts = !isReview && hearts === 0
+
+  // Dictee : l'enonce est sonore. Le champ `question` ne porte qu'une
+  // consigne en francais — la phrase anglaise est dans `correct_answer` et
+  // ne doit jamais s'afficher avant validation, sinon il n'y a plus rien a
+  // ecouter.
+  const isDictation = exercise.type === 'ecoute'
+
   // La phrase a lire est en anglais : c'est la reponse attendue pour une
-  // traduction, la question elle-meme sinon.
-  const spoken = exercise.type === 'traduction' ? exercise.correct_answer : exercise.question
+  // traduction et une dictee, la question elle-meme sinon.
+  const spoken = (exercise.type === 'traduction' || isDictation)
+    ? exercise.correct_answer
+    : exercise.question
 
   return (
     <div className="lesson-screen">
@@ -95,6 +105,15 @@ export default function ExerciseView({
         </div>
       </section>
 
+      {/* --- Dictee : le lecteur remplace l'enonce ecrit --- */}
+      {isDictation && (
+        <DictationPlayer
+          text={spoken}
+          onSpeak={onSpeak}
+          disabled={Boolean(verdict)}
+        />
+      )}
+
       {/* --- Reponses --- */}
       {exercise.type === 'qcm' ? (
         <ul className="answers">
@@ -126,12 +145,12 @@ export default function ExerciseView({
           value={answer}
           onChange={(e) => onAnswer(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && (verdict ? onNext() : onValidate())}
-          placeholder="Ta réponse…"
+          placeholder={isDictation ? 'Écris la phrase entendue…' : 'Ta réponse…'}
           disabled={Boolean(verdict)}
           autoComplete="off"
           autoCapitalize="off"
           spellCheck="false"
-          aria-label="Ta réponse"
+          aria-label={isDictation ? 'La phrase que tu as entendue' : 'Ta réponse'}
         />
       )}
 
@@ -143,6 +162,15 @@ export default function ExerciseView({
             <h2 className="verdict-title">
               {verdict === 'right' ? 'Bravo !' : 'Presque…'}
             </h2>
+
+            {/* Dictee reussie : on montre quand meme la phrase. L'oreille a
+                bien fait son travail, mais voir l'orthographe juste a cote
+                de ce qu'on a entendu est la moitie de l'apprentissage. */}
+            {verdict === 'right' && isDictation && (
+              <p className="verdict-answer">
+                Tu as bien entendu : <b>{exercise.correct_answer}</b>
+              </p>
+            )}
             {verdict === 'wrong' && (
               <p className="verdict-answer">
                 C'était <b>{exercise.correct_answer}</b>.
@@ -180,10 +208,23 @@ export default function ExerciseView({
           </button>
         )}
 
-        <button type="button" className="listen-btn" onClick={() => onSpeak(spoken)}>
-          <IconSoundOn size={16} />
-          Écouter la phrase
-        </button>
+        {/* Une dictee a deja son lecteur en haut : ce bouton ferait doublon
+            et, avant validation, laisserait croire a une seconde phrase. */}
+        {!isDictation && (
+          <button type="button" className="listen-btn" onClick={() => onSpeak(spoken)}>
+            <IconSoundOn size={16} />
+            Écouter la phrase
+          </button>
+        )}
+
+        {/* Apres validation, on peut reecouter la phrase juste : c'est le
+            moment ou on relie enfin le son a l'orthographe. */}
+        {isDictation && verdict && (
+          <button type="button" className="listen-btn" onClick={() => onSpeak(exercise.correct_answer)}>
+            <IconSoundOn size={16} />
+            Réécouter la bonne phrase
+          </button>
+        )}
       </div>
     </div>
   )

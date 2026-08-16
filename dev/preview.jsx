@@ -16,8 +16,9 @@ import LessonEnd from '../src/components/LessonEnd'
 import ProfileView from '../src/components/ProfileView'
 import LeaderboardView from '../src/components/LeaderboardView'
 import ReviewEnd from '../src/components/ReviewEnd'
+import ListeningView from '../src/components/ListeningView'
 import Mascot from '../src/components/Mascot'
-import { demoBoard, demoExercise, demoLesson, demoPath, demoProfile, demoResults } from './fixtures'
+import { demoBoard, demoDictation, demoExercise, demoLesson, demoListeningQuestions, demoPassage, demoPath, demoProfile, demoResults } from './fixtures'
 
 const SCREENS = [
   { key: 'parcours', label: '01 Parcours' },
@@ -30,7 +31,11 @@ const SCREENS = [
   { key: 'profil', label: '06 Profil' },
   { key: 'revision', label: '07 Révision' },
   { key: 'revision-fin', label: '07 Fin révision' },
-  { key: 'revision-vide', label: '07 Rien à revoir' }
+  { key: 'revision-vide', label: '07 Rien à revoir' },
+  { key: 'dictee', label: '08 Dictée' },
+  { key: 'ecoute-intro', label: '09 Écoute intro' },
+  { key: 'ecoute-question', label: '09 Écoute question' },
+  { key: 'ecoute-verdict', label: '09 Écoute verdict' }
 ]
 
 function Preview() {
@@ -89,6 +94,28 @@ function Preview() {
           menace de fin de lecon. */}
       {screen === 'revision' && (
         <ExerciseView {...exerciseProps} mode="review" verdict="wrong" answer={demoExercise.options[0]} />
+      )}
+
+      {screen === 'dictee' && (
+        <ExerciseView {...exerciseProps} exercise={demoDictation} answer={answer} verdict={null} />
+      )}
+
+      {['ecoute-intro', 'ecoute-question', 'ecoute-verdict'].includes(screen) && (
+        <AppShell profile={demoProfile} dueCount={0}>
+          <ListeningView
+            passage={demoPassage}
+            questions={demoListeningQuestions}
+            started={screen !== 'ecoute-intro'}
+            index={0}
+            answer={screen === 'ecoute-verdict' ? demoListeningQuestions[0].options[1] : answer}
+            verdict={screen === 'ecoute-verdict' ? 'wrong' : null}
+            onStart={() => setScreen('ecoute-question')}
+            onAnswer={setAnswer}
+            onValidate={() => setScreen('ecoute-verdict')}
+            onNext={() => {}}
+            onQuit={() => setScreen('parcours')}
+          />
+        </AppShell>
       )}
 
       {screen === 'revision-fin' && (

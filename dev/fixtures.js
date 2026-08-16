@@ -58,3 +58,47 @@ export const demoBoard = [
   { id: 'e', username: 'noah', xp: 430 },
   { id: 'f', username: 'lina', xp: 220 }
 ]
+
+// --- Comprehension orale ---
+export const demoPassage = {
+  id: 1,
+  level: 'A1',
+  format: 'conversation',
+  title: 'Au café',
+  context: 'Deux personnes commandent au comptoir d\'un café.',
+  audio_url: null,
+  xp_reward: 15,
+  script: [
+    { speaker: 'A', text: 'Good morning. What would you like?' },
+    { speaker: 'B', text: 'Good morning. A coffee and a chocolate cake, please.' },
+    { speaker: 'A', text: 'Of course. Would you like the coffee with milk?' },
+    { speaker: 'B', text: 'No, thank you. Just black. How much is that?' },
+    { speaker: 'A', text: 'That is five euros fifty.' }
+  ]
+}
+
+export const demoListeningQuestions = [
+  {
+    id: 1,
+    question: 'What does the customer order?',
+    options: ['A coffee and a cake', 'A tea and a sandwich', 'Two coffees', 'A chocolate drink'],
+    correct_answer: 'A coffee and a cake',
+    explanation: 'Le mot « chocolate » désigne ici le gâteau, pas la boisson.'
+  },
+  {
+    id: 2,
+    question: 'How much does it cost?',
+    options: ['5.50', '5.15', '15.50', '5.05'],
+    correct_answer: '5.50',
+    explanation: 'Attention à ne pas entendre « fifteen ».'
+  }
+]
+
+export const demoDictation = {
+  id: 99,
+  type: 'ecoute',
+  question: 'Quelqu\'un décrit sa famille.',
+  options: null,
+  correct_answer: 'I have two brothers and one sister',
+  explanation: 'Piège d\'écoute : « brothers » porte un « s » sonore, « sister » est au singulier.'
+}

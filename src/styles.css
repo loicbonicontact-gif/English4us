@@ -1413,6 +1413,77 @@ html, body { max-width: 100%; overflow-x: hidden; }
 .board-note { margin: 0; font-size: 13.5px; color: var(--ink-3); text-align: center; }
 
 /* ============================================
+   08 · DICTEE AUDIO
+   Le seul exercice dont l'enonce n'est pas ecrit. Le lecteur remplace donc
+   la phrase : il doit etre le point le plus visible de l'ecran.
+   ============================================ */
+.dictation {
+  display: grid; justify-items: center; gap: 10px;
+  padding: var(--sp-5) var(--sp-4);
+  border: 1px solid var(--border); border-radius: var(--r-lg);
+  background: var(--surface);
+  box-shadow: var(--e-rest);
+}
+
+/* Cible principale : large et haute, on l'appuie plusieurs fois par
+   exercice, souvent sans regarder. */
+.dictation-play {
+  display: grid; justify-items: center; gap: 6px;
+  min-width: 148px; min-height: 96px;
+  padding: 16px 26px;
+  border: none; border-radius: var(--r-lg);
+  background: var(--grad-accent);
+  color: #fff;                      /* 4.5:1 sur --accent-solid */
+  font-family: var(--font); font-size: 16px; font-weight: 700;
+  cursor: pointer;
+  box-shadow: var(--e-primary);
+  transition: transform .18s ease, box-shadow .18s ease;
+}
+
+.dictation-play:disabled { opacity: .5; cursor: default; box-shadow: none; }
+.dictation-play-label { letter-spacing: .01em; }
+
+/* Lecture en cours : l'icone respire doucement. C'est la seule indication
+   que le son part vraiment — utile quand le volume est au minimum. */
+.dictation-play.is-playing svg { animation: dictation-pulse 1.1s ease-in-out infinite; }
+
+@keyframes dictation-pulse {
+  0%, 100% { opacity: 1;   transform: scale(1); }
+  50%      { opacity: .62; transform: scale(.92); }
+}
+
+.dictation-slow {
+  display: inline-flex; align-items: center; gap: 7px;
+  min-height: 44px; padding: 9px 16px;
+  border: 1px solid var(--border); border-radius: var(--r-pill);
+  background: var(--surface);
+  color: var(--accent-dark);        /* 6.9:1 sur blanc */
+  font-family: var(--font); font-size: 14px; font-weight: 600;
+  cursor: pointer;
+  transition: background .18s ease;
+}
+
+.dictation-slow:disabled { opacity: .5; cursor: default; }
+
+.dictation-count {
+  margin: 0; text-align: center;
+  font-size: 13px; color: var(--ink-3);   /* 4.8:1 sur blanc */
+}
+
+@media (hover: hover) {
+  .dictation-play:not(:disabled):hover { transform: translateY(-1px); }
+  .dictation-slow:not(:disabled):hover { background: var(--surface-off); }
+}
+
+.dictation-play:not(:disabled):active { transform: translateY(1px); }
+
+/* Regle 5 des consignes d'interface : aucune animation si le systeme la
+   refuse. Le bouton reste lisible, seul le battement disparait. */
+@media (prefers-reduced-motion: reduce) {
+  .dictation-play.is-playing svg { animation: none; opacity: .7; }
+}
+
+/* ============================================
    07 · REVISION ESPACEE
    Fin de session et file vide. L'exercice lui-meme reutilise les styles
    de la lecon (section 02) : c'est le meme geste, seul le cadre change.
@@ -1471,6 +1542,172 @@ html, body { max-width: 100%; overflow-x: hidden; }
 }
 
 .review-empty .btn-wide { max-width: 420px; margin-top: var(--sp-2); }
+
+/* ============================================
+   09 · COMPREHENSION ORALE
+   ============================================ */
+
+/* --- Entree depuis le parcours --- */
+.listen-entry {
+  display: flex; align-items: center; gap: 12px; width: 100%;
+  min-height: 44px; padding: 14px 16px;
+  border: 1px solid var(--border); border-radius: var(--r-lg);
+  background: var(--surface);
+  box-shadow: var(--e-rest);
+  cursor: pointer; text-align: left;
+  transition: transform .18s ease, box-shadow .18s ease;
+}
+
+.listen-entry-icon {
+  flex: 0 0 auto;
+  display: grid; place-items: center;
+  width: 42px; height: 42px;
+  border-radius: var(--r-md);
+  background: var(--accent-tint);
+  color: var(--accent-dark);            /* 6.9:1 sur la teinte */
+}
+
+.listen-entry-text { flex: 1; display: grid; gap: 2px; min-width: 0; }
+.listen-entry-title { font-size: 15.5px; font-weight: 700; color: var(--ink); }
+.listen-entry-sub { font-size: 13px; color: var(--ink-3); }
+.listen-entry-chevron { flex: 0 0 auto; color: var(--chevron); }
+
+/* --- Liste des passages --- */
+.listen-list { display: grid; gap: var(--sp-5); padding-bottom: var(--sp-4); }
+
+.listen-list-head h1 {
+  margin: 0 0 var(--sp-2);
+  font-family: var(--font-title); font-size: 32px;
+}
+
+.listen-list-head p {
+  margin: 0; max-width: 60ch;
+  font-size: 14.5px; color: var(--ink-2);   /* 9.8:1 sur le fond d'app */
+}
+
+.listen-group { display: grid; gap: var(--sp-3); }
+.listen-items { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+
+.listen-item {
+  display: flex; align-items: center; gap: 12px; width: 100%;
+  min-height: 44px; padding: 13px 15px;
+  border: 1px solid var(--border); border-radius: var(--r-md);
+  background: var(--surface);
+  cursor: pointer; text-align: left;
+  transition: transform .18s ease, background .18s ease;
+}
+
+.listen-item.is-done { background: var(--success-tint); border-color: var(--success); }
+.listen-item.is-done .listen-item-icon { background: var(--surface); color: var(--success-dark); }
+
+.listen-item-icon {
+  flex: 0 0 auto;
+  display: grid; place-items: center;
+  width: 38px; height: 38px;
+  border-radius: var(--r-sm);
+  background: var(--accent-tint); color: var(--accent-dark);
+}
+
+.listen-item-text { flex: 1; display: grid; gap: 1px; min-width: 0; }
+.listen-item-title { font-size: 15px; font-weight: 600; color: var(--ink); }
+.listen-item-meta { font-size: 12.5px; color: var(--ink-3); }
+.listen-item-chevron { flex: 0 0 auto; color: var(--chevron); }
+
+/* --- Mise en situation, avant l'ecoute --- */
+.listen-intro {
+  position: relative;
+  display: flex; flex-direction: column; align-items: center; text-align: center;
+  gap: 12px;
+  padding: var(--sp-6) var(--sp-4);
+}
+
+.listen-intro .lesson-close { position: absolute; top: 0; left: 0; }
+
+.listen-format {
+  margin: 0;
+  font-size: 12.5px; font-weight: 700; letter-spacing: .04em;
+  text-transform: uppercase;
+  color: var(--accent-dark);
+}
+
+.listen-title {
+  margin: 0;
+  font-family: var(--font-title); font-size: 30px; font-weight: 600;
+  color: var(--ink);
+}
+
+.listen-context { margin: 0; max-width: 44ch; font-size: 15.5px; color: var(--ink-2); }
+.listen-hint { margin: 0; max-width: 44ch; font-size: 14px; color: var(--ink-3); }
+
+/* Avertissement : l'apprenant doit savoir AVANT de lancer qu'il n'aura pas
+   le texte sous les yeux. La surprise ferait abandonner. */
+.listen-warn {
+  max-width: 44ch;
+  padding: 12px 15px;
+  border-left: 3px solid var(--accent);
+  border-radius: var(--r-sm);
+  background: var(--accent-tint);
+  text-align: left;
+}
+
+.listen-warn p { margin: 0; font-size: 13.5px; color: var(--accent-dark); }
+
+.listen-intro .btn-wide { max-width: 420px; margin-top: var(--sp-2); }
+
+/* --- Lecteur du passage --- */
+.listen {
+  display: grid; justify-items: center; gap: 10px;
+  padding: var(--sp-5) var(--sp-4);
+  border: 1px solid var(--border); border-radius: var(--r-lg);
+  background: var(--surface);
+  box-shadow: var(--e-rest);
+}
+
+/* Tours de parole : des pastilles A / B, jamais le texte. Elles disent qui
+   parle et ou l'on en est, sans rien donner a lire. */
+.listen-turns {
+  list-style: none; margin: 0; padding: 0;
+  display: flex; flex-wrap: wrap; justify-content: center; gap: 6px;
+}
+
+.listen-turn {
+  display: grid; place-items: center;
+  width: 26px; height: 26px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface-off);
+  color: var(--ink-3);
+  font-size: 12px; font-weight: 700;
+  transition: transform .18s ease, background .18s ease, color .18s ease;
+}
+
+.listen-turn.is-active.is-a { background: var(--accent-solid); color: #fff; border-color: transparent; transform: scale(1.12); }
+.listen-turn.is-active.is-b { background: var(--success-solid); color: #fff; border-color: transparent; transform: scale(1.12); }
+
+/* --- Transcription, apres validation --- */
+.listen-script { margin-top: 10px; }
+
+.listen-script summary {
+  cursor: pointer;
+  font-size: 13.5px; font-weight: 600;
+  color: var(--accent-dark);
+}
+
+.listen-script ol {
+  margin: 8px 0 0; padding-left: 18px;
+  display: grid; gap: 5px;
+  font-size: 14px; color: var(--ink-2);
+}
+
+/* Partie 2 du TOEIC : les propositions n'ont pas de texte, le bouton n'a
+   donc pas besoin de toute la largeur d'une reponse ecrite. */
+.answer.is-letter-only .answer-label { color: var(--ink-3); font-weight: 600; }
+
+@media (hover: hover) {
+  .listen-entry:hover { transform: translateY(-2px); }
+  .listen-item:hover { transform: translateY(-1px); background: var(--surface-off); }
+  .listen-item.is-done:hover { background: var(--success-tint); }
+}
 
 /* ============================================
    BARRE DE PREVISUALISATION (developpement seulement)

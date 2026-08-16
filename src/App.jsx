@@ -3,6 +3,7 @@ import { Navigate, Route, Routes } from 'react-router-dom'
 import { supabase } from './supabaseClient'
 import { ensureProfile, fetchProfile } from './lib/profile'
 import { countDueReviews } from './lib/reviews'
+import { primeVoices } from './lib/speech'
 import Auth from './components/Auth'
 import AppShell from './components/AppShell'
 import LessonPath from './components/LessonPath'
@@ -10,6 +11,8 @@ import Exercise from './components/Exercise'
 import Profile from './components/Profile'
 import Leaderboard from './components/Leaderboard'
 import Review from './components/Review'
+import ListeningList from './components/ListeningList'
+import Listening from './components/Listening'
 
 export default function App() {
   const [session, setSession] = useState(null)
@@ -17,6 +20,11 @@ export default function App() {
   const [booting, setBooting] = useState(true)
   const [profileError, setProfileError] = useState(null)
   const [dueCount, setDueCount] = useState(0)
+
+  // Charge la liste des voix dès le démarrage. Sans cela, la première phrase
+  // anglaise de la session serait lue par la voix par défaut du système —
+  // souvent une voix française, qui rend l'anglais incompréhensible.
+  useEffect(() => { primeVoices() }, [])
 
   // Récupère la session au démarrage puis écoute les changements (login/logout).
   useEffect(() => {
@@ -129,6 +137,11 @@ export default function App() {
           <Route
             path="/reviews"
             element={<Review profile={profile} onProfileChange={refreshProfile} />}
+          />
+          <Route path="/listening" element={<ListeningList profile={profile} />} />
+          <Route
+            path="/listening/:id"
+            element={<Listening profile={profile} onProfileChange={refreshProfile} />}
           />
           <Route path="/leaderboard" element={<Leaderboard profile={profile} />} />
           <Route path="/profile" element={<Profile profile={profile} onSignOut={handleSignOut} />} />

@@ -44,5 +44,12 @@ export default function LessonPath({ userId, hearts }) {
   if (error) return <p className="alert alert-error" role="alert">{error}</p>
   if (!path) return null
 
-  return <PathView path={path} hearts={hearts} onOpen={(id) => navigate(`/lesson/${id}`)} />
+  return (
+    <PathView
+      path={path}
+      hearts={hearts}
+      onOpen={(id) => navigate(`/lesson/${id}`)}
+      onOpenListening={() => navigate('/listening')}
+    />
+  )
 }

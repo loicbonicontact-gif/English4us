@@ -2,7 +2,56 @@
 
 Dernière mise à jour : 16 août 2026
 
-## Fait dans cette session (révision espacée)
+## Fait dans cette session (2/2) — écoute et compréhension orale
+
+### Dictée audio
+Nouveau type d'exercice `ecoute` : la phrase anglaise n'existe que sous
+forme sonore, l'apprenant la réécrit. 60 dictées, 2 par leçon, A1 → C2
+(`supabase/seed-dictation.sql`). Le champ `question` ne porte qu'une
+consigne en français — la phrase attendue est dans `correct_answer` et ne
+s'affiche jamais avant validation.
+
+### Module de compréhension orale (`/listening`)
+Trois formats calqués sur le TOEIC, 18 passages et 48 questions
+(`migration-listening.sql` + `seed-listening.sql`) :
+
+- **question-réponse** (partie 2) — question orale, 3 réponses lues, rien
+  d'écrit à l'écran
+- **conversation** (partie 3) — deux interlocuteurs, deux voix distinctes
+- **annonce / exposé** (partie 4) — un seul locuteur
+
+Le texte anglais n'apparaît qu'après avoir répondu, dans une transcription
+repliée. Aucun cœur n'est perdu. Les questions ratées rejoignent la file
+de révision.
+
+### Qualité des voix — trois défauts corrigés
+1. **Aucune voix anglaise n'était choisie** au démarrage : `getVoices()`
+   renvoie une liste vide pendant la première seconde, et le navigateur
+   lisait donc l'anglais avec la voix française du système. Mesuré à 0 voix
+   au moment du lancement. La lecture attend maintenant que la liste soit
+   prête (1,5 s au maximum).
+2. **La pire voix était retenue.** L'ancien code prenait la première voix
+   anglaise venue, soit « Albert », une voix gadget d'Apple. Un classement
+   par indices de qualité choisit désormais Daniel (en-GB) sur ce Mac.
+3. **La liste d'exclusion ne marchait pas** : macOS traduit les noms des
+   voix gadget (« Bouffon », « Cloches »). Remplacée par une liste des
+   bonnes voix, dont les prénoms ne sont jamais traduits.
+
+Vérifié en conditions réelles : dialogue lu en alternance Daniel (A) /
+Samantha (B), à partir d'une page fraîchement rechargée.
+
+### Décision d'architecture — `audio_url`
+Chaque passage porte un champ `audio_url` laissé vide. Vide, la synthèse du
+navigateur lit le script ; rempli, l'application joue le fichier. Le module
+fonctionne donc aujourd'hui sans rien payer, et pourra passer à une voix
+neuronale enregistrée **sans qu'une ligne de code d'exercice change**.
+
+Coût constaté pour ce passage : les 45 000 caractères de contenu tiennent
+dans le quota gratuit mensuel de Google Cloud (1 M) ou d'Azure (500 k).
+Le frein n'est pas l'argent mais l'ouverture d'un compte avec carte
+bancaire — non fait, en attente de décision.
+
+## Fait dans cette session (1/2) — révision espacée
 
 La plus grosse lacune pédagogique de l'app est comblée : une leçon terminée
 n'était plus jamais revue, donc ce qui était appris s'oubliait.
@@ -70,10 +119,9 @@ Refonte complète de l'interface d'après le handoff de design
 Priorité pédagogique décidée le 16 août (après recherche sur les méthodes
 d'apprentissage et le format TOEIC) :
 
-- [ ] **Dictée audio** — écoute et réécris la phrase. Réutilise la synthèse
-      vocale déjà en place, alimente la file de révision. Prochaine étape.
-- [ ] **Compréhension orale longue** — dialogue de 30-60 s puis 2-3
-      questions. C'est le format des parties 3 et 4 du TOEIC.
+- [ ] **Voix neuronales enregistrées** — ouvrir un compte Google Cloud ou
+      Azure, générer les fichiers une fois, remplir `audio_url`. Gratuit au
+      vu du volume, mais demande une carte bancaire. Décision en attente.
 - [ ] **Lecture de passage** — email, annonce, article puis questions.
       Partie 7 du TOEIC : 54 questions sur 200.
 - [ ] **Réponse orale** — reconnaissance vocale du navigateur (absente de
