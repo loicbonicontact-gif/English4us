@@ -595,19 +595,22 @@ h1 { font-size: 30px; margin: 0 0 var(--sp-1); }
 .end-xp { font-size: 1.9rem; font-weight: 900; color: var(--amber); font-variant-numeric: tabular-nums; }
 .end-streak { font-size: 1.9rem; font-weight: 900; color: var(--amber); }
 
+
 /* ============================================
-   RESPONSIVE — telephone / tablette / ordinateur
-   Approche mobile-first : les regles ci-dessus valent
-   pour telephone, celles-ci ajoutent pour les grands ecrans.
+   REGLES GLOBALES DE MISE EN PAGE
    ============================================ */
 
-/* Marges de securite : encoche en haut, barre gestuelle en bas.
-   Sans elles, le bouton "Verifier" passe sous la barre de l'iPhone. */
-.exercise-screen,
-.path {
-  padding-left: max(1rem, env(safe-area-inset-left));
-  padding-right: max(1rem, env(safe-area-inset-right));
-  padding-bottom: max(2.5rem, calc(env(safe-area-inset-bottom) + 1.5rem));
+/* Reserve aux lecteurs d'ecran : le texte existe pour la synthese vocale
+   mais n'occupe aucune place a l'ecran. `clip-path` plutot que
+   `display: none`, qui le retirerait aussi de l'arbre d'accessibilite. */
+.sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
 }
 
 /* Empeche tout debordement horizontal, quel que soit l'ecran */
@@ -617,274 +620,390 @@ html, body { max-width: 100%; overflow-x: hidden; }
 .exercise-question,
 .option,
 .feedback-why,
-.path-node-title { overflow-wrap: break-word; hyphens: auto; }
+.lesson-title { overflow-wrap: break-word; hyphens: auto; }
 
-/* ---------- Tablette (>= 768px) ---------- */
+/* Marges de securite : encoche en haut, barre gestuelle en bas. */
+.exercise-screen {
+  padding-left: max(1rem, env(safe-area-inset-left));
+  padding-right: max(1rem, env(safe-area-inset-right));
+  padding-bottom: max(2.5rem, calc(env(safe-area-inset-bottom) + 1.5rem));
+}
+
 @media (min-width: 768px) {
   .exercise-screen { max-width: 680px; padding-top: 1.5rem; }
   .exercise-question { font-size: 1.55rem; }
-  .path { max-width: 700px; }
-
-  /* Deux colonnes de reponses : moins de defilement sur ecran large */
   .options { display: grid; grid-template-columns: 1fr 1fr; gap: 0.7rem; }
-
   .end-rewards { gap: 1.5rem; }
+}
+
+@media (min-width: 1024px) {
+  .exercise-screen { max-width: 760px; }
+  .exercise-question { font-size: 1.7rem; }
+}
+
+@media (max-height: 480px) and (orientation: landscape) {
+  .auth-screen { align-items: flex-start; padding-top: 1rem; }
+  .auth-brand { margin-bottom: 0.75rem; }
+  .auth-logo, .auth-brand .mascot { display: none; }
+  .exercise-screen { padding-top: 0.5rem; gap: 0.7rem; }
+}
+
+/* ============================================
+   COQUE : en-tete + barre d'onglets
+   ============================================ */
+
+.app-shell { min-height: 100dvh; display: flex; flex-direction: column; }
+
+.app-header { padding-top: env(safe-area-inset-top); }
+
+.app-header-inner {
+  display: flex; align-items: center; gap: var(--sp-3);
+  padding: 16px 18px 12px;
+}
+
+.brand { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--ink); }
+
+.brand-mark {
+  width: 34px; height: 34px; flex: 0 0 auto;
+  display: grid; place-items: center;
+  border-radius: var(--r-sm);
+  background: var(--grad-accent);
+  color: #fff; font-family: var(--font-title); font-size: 13px; letter-spacing: .04em;
+}
+
+.brand-name { font-size: 18px; font-weight: 700; letter-spacing: -.01em; }
+
+.stat-pills { display: flex; gap: 8px; margin-left: auto; }
+
+.stat-pill {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 6px 11px;
+  background: var(--surface);
+  border-radius: var(--r-pill);
+  box-shadow: var(--e-rest);
+  font-size: 13.5px; font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.stat-pill-unit { font-size: 11px; font-weight: 500; color: var(--ink-3); }
+.stat-pill-hearts { color: var(--error-dark); }
+
+/* Reserve la hauteur de la barre d'onglets flottante, sinon la derniere
+   ligne de lecon reste cachee dessous. */
+.app-main { flex: 1; padding-bottom: calc(76px + env(safe-area-inset-bottom)); }
+
+/* --- Barre d'onglets : detachee en bas de l'ecran sur telephone --- */
+.tabbar {
+  position: fixed; bottom: 0; left: 0; right: 0; z-index: 40;
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  padding: 8px 8px max(16px, env(safe-area-inset-bottom));
+  background: rgba(255,255,255,.86);
+  backdrop-filter: blur(14px);
+  border-top: 1px solid var(--border);
+}
+
+.tab {
+  display: grid; justify-items: center; gap: 3px;
+  padding: 7px 0;
+  border-radius: var(--r-md);
+  text-decoration: none;
+  color: var(--ink-3);
+  min-height: 44px;
+  transition: background .18s ease, color .18s ease;
+}
+
+.tab-label { font-size: 11.5px; }
+
+.tab.active { background: var(--accent-tint); color: var(--accent-dark); }
+.tab.active .tab-label { font-weight: 700; }
+/* Onglet actif : icone pleine, pas seulement une couleur differente */
+.tab.active svg { fill: currentColor; fill-opacity: .18; }
+
+/* ============================================
+   01 · PARCOURS
+   ============================================ */
+
+.path {
+  display: grid;
+  gap: var(--sp-5);
+  padding: 0 18px var(--sp-6);
+}
+
+.path-loading { display: grid; place-items: center; gap: var(--sp-3); padding: var(--sp-8) 0; color: var(--ink-3); }
+
+/* Les colonnes laterales n'existent qu'a partir de la tablette */
+.level-rail, .path-aside { display: none; }
+.path-main { display: grid; gap: var(--sp-5); min-width: 0; }
+
+/* --- Carte « reprends » --- */
+.resume-card {
+  display: flex; align-items: center; gap: var(--sp-3);
+  padding: 20px;
+  border-radius: var(--r-2xl);
+  background: var(--grad-hero);
+  color: #fff;
+  box-shadow: var(--e-hero);
+}
+
+.resume-text { flex: 1; min-width: 0; }
+
+.resume-eyebrow {
+  margin: 0 0 6px;
+  font-size: 12.5px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: .12em;
+  opacity: .8;
+}
+
+.resume-title {
+  margin: 0 0 6px;
+  font-family: var(--font-title); font-weight: 600; font-size: 36px; line-height: 1.05;
+  color: #fff;
+}
+
+.resume-meta { margin: 0 0 16px; font-size: 13.5px; opacity: .85; }
+
+.resume-btn {
+  padding: 12px 24px;
+  border: none; border-radius: var(--r-pill);
+  background: #fff; color: var(--accent-dark);
+  font-family: var(--font); font-size: 15px; font-weight: 700;
+  box-shadow: 0 4px 12px rgba(20,22,26,.18);
+  cursor: pointer;
+  min-height: 44px;
+  transition: transform .18s ease, box-shadow .18s ease;
+}
+
+.resume-mascot { flex: 0 0 auto; }
+
+/* --- Carte de progression --- */
+.progress-card {
+  padding: 15px 16px;
+  background: var(--surface);
+  border-radius: var(--r-lg);
+  box-shadow: var(--e-rest);
+}
+
+.progress-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 9px; }
+.progress-label { font-size: 14px; font-weight: 600; }
+.progress-count { font-size: 13px; color: var(--ink-3); font-variant-numeric: tabular-nums; }
+
+.progress-track { height: 10px; background: var(--track); border-radius: var(--r-pill); overflow: hidden; }
+
+.progress-fill {
+  display: block; height: 100%;
+  border-radius: var(--r-pill);
+  background: var(--grad-progress);
+  transition: width .4s ease;
+}
+
+/* --- En-tete de niveau --- */
+.level-block { display: grid; gap: var(--sp-3); }
+
+.level-head { display: flex; align-items: center; gap: 10px; }
+
+.level-pill {
+  padding: 4px 11px;
+  border-radius: var(--r-pill);
+  background: var(--accent-tint); color: var(--accent-dark);
+  font-size: 12.5px; font-weight: 700;
+}
+
+.level-name { margin: 0; font-family: var(--font); font-size: 16px; font-weight: 700; letter-spacing: 0; }
+.level-count { margin-left: auto; font-size: 13px; color: var(--ink-3); font-variant-numeric: tabular-nums; }
+
+/* --- Lignes de lecon --- */
+.lesson-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+
+.lesson-hit {
+  width: 100%;
+  display: grid; grid-template-columns: 52px 1fr auto; align-items: center; gap: 14px;
+  padding: 12px 14px;
+  border: none; border-radius: var(--r-lg);
+  background: var(--surface);
+  box-shadow: var(--e-rest);
+  text-align: left;
+  font-family: var(--font);
+  cursor: pointer;
+  min-height: 76px;
+  transition: transform .18s ease, box-shadow .18s ease;
+}
+
+.lesson-badge {
+  width: 52px; height: 52px;
+  display: grid; place-items: center;
+  border-radius: 18px;
+}
+
+.lesson-text { display: grid; min-width: 0; }
+.lesson-title { font-size: 15px; font-weight: 600; color: var(--ink); }
+.lesson-meta { font-size: 13px; }
+.lesson-chevron { font-size: 20px; color: var(--chevron); }
+
+/* Terminee */
+.lesson-row.is-done .lesson-badge { background: var(--success-tint); color: var(--success-dark); }
+.lesson-row.is-done .lesson-meta { color: var(--success-dark); font-weight: 600; }
+
+/* En cours */
+.lesson-row.is-current .lesson-hit { box-shadow: var(--e-active); }
+.lesson-row.is-current .lesson-badge { background: var(--grad-accent); color: #fff; }
+.lesson-row.is-current .lesson-meta { color: var(--accent-dark); font-weight: 600; }
+
+/* Verrouillee */
+.lesson-row.is-locked .lesson-hit { background: var(--surface-off); box-shadow: none; cursor: default; }
+.lesson-row.is-locked .lesson-badge { background: #e2e5ea; }
+.lesson-row.is-locked .lesson-title { color: var(--ink-3); font-weight: 500; }
+.lesson-row.is-locked .lesson-meta { color: var(--ink-disabled); }
+.lesson-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--ink-disabled); }
+
+/* --- Carte coeurs (colonne de droite) --- */
+.hearts-card {
+  padding: 16px;
+  background: var(--error-tint);
+  border-radius: var(--r-xl);
+}
+.hearts-card-title {
+  margin: 0 0 4px;
+  font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .1em;
+  color: var(--error-dark);
+}
+.hearts-card-value { margin: 0 0 6px; font-family: var(--font-title); font-size: 28px; color: var(--error-dark); }
+.hearts-card-hint { margin: 0; font-size: 13px; line-height: 1.45; color: var(--ink-2); }
+
+/* ---------- Tablette (>= 768px) ---------- */
+@media (min-width: 768px) {
+  .app-header-inner, .path { max-width: 900px; margin-inline: auto; }
+  .path { grid-template-columns: 1fr; }
+  .path-aside { display: grid; gap: var(--sp-4); grid-template-columns: 1fr 1fr; align-items: start; }
+  .progress-card-inline { display: none; }
+  .lesson-list { grid-template-columns: 1fr 1fr; }
+  .resume-title { font-size: 42px; }
+
+  /* Les niveaux deviennent une barre horizontale defilante */
+  .level-rail {
+    display: flex; gap: 8px;
+    order: -1;
+    overflow-x: auto;
+    scrollbar-width: none;
+    padding-bottom: 2px;
+  }
+  .level-rail::-webkit-scrollbar { display: none; }
+  .level-rail-item {
+    display: flex; align-items: center; gap: 8px; flex: 0 0 auto;
+    padding: 7px 12px 7px 8px;
+    background: var(--surface);
+    border-radius: var(--r-pill);
+    box-shadow: var(--e-rest);
+  }
+  .level-rail-badge {
+    width: 28px; height: 28px;
+    display: grid; place-items: center;
+    border-radius: 50%;
+    background: var(--surface-off); color: var(--ink-3);
+    font-size: 12px; font-weight: 700;
+  }
+  .level-rail-label { font-size: 13px; color: var(--ink-2); white-space: nowrap; }
+  .level-rail-item.is-current { background: var(--accent-tint); box-shadow: none; }
+  .level-rail-item.is-current .level-rail-badge { background: var(--grad-accent); color: #fff; }
+  .level-rail-item.is-current .level-rail-label { color: var(--accent-dark); font-weight: 600; }
 }
 
 /* ---------- Ordinateur (>= 1024px) ---------- */
 @media (min-width: 1024px) {
-  .exercise-screen { max-width: 760px; }
-  .path { max-width: 760px; }
-  .exercise-question { font-size: 1.7rem; }
+  .app-header-inner { max-width: 1280px; }
 
-  /* Le survol n'existe qu'a la souris : on ne l'active que la */
-  .path-node-btn:not(:disabled):hover { transform: translateY(-3px); }
+  .path {
+    max-width: 1280px;
+    grid-template-columns: 220px minmax(0, 1fr) 320px;
+    align-items: start;
+    gap: var(--sp-5);
+  }
+
+  /* Retour a une colonne verticale : on annule la barre horizontale
+     de la tablette, sinon ses reglages restent actifs. */
+  .level-rail {
+    display: grid; gap: 4px;
+    position: sticky; top: 76px;
+    order: 0; overflow: visible;
+  }
+
+  .level-rail-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 7px 10px;
+    border-radius: var(--r-md);
+    background: none; box-shadow: none;
+  }
+  .level-rail-badge {
+    width: 34px; height: 34px; flex: 0 0 auto;
+    display: grid; place-items: center;
+    border-radius: var(--r-sm);
+    background: var(--surface-off); color: var(--ink-3);
+    font-size: 13px; font-weight: 700;
+  }
+  .level-rail-label { font-size: 13px; color: var(--ink-2); white-space: normal; }
+  .level-rail-item.is-current { background: var(--accent-tint); }
+  .level-rail-item.is-current .level-rail-badge { background: var(--grad-accent); color: #fff; }
+  .level-rail-item.is-current .level-rail-label { color: var(--accent-dark); font-weight: 600; }
+
+  .path-aside { display: grid; grid-template-columns: 1fr; gap: var(--sp-4); position: sticky; top: 16px; }
+
+  .resume-card { padding: 28px; box-shadow: var(--e-hero-lg); }
+  .resume-title { font-size: 50px; }
+  .resume-btn { padding: 15px 34px; font-size: 16.5px; }
+
+  /* La barre d'onglets rejoint l'en-tete : plus rien ne flotte en bas */
+  .tabbar {
+    position: static;
+    grid-template-columns: repeat(3, max-content);
+    gap: 4px;
+    margin-left: var(--sp-5);
+    border-top: none; background: none; backdrop-filter: none;
+    padding: 0;
+  }
+  .tab { grid-auto-flow: column; justify-items: start; align-items: center; gap: 8px; padding: 8px 14px; }
+  .tab-label { font-size: 13.5px; }
+  .app-main { padding-bottom: var(--sp-6); }
+
+  /* En-tete collante et translucide, comme dans la maquette */
+  .app-header {
+    position: sticky; top: 0; z-index: 40;
+    background: rgba(246,247,249,.86);
+    backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--border);
+  }
 }
 
-/* ---------- Grand ecran (>= 1440px) ---------- */
-@media (min-width: 1440px) {
-  .navbar-inner { max-width: 1100px; }
+/* ---------- Survol : souris uniquement ---------- */
+@media (hover: hover) {
+  .resume-btn:hover { transform: translateY(-1px); }
+  .lesson-row:not(.is-locked) .lesson-hit:hover { transform: translateY(-2px); }
+  .tab:hover { background: var(--surface-off); }
 }
 
-/* ---------- Paysage sur telephone (hauteur reduite) ---------- */
-@media (max-height: 480px) and (orientation: landscape) {
-  .auth-screen { align-items: flex-start; padding-top: 1rem; }
-  .auth-brand { margin-bottom: 0.75rem; }
-  .auth-logo, .auth-brand .mascot { display: none; }  /* la mascotte mange toute la hauteur */
-  .exercise-screen { padding-top: 0.5rem; gap: 0.7rem; }
+/* ---------- Appui ---------- */
+.resume-btn:active,
+.lesson-row:not(.is-locked) .lesson-hit:active {
+  transform: scale(.98);
+  box-shadow: var(--e-rest);
+  transition-duration: 90ms;
 }
 
-/* ---------- Appareils tactiles : pas d'effet de survol ---------- */
-@media (hover: none) {
-  .option:hover { background: var(--bg); }
-  .navbar-link:hover { background: none; color: var(--text-muted); }
+@media (prefers-reduced-motion: reduce) {
+  .resume-btn:hover, .lesson-hit:hover, .resume-btn:active, .lesson-hit:active { transform: none; }
 }
 
-/* ============================================
-   NAVBAR — refonte
-   ============================================ */
-
-.navbar {
-  position: sticky; top: 0; z-index: 40;
-  background: rgba(255,255,255,.92);
-  backdrop-filter: saturate(180%) blur(12px);
-  border-bottom: 1px solid var(--border);
-  padding-top: env(safe-area-inset-top);
+/* --- Boutons pleine largeur des reglages et de la deconnexion --- */
+.settings-row-btn,
+.signout-btn {
+  width: 100%;
+  padding: 14px 18px;
+  border: none; border-radius: var(--r-pill);
+  background: var(--surface);
+  box-shadow: var(--e-rest);
+  color: var(--ink-2);
+  font-family: var(--font); font-size: 15.5px; font-weight: 600;
+  cursor: pointer;
+  min-height: 48px;
+  transition: transform .18s ease;
 }
-
-.navbar-inner {
-  max-width: 1000px; margin: 0 auto;
-  padding: var(--sp-2) var(--sp-4);
-  display: flex; align-items: center; gap: var(--sp-4);
-}
-
-.navbar-brand {
-  display: flex; align-items: center; gap: var(--sp-2);
-  font-family: var(--font-title); font-weight: 900; font-size: 1.15rem;
-  color: var(--text); text-decoration: none; letter-spacing: -.02em;
-}
-
-/* Statistiques en pastilles : lisibles d'un coup d'oeil, pas une ligne de texte */
-.stats { display: flex; gap: var(--sp-2); list-style: none; margin: 0 0 0 auto; padding: 0; }
-
-.stat {
-  display: flex; align-items: center; gap: 5px;
-  padding: 5px 10px; border-radius: 999px;
-  font-family: var(--font-title); font-weight: 800; font-size: .92rem;
-  font-variant-numeric: tabular-nums;   /* les chiffres ne sautent plus en changeant */
-  background: var(--bg-soft);
-}
-.stat-value { line-height: 1; }
-.stat-max { font-size: .72em; opacity: .55; font-weight: 700; }
-
-.stat-level  { color: var(--indigo-text); background: var(--indigo-soft); }
-.stat-streak { color: var(--amber); background: var(--amber-soft); }
-.stat-xp     { color: var(--amber);  background: var(--amber-soft); }
-.stat-hearts { color: var(--rose);   background: var(--rose-soft); }
-.stat-hearts.is-empty { color: var(--text-muted); background: var(--bg-soft); }
-
-/* Onglets : etat actif marque par un fond, pas seulement une couleur */
-.navbar-nav { display: flex; gap: var(--sp-1); }
-
-.nav-tab {
-  display: flex; align-items: center; gap: 6px;
-  min-height: 44px; padding: 0 var(--sp-3);
-  border-radius: 12px;
-  font-family: var(--font-title); font-weight: 800; font-size: .88rem;
-  color: var(--text-muted); text-decoration: none;
-  transition: background .18s ease, color .18s ease;
-  touch-action: manipulation;
-}
-.nav-tab:hover { background: var(--bg-soft); color: var(--text); }
-.nav-tab.active { background: var(--indigo-soft); color: var(--indigo-text); }
-
-.navbar-signout {
-  display: grid; place-items: center;
-  width: 44px; height: 44px;
-  border: none; background: none; border-radius: 12px;
-  color: var(--text-muted); cursor: pointer;
-  transition: background .18s ease, color .18s ease;
-}
-.navbar-signout:hover { background: var(--bg-soft); color: var(--text); }
-
-@media (max-width: 860px) {
-  .navbar-brand-name { display: none; }
-  .nav-tab span { display: none; }
-  .nav-tab { padding: 0 var(--sp-3); }
-}
-@media (max-width: 560px) {
-  .navbar-inner { gap: var(--sp-2); padding: var(--sp-2) var(--sp-3); }
-  .stats { gap: 4px; }
-  .stat { padding: 4px 8px; font-size: .85rem; }
-}
-
-/* ============================================
-   PARCOURS — refonte
-   ============================================ */
-
-.path {
-  max-width: 720px; margin: 0 auto;
-  padding: var(--sp-5) var(--sp-4) var(--sp-8);
-  display: flex; flex-direction: column; gap: var(--sp-5);
-}
-
-.path-loading { display: grid; place-items: center; gap: var(--sp-3); padding: var(--sp-8) 0; color: var(--text-muted); }
-
-/* --- Bandeau : la prochaine action, mise en avant --- */
-.path-hero {
-  display: flex; align-items: center; gap: var(--sp-4);
-  padding: var(--sp-5);
-  border-radius: var(--radius-lg);
-  background: linear-gradient(135deg, var(--indigo) 0%, var(--violet) 100%);
-  color: #fff;
-  box-shadow: var(--e2);
-}
-.path-hero-text { flex: 1; min-width: 0; }
-.path-hero-eyebrow {
-  margin: 0 0 var(--sp-1); font-size: .8rem; font-weight: 700;
-  text-transform: uppercase; letter-spacing: .06em; opacity: .85;
-}
-.path-hero-title { margin: 0 0 var(--sp-1); font-size: 1.5rem; color: #fff; }
-.path-hero-meta { margin: 0 0 var(--sp-4); font-size: .9rem; opacity: .9; }
-.path-hero .btn-primary {
-  background: #fff; color: var(--indigo-text);
-  box-shadow: 0 4px 0 rgba(0,0,0,.14);
-}
-.path-hero-mascot { flex: 0 0 auto; }
-
-/* --- Progression : toujours accompagnee du chiffre --- */
-.progress-card {
-  padding: var(--sp-4);
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  box-shadow: var(--e1);
-}
-.progress-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: var(--sp-2); }
-.progress-label { font-family: var(--font-title); font-weight: 800; font-size: .95rem; }
-.progress-count { font-size: .85rem; color: var(--text-muted); font-variant-numeric: tabular-nums; }
-.progress-track { height: 10px; background: var(--border); border-radius: 999px; overflow: hidden; }
-.progress-fill {
-  display: block; height: 100%; border-radius: 999px;
-  background: linear-gradient(90deg, var(--teal), #14b8a6);
-  transition: width .6s cubic-bezier(.22,1,.36,1);
-}
-
-/* --- Niveaux --- */
-.level { display: flex; flex-direction: column; gap: var(--sp-3); }
-.level.is-locked { opacity: .62; }
-
-.level-head { display: flex; align-items: center; gap: var(--sp-3); }
-
-.level-badge {
-  display: grid; place-items: center;
-  width: 46px; height: 46px; flex: 0 0 auto;
-  border-radius: 14px;
-  font-family: var(--font-title); font-weight: 900; font-size: 1rem;
-  color: #fff; background: var(--level-color, var(--green));
-  box-shadow: var(--e1);
-}
-.level-A1 { --level-color: var(--lvl-A1); }
-.level-A2 { --level-color: var(--lvl-A2); }
-.level-B1 { --level-color: var(--lvl-B1); }
-.level-B2 { --level-color: var(--lvl-B2); }
-.level-C1 { --level-color: var(--lvl-C1); }
-.level-C2 { --level-color: var(--lvl-C2); }
-
-.level-titles { flex: 1; min-width: 0; }
-.level-name { margin: 0; font-size: 1.05rem; }
-.level-count { margin: 0; font-size: .84rem; color: var(--text-muted); font-variant-numeric: tabular-nums; }
-
-/* --- Lecons : chemin qui serpente --- */
-.lessons { list-style: none; margin: 0; padding: 0 0 0 var(--sp-2); display: flex; flex-direction: column; gap: var(--sp-3); }
-
-.lesson {
-  display: flex; align-items: center; gap: var(--sp-4);
-  animation: lesson-in .34s ease-out backwards;
-}
-@keyframes lesson-in {
-  from { opacity: 0; transform: translateY(8px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-.lesson:nth-child(1) { animation-delay: 0s; }
-.lesson:nth-child(2) { animation-delay: .04s; }
-.lesson:nth-child(3) { animation-delay: .08s; }
-.lesson:nth-child(4) { animation-delay: .12s; }
-.lesson:nth-child(5) { animation-delay: .16s; }
-
-/* Le decalage transforme la liste en chemin */
-.offset-0 { margin-left: 0; }
-.offset-1 { margin-left: 28px; }
-.offset-2 { margin-left: 44px; }
-.offset-3 { margin-left: 28px; }
-
-.lesson-btn {
-  flex: 0 0 auto;
-  display: grid; place-items: center;
-  width: 62px; height: 62px;
-  border: none; border-radius: 50%;
-  color: #fff; cursor: pointer;
-  background: var(--border-strong);
-  box-shadow: 0 5px 0 #b6bcc4;
-  transition: transform .12s ease, box-shadow .12s ease;
-  touch-action: manipulation;
-}
-.lesson.is-open .lesson-btn { background: var(--level-color); box-shadow: 0 5px 0 rgba(0,0,0,.18); }
-.lesson.is-done .lesson-btn { background: var(--gold); box-shadow: 0 5px 0 #92400e; }
-.lesson.is-locked .lesson-btn { background: #eceef1; color: #9aa1ab; box-shadow: 0 4px 0 #dcdfe4; cursor: not-allowed; }
-
-.lesson-btn:not(:disabled):active { transform: translateY(4px); box-shadow: none; }
-
-/* La lecon en cours : halo pulse, l'oeil la trouve immediatement */
-.lesson.is-current .lesson-btn { animation: halo 2.4s ease-in-out infinite; }
-@keyframes halo {
-  0%, 100% { box-shadow: 0 5px 0 rgba(0,0,0,.18), 0 0 0 0 rgba(67,56,202,.45); }
-  50%      { box-shadow: 0 5px 0 rgba(0,0,0,.18), 0 0 0 12px rgba(67,56,202,0); }
-}
-
-.lesson-text { display: flex; flex-direction: column; min-width: 0; }
-.lesson-title { font-family: var(--font-title); font-weight: 800; font-size: 1rem; }
-.lesson-meta { font-size: .82rem; color: var(--text-muted); }
-.lesson.is-done .lesson-meta { color: var(--green-text); font-weight: 700; }
-/* On n'ecrit plus "Verrouille" 29 fois : le cadenas le dit deja */
-.lesson.is-locked .lesson-title { color: var(--text-muted); }
-
-@media (max-width: 560px) {
-  .path-hero { flex-direction: column; text-align: center; }
-  .path-hero .btn-primary { width: 100%; }
-  .offset-1, .offset-3 { margin-left: 16px; }
-  .offset-2 { margin-left: 26px; }
-  .lesson-btn { width: 56px; height: 56px; }
-}
-
-/* Boutons icone de la navbar (son, deconnexion) */
-.navbar-icon-btn {
-  display: grid; place-items: center;
-  width: 44px; height: 44px; flex: 0 0 auto;
-  border: none; background: none; border-radius: 12px;
-  color: var(--text-muted); cursor: pointer;
-  transition: background .18s ease, color .18s ease;
-  touch-action: manipulation;
-}
-.navbar-icon-btn:hover { background: var(--bg-soft); color: var(--text); }
-.navbar-icon-btn[aria-pressed="false"] { color: var(--border-strong); }
+.settings-row-btn:active,
+.signout-btn:active { transform: scale(.98); transition-duration: 90ms; }

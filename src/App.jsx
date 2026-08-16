@@ -2,10 +2,36 @@ import { useCallback, useEffect, useState } from 'react'
 import { Navigate, Route, Routes } from 'react-router-dom'
 import { supabase } from './supabaseClient'
 import { ensureProfile, fetchProfile } from './lib/profile'
+import { isSoundOn, setSoundOn } from './lib/sounds'
 import Auth from './components/Auth'
-import Navbar from './components/Navbar'
+import AppShell from './components/AppShell'
 import LessonPath from './components/LessonPath'
 import Exercise from './components/Exercise'
+
+// Provisoire, remplace par l'ecran de profil complet a l'etape suivante.
+function ProfileStub({ onSignOut }) {
+  const [sound, setSound] = useState(isSoundOn())
+
+  function toggleSound() {
+    const next = !sound
+    setSound(next)
+    setSoundOn(next)   // le choix est retenu d'une session a l'autre
+  }
+
+  return (
+    <div className="path">
+      <div className="path-main">
+        <p className="path-status">L'écran de profil arrive bientôt.</p>
+        <button type="button" className="settings-row-btn" onClick={toggleSound} aria-pressed={sound}>
+          {sound ? 'Couper les sons' : 'Activer les sons'}
+        </button>
+        <button type="button" className="signout-btn" onClick={onSignOut}>
+          Se déconnecter
+        </button>
+      </div>
+    </div>
+  )
+}
 
 export default function App() {
   const [session, setSession] = useState(null)
@@ -51,7 +77,7 @@ export default function App() {
   }, [session])
 
   // Écoute en temps réel les modifications du profil (XP, cœurs, série),
-  // pour que la Navbar se mette à jour sans rechargement de page.
+  // pour que l'en-tête se mette à jour sans rechargement de page.
   useEffect(() => {
     const userId = session?.user?.id
     if (!userId) return
@@ -88,27 +114,30 @@ export default function App() {
   }
 
   return (
-    <>
-      <Navbar profile={profile} onSignOut={handleSignOut} />
-      <main>
-        {profileError && (
-          <p className="alert alert-error" role="alert">Profil indisponible : {profileError}</p>
-        )}
+    <AppShell profile={profile}>
+      {profileError && (
+        <p className="alert alert-error" role="alert">Profil indisponible : {profileError}</p>
+      )}
 
-        {!profile && !profileError && <p className="path-status">Préparation de ton profil…</p>}
+      {!profile && !profileError && <p className="path-status">Préparation de ton profil…</p>}
 
-        {profile && (
-          <Routes>
-            <Route path="/dashboard" element={<LessonPath userId={profile.id} />} />
-            <Route
-              path="/lesson/:id"
-              element={<Exercise profile={profile} onProfileChange={refreshProfile} />}
-            />
-            <Route path="/leaderboard" element={<p className="path-status">Le classement arrive bientôt.</p>} />
-            <Route path="*" element={<Navigate to="/dashboard" replace />} />
-          </Routes>
-        )}
-      </main>
-    </>
+      {profile && (
+        <Routes>
+          <Route
+            path="/dashboard"
+            element={<LessonPath userId={profile.id} hearts={profile.hearts} />}
+          />
+          <Route
+            path="/lesson/:id"
+            element={<Exercise profile={profile} onProfileChange={refreshProfile} />}
+          />
+          <Route path="/leaderboard" element={<p className="path-status">Le classement arrive bientôt.</p>} />
+          {/* Ecran de profil provisoire : il porte la deconnexion et le
+              reglage du son, le temps que l'ecran complet soit construit. */}
+          <Route path="/profile" element={<ProfileStub onSignOut={handleSignOut} />} />
+          <Route path="*" element={<Navigate to="/dashboard" replace />} />
+        </Routes>
+      )}
+    </AppShell>
   )
 }
