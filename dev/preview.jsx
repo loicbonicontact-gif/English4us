@@ -14,7 +14,8 @@ import PathView from '../src/components/PathView'
 import ExerciseView from '../src/components/ExerciseView'
 import LessonEnd from '../src/components/LessonEnd'
 import ProfileView from '../src/components/ProfileView'
-import { demoExercise, demoLesson, demoPath, demoProfile, demoResults } from './fixtures'
+import LeaderboardView from '../src/components/LeaderboardView'
+import { demoBoard, demoExercise, demoLesson, demoPath, demoProfile, demoResults } from './fixtures'
 
 const SCREENS = [
   { key: 'parcours', label: '01 Parcours' },
@@ -23,6 +24,7 @@ const SCREENS = [
   { key: 'faux', label: '03 Faux' },
   { key: 'vide', label: '03 Sans cœur' },
   { key: 'fin', label: '04 Fin' },
+  { key: 'classement', label: '05 Classement' },
   { key: 'profil', label: '06 Profil' }
 ]
 
@@ -77,6 +79,12 @@ function Preview() {
       )}
 
       {['question', 'juste', 'faux', 'vide'].includes(screen) && <ExerciseView {...exerciseProps} />}
+
+      {screen === 'classement' && (
+        <AppShell profile={demoProfile}>
+          <LeaderboardView rows={demoBoard} me={demoBoard[3]} myRank={4} total={128} />
+        </AppShell>
+      )}
 
       {screen === 'profil' && (
         <AppShell profile={demoProfile}>

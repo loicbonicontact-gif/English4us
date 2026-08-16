@@ -1308,6 +1308,71 @@ html, body { max-width: 100%; overflow-x: hidden; }
 }
 
 /* ============================================
+   05 · CLASSEMENT
+   ============================================ */
+
+.board-screen {
+  max-width: 560px; margin: 0 auto;
+  display: grid; gap: 14px;
+  padding: 8px 18px var(--sp-6);
+}
+
+.board-eyebrow {
+  margin: 0 0 2px;
+  font-size: 12.5px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: .12em;
+  color: var(--ink-3);
+}
+.board-title { margin: 0; font-family: var(--font-title); font-weight: 600; font-size: 36px; }
+
+.board-card {
+  padding: 8px 14px;
+  background: var(--surface);
+  border-radius: var(--r-2xl);
+  box-shadow: var(--e-rest);
+}
+
+.board-list { list-style: none; margin: 0; padding: 0; }
+
+.board-row,
+.board-me {
+  display: grid; grid-template-columns: 26px 38px 1fr auto; align-items: center; gap: 12px;
+  padding: 11px 0;
+  border-bottom: 1px solid var(--separator);
+}
+.board-row:last-child { border-bottom: none; }
+
+.board-rank { font-size: 14px; font-weight: 600; color: var(--ink-3); font-variant-numeric: tabular-nums; }
+
+.board-avatar {
+  width: 38px; height: 38px;
+  display: grid; place-items: center;
+  border-radius: var(--r-sm);
+  color: #fff; font-size: 15px; font-weight: 700;
+}
+.board-avatar.av-0 { background: var(--av-1); }
+.board-avatar.av-1 { background: var(--av-2); }
+.board-avatar.av-2 { background: var(--av-3); }
+.board-avatar.av-3 { background: var(--av-4); }
+.board-avatar.is-mine { background: var(--grad-accent); }
+
+.board-name { font-size: 15px; font-weight: 500; overflow-wrap: anywhere; }
+.board-xp { font-size: 14.5px; font-weight: 700; color: var(--accent-dark); font-variant-numeric: tabular-nums; }
+
+/* Ligne de l'utilisateur : hors carte, pour rester reperable */
+.board-me {
+  padding: 12px 14px;
+  border-bottom: none;
+  background: var(--accent-tint);
+  border-radius: var(--r-lg);
+  box-shadow: 0 6px 16px rgba(74,127,208,.18);
+}
+.board-row.is-me { background: var(--accent-tint); border-radius: var(--r-md); padding-inline: 8px; }
+.board-you { color: var(--accent-dark); font-weight: 600; }
+
+.board-note { margin: 0; font-size: 13.5px; color: var(--ink-3); text-align: center; }
+
+/* ============================================
    BARRE DE PREVISUALISATION (developpement seulement)
    Presente uniquement sur preview.html, jamais dans l'app.
    ============================================ */

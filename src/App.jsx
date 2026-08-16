@@ -7,6 +7,7 @@ import AppShell from './components/AppShell'
 import LessonPath from './components/LessonPath'
 import Exercise from './components/Exercise'
 import Profile from './components/Profile'
+import Leaderboard from './components/Leaderboard'
 
 export default function App() {
   const [session, setSession] = useState(null)
@@ -106,7 +107,7 @@ export default function App() {
             path="/lesson/:id"
             element={<Exercise profile={profile} onProfileChange={refreshProfile} />}
           />
-          <Route path="/leaderboard" element={<p className="path-status">Le classement arrive bientôt.</p>} />
+          <Route path="/leaderboard" element={<Leaderboard profile={profile} />} />
           <Route path="/profile" element={<Profile profile={profile} onSignOut={handleSignOut} />} />
           <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Routes>

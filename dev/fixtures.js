@@ -49,3 +49,12 @@ export const demoResults = [
   { question: 'ma sœur', answer: 'My sister', right: true },
   { question: 'mes parents', answer: 'My parents', right: false }
 ]
+
+export const demoBoard = [
+  { id: 'a', username: 'clara', xp: 1240 },
+  { id: 'b', username: 'yanis', xp: 980 },
+  { id: 'c', username: 'ines', xp: 760 },
+  { id: 'demo', username: 'malo', xp: 610 },
+  { id: 'e', username: 'noah', xp: 430 },
+  { id: 'f', username: 'lina', xp: 220 }
+]
