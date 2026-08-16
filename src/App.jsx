@@ -2,36 +2,11 @@ import { useCallback, useEffect, useState } from 'react'
 import { Navigate, Route, Routes } from 'react-router-dom'
 import { supabase } from './supabaseClient'
 import { ensureProfile, fetchProfile } from './lib/profile'
-import { isSoundOn, setSoundOn } from './lib/sounds'
 import Auth from './components/Auth'
 import AppShell from './components/AppShell'
 import LessonPath from './components/LessonPath'
 import Exercise from './components/Exercise'
-
-// Provisoire, remplace par l'ecran de profil complet a l'etape suivante.
-function ProfileStub({ onSignOut }) {
-  const [sound, setSound] = useState(isSoundOn())
-
-  function toggleSound() {
-    const next = !sound
-    setSound(next)
-    setSoundOn(next)   // le choix est retenu d'une session a l'autre
-  }
-
-  return (
-    <div className="path">
-      <div className="path-main">
-        <p className="path-status">L'écran de profil arrive bientôt.</p>
-        <button type="button" className="settings-row-btn" onClick={toggleSound} aria-pressed={sound}>
-          {sound ? 'Couper les sons' : 'Activer les sons'}
-        </button>
-        <button type="button" className="signout-btn" onClick={onSignOut}>
-          Se déconnecter
-        </button>
-      </div>
-    </div>
-  )
-}
+import Profile from './components/Profile'
 
 export default function App() {
   const [session, setSession] = useState(null)
@@ -132,9 +107,7 @@ export default function App() {
             element={<Exercise profile={profile} onProfileChange={refreshProfile} />}
           />
           <Route path="/leaderboard" element={<p className="path-status">Le classement arrive bientôt.</p>} />
-          {/* Ecran de profil provisoire : il porte la deconnexion et le
-              reglage du son, le temps que l'ecran complet soit construit. */}
-          <Route path="/profile" element={<ProfileStub onSignOut={handleSignOut} />} />
+          <Route path="/profile" element={<Profile profile={profile} onSignOut={handleSignOut} />} />
           <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Routes>
       )}

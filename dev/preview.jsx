@@ -13,6 +13,7 @@ import AppShell from '../src/components/AppShell'
 import PathView from '../src/components/PathView'
 import ExerciseView from '../src/components/ExerciseView'
 import LessonEnd from '../src/components/LessonEnd'
+import ProfileView from '../src/components/ProfileView'
 import { demoExercise, demoLesson, demoPath, demoProfile, demoResults } from './fixtures'
 
 const SCREENS = [
@@ -21,12 +22,14 @@ const SCREENS = [
   { key: 'juste', label: '03 Juste' },
   { key: 'faux', label: '03 Faux' },
   { key: 'vide', label: '03 Sans cœur' },
-  { key: 'fin', label: '04 Fin' }
+  { key: 'fin', label: '04 Fin' },
+  { key: 'profil', label: '06 Profil' }
 ]
 
 function Preview() {
   const [screen, setScreen] = useState('parcours')
   const [answer, setAnswer] = useState('')
+  const [sound, setSound] = useState(true)
 
   const verdict = screen === 'juste' ? 'right' : (screen === 'faux' || screen === 'vide') ? 'wrong' : null
   const hearts = screen === 'vide' ? 0 : screen === 'faux' ? 1 : 2
@@ -74,6 +77,22 @@ function Preview() {
       )}
 
       {['question', 'juste', 'faux', 'vide'].includes(screen) && <ExerciseView {...exerciseProps} />}
+
+      {screen === 'profil' && (
+        <AppShell profile={demoProfile}>
+          <ProfileView
+            username="malo"
+            memberSince="août 2026"
+            level={{ current: 'A1', next: 'A2', inLevel: 10, needed: 500, percent: 2 }}
+            lessonsDone={1}
+            streak={1}
+            accuracy={89}
+            soundOn={sound}
+            onToggleSound={() => setSound((v) => !v)}
+            onSignOut={() => {}}
+          />
+        </AppShell>
+      )}
 
       {screen === 'fin' && (
         <LessonEnd

@@ -18,13 +18,38 @@ export function computeStreak(lastActivityDate, currentStreak) {
   return 1 // streak cassé, on repart à 1
 }
 
+// XP nécessaires pour passer d'un niveau CECRL au suivant.
+export const XP_PER_LEVEL = 500
+
+const LEVEL_ORDER = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2']
+
 // Détermine le niveau CECRL selon l'XP total
 export function levelFromXP(xp) {
-  const thresholds = [0, 500, 1000, 1500, 2000, 2500]
-  const levels = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2']
+  const thresholds = LEVEL_ORDER.map((_, i) => i * XP_PER_LEVEL)
   let idx = 0
   thresholds.forEach((t, i) => { if (xp >= t) idx = i })
-  return levels[idx]
+  return LEVEL_ORDER[idx]
+}
+
+// Progression à l'intérieur du niveau courant : sert la barre du profil.
+// Au dernier niveau, il n'y a plus de palier à atteindre — la barre est pleine.
+export function levelProgress(xp) {
+  const current = levelFromXP(xp)
+  const idx = LEVEL_ORDER.indexOf(current)
+  const isLast = idx === LEVEL_ORDER.length - 1
+
+  if (isLast) {
+    return { current, next: null, inLevel: XP_PER_LEVEL, needed: XP_PER_LEVEL, percent: 100 }
+  }
+
+  const inLevel = xp - idx * XP_PER_LEVEL
+  return {
+    current,
+    next: LEVEL_ORDER[idx + 1],
+    inLevel,
+    needed: XP_PER_LEVEL,
+    percent: Math.round((inLevel / XP_PER_LEVEL) * 100)
+  }
 }
 
 // Enregistre la complétion d'une leçon : XP, streak, progression

@@ -1,0 +1,91 @@
+import Mascot from './Mascot'
+
+// Affichage pur de l'ecran de profil.
+// Les statistiques sont calculees par Profile.jsx.
+export default function ProfileView({
+  username,
+  memberSince,
+  level,
+  lessonsDone,
+  streak,
+  accuracy,
+  soundOn,
+  onToggleSound,
+  onSignOut
+}) {
+  const initial = (username || '?').charAt(0).toUpperCase()
+
+  return (
+    <div className="profile-screen">
+      <header className="profile-head">
+        <span className="profile-avatar" aria-hidden="true">{initial}</span>
+        <h1 className="profile-name">{username}</h1>
+        {memberSince && <p className="profile-since">Membre depuis {memberSince}</p>}
+      </header>
+
+      <section className="level-card">
+        <div className="level-card-head">
+          <span className="level-card-title">
+            Niveau {level.current}{level.next ? ` → ${level.next}` : ''}
+          </span>
+          <span className="level-card-count">
+            {level.next ? `${level.inLevel} / ${level.needed} XP` : 'Niveau maximum'}
+          </span>
+        </div>
+        <div
+          className="progress-track"
+          role="progressbar"
+          aria-valuenow={level.inLevel}
+          aria-valuemin={0}
+          aria-valuemax={level.needed}
+          aria-label="Progression vers le niveau suivant"
+        >
+          <span className="progress-fill" style={{ width: `${Math.max(level.percent, 5)}%` }} />
+        </div>
+      </section>
+
+      <div className="end-tiles">
+        <div className="end-tile">
+          <span className="end-tile-value">{lessonsDone}</span>
+          <span className="end-tile-label">
+            leçon{lessonsDone > 1 ? 's' : ''} terminée{lessonsDone > 1 ? 's' : ''}
+          </span>
+        </div>
+        <div className="end-tile">
+          <span className="end-tile-value">{streak}</span>
+          <span className="end-tile-label">jour{streak > 1 ? 's' : ''} de série</span>
+        </div>
+        <div className="end-tile">
+          {/* Tiret tant qu'aucune leçon n'est finie : « 0 % » se lirait
+              comme un mauvais résultat, alors qu'il n'y a rien à mesurer. */}
+          <span className="end-tile-value end-tile-score">
+            {accuracy === null ? '—' : `${accuracy} %`}
+          </span>
+          <span className="end-tile-label">Précision</span>
+        </div>
+      </div>
+
+      <section className="settings-card">
+        <div className="settings-row">
+          <span className="settings-label">Sons de l'application</span>
+          <button
+            type="button"
+            className={`toggle ${soundOn ? 'is-on' : ''}`}
+            onClick={onToggleSound}
+            role="switch"
+            aria-checked={soundOn}
+            aria-label="Sons de l'application"
+          >
+            <span className="toggle-knob" />
+          </button>
+        </div>
+      </section>
+
+      <button type="button" className="signout-btn" onClick={onSignOut}>
+        Se déconnecter
+      </button>
+
+      <Mascot mood="idle" size={72} className="profile-mascot" />
+    </div>
+  )
+}
