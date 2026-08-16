@@ -77,7 +77,18 @@ export async function applyRefill(profile) {
   if (!profile) return profile
 
   const result = computeRefill(profile.hearts, profile.hearts_updated_at)
-  if (result.gained === 0) return profile
+
+  // Deux raisons d'écrire en base :
+  //   - des cœurs ont été rendus ;
+  //   - le compte est incomplet mais aucune date n'était enregistrée, donc
+  //     le compteur n'avait jamais démarré.
+  //
+  // Ce second cas est indispensable : sans lui, un profil sans date
+  // recalculerait « 4 heures à attendre » à chaque ouverture, sans jamais
+  // rien enregistrer. Le compte à rebours resterait figé pour toujours et
+  // aucun cœur ne reviendrait.
+  const timerNeverStarted = !profile.hearts_updated_at && result.updatedAt !== null
+  if (result.gained === 0 && !timerNeverStarted) return profile
 
   const { error } = await supabase
     .from('profiles')

@@ -64,7 +64,25 @@ describe('computeRefill', () => {
     const r = computeRefill(1, null, NOW)
     expect(r.gained).toBe(0)
     expect(r.msUntilNext).toBe(REFILL_MS)
+    // La date renvoyée doit être « maintenant » ET non nulle : c'est elle
+    // que applyRefill enregistre pour démarrer réellement l'attente. Sans
+    // cet enregistrement, le compte à rebours resterait figé sur 4 h à
+    // chaque ouverture et aucun cœur ne reviendrait jamais.
     expect(r.updatedAt).toBe(new Date(NOW).toISOString())
+  })
+
+  it('le compteur démarré avance réellement au rechargement suivant', () => {
+    // Première ouverture, sans date : le compteur démarre.
+    const start = computeRefill(1, null, NOW)
+
+    // Deux heures plus tard : l'attente doit avoir diminué de deux heures.
+    const later = computeRefill(1, start.updatedAt, NOW + 2 * 60 * 60 * 1000)
+    expect(Math.round(later.msUntilNext / 60000)).toBe(120)
+
+    // Quatre heures après le départ : le cœur est rendu.
+    const done = computeRefill(1, start.updatedAt, NOW + 4 * 60 * 60 * 1000)
+    expect(done.gained).toBe(1)
+    expect(done.hearts).toBe(2)
   })
 
   it('supporte une date invalide sans planter', () => {
