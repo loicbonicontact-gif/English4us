@@ -12,6 +12,7 @@ import Profile from './components/Profile'
 import Leaderboard from './components/Leaderboard'
 import Review from './components/Review'
 import Listening from './components/Listening'
+import Reading from './components/Reading'
 
 export default function App() {
   const [session, setSession] = useState(null)
@@ -140,6 +141,10 @@ export default function App() {
           <Route
             path="/listening/:id"
             element={<Listening profile={profile} onProfileChange={refreshProfile} />}
+          />
+          <Route
+            path="/reading/:id"
+            element={<Reading profile={profile} onProfileChange={refreshProfile} />}
           />
           <Route path="/leaderboard" element={<Leaderboard profile={profile} />} />
           <Route path="/profile" element={<Profile profile={profile} onSignOut={handleSignOut} />} />

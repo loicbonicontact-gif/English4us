@@ -42,57 +42,83 @@ describe('buildPath — déverrouillage des leçons', () => {
   })
 })
 
-describe('buildPath — écoutes intercalées', () => {
-  it('place une écoute toutes les deux leçons', () => {
-    const kinds = itemsOf(buildPath(LESSONS, {}, PASSAGES)).map((i) => i.kind)
+const READINGS = [
+  { id: 201, level: 'A1', title: 'Un e-mail de confirmation', position: 1, xp_reward: 15 },
+  { id: 202, level: 'A1', title: 'Une annonce de magasin', position: 2, xp_reward: 15 }
+]
+
+describe('buildPath — mises en pratique intercalées', () => {
+  it('place une mise en pratique après chaque leçon, en alternant écoute et lecture', () => {
+    const kinds = itemsOf(buildPath(LESSONS, {}, PASSAGES, {}, READINGS, {})).map((i) => i.kind)
     expect(kinds).toEqual([
-      'lesson', 'lesson', 'listening',
-      'lesson', 'lesson', 'listening',
+      'lesson', 'listening',
+      'lesson', 'reading',
+      'lesson', 'listening',
+      'lesson', 'reading',
       'lesson', 'listening'
     ])
   })
 
-  it('n\'oublie aucune écoute, même la dernière', () => {
-    const listenings = itemsOf(buildPath(LESSONS, {}, PASSAGES))
-      .filter((i) => i.kind === 'listening')
-    expect(listenings.map((l) => l.id)).toEqual([101, 102, 103])
+  it('n\'oublie aucun passage, même quand il y en a plus que de leçons', () => {
+    const manyReadings = [...READINGS,
+      { id: 203, level: 'A1', title: 'Un troisième texte', position: 3, xp_reward: 15 },
+      { id: 204, level: 'A1', title: 'Un quatrième texte', position: 4, xp_reward: 15 }
+    ]
+    const items = itemsOf(buildPath(LESSONS, {}, PASSAGES, {}, manyReadings, {}))
+    const ids = items.filter((i) => i.kind !== 'lesson').map((i) => i.id).sort()
+    expect(ids).toEqual([101, 102, 103, 201, 202, 203, 204])
   })
 
-  it('verrouille une écoute tant que la leçon qui la précède n\'est pas faite', () => {
-    const items = itemsOf(buildPath(LESSONS, {}, PASSAGES))
-    expect(items[2].kind).toBe('listening')
-    expect(items[2].unlocked).toBe(false)
+  it('ne saute pas de tour quand une seule file est fournie', () => {
+    // Sans lecture, les écoutes doivent se succéder sans laisser de trou.
+    const kinds = itemsOf(buildPath(LESSONS, {}, PASSAGES)).map((i) => i.kind)
+    expect(kinds).toEqual([
+      'lesson', 'listening',
+      'lesson', 'listening',
+      'lesson', 'listening',
+      'lesson', 'lesson'
+    ])
   })
 
-  it('ouvre l\'écoute dès que la leçon qui la précède est terminée', () => {
-    const progress = { 1: { completed: true }, 2: { completed: true } }
-    const items = itemsOf(buildPath(LESSONS, progress, PASSAGES))
+  it('verrouille une mise en pratique tant que la leçon qui la précède n\'est pas faite', () => {
+    const items = itemsOf(buildPath(LESSONS, {}, PASSAGES, {}, READINGS, {}))
+    expect(items[1].kind).toBe('listening')
+    expect(items[1].unlocked).toBe(false)
+  })
+
+  it('l\'ouvre dès que la leçon qui la précède est terminée', () => {
+    const items = itemsOf(buildPath(LESSONS, { 1: { completed: true } }, PASSAGES, {}, READINGS, {}))
+    expect(items[1].unlocked).toBe(true)
+  })
+
+  it('ne bloque jamais la leçon suivante', () => {
+    const items = itemsOf(buildPath(LESSONS, { 1: { completed: true } }, PASSAGES, {}, READINGS, {}))
+    expect(items[2].kind).toBe('lesson')
     expect(items[2].unlocked).toBe(true)
   })
 
-  it('ne bloque jamais la leçon suivante, même si l\'écoute n\'est pas faite', () => {
-    const progress = { 1: { completed: true }, 2: { completed: true } }
-    const items = itemsOf(buildPath(LESSONS, progress, PASSAGES))
-    const lessonAfterListening = items[3]
-    expect(lessonAfterListening.kind).toBe('lesson')
-    expect(lessonAfterListening.unlocked).toBe(true)
-  })
-
   it('marque une écoute terminée avec son score', () => {
-    const progress = { 1: { completed: true }, 2: { completed: true } }
-    const items = itemsOf(buildPath(LESSONS, progress, PASSAGES, { 101: { score: 67 } }))
-    expect(items[2].completed).toBe(true)
-    expect(items[2].score).toBe(67)
+    const items = itemsOf(buildPath(LESSONS, { 1: { completed: true } }, PASSAGES, { 101: { score: 67 } }, READINGS, {}))
+    expect(items[1].completed).toBe(true)
+    expect(items[1].score).toBe(67)
   })
 
-  it('affiche le parcours normalement quand aucune écoute n\'existe', () => {
+  it('marque une lecture terminée avec son score', () => {
+    const progress = { 1: { completed: true }, 2: { completed: true } }
+    const items = itemsOf(buildPath(LESSONS, progress, PASSAGES, {}, READINGS, { 201: { score: 100 } }))
+    const reading = items.find((i) => i.kind === 'reading')
+    expect(reading.completed).toBe(true)
+    expect(reading.score).toBe(100)
+  })
+
+  it('affiche le parcours normalement quand aucune mise en pratique n\'existe', () => {
     const items = itemsOf(buildPath(LESSONS, {}))
     expect(items).toHaveLength(5)
     expect(items.every((i) => i.kind === 'lesson')).toBe(true)
   })
 
   it('n\'affecte pas le compte de leçons du niveau', () => {
-    const group = buildPath(LESSONS, {}, PASSAGES).byLevel.find((g) => g.level === 'A1')
+    const group = buildPath(LESSONS, {}, PASSAGES, {}, READINGS, {}).byLevel.find((g) => g.level === 'A1')
     expect(group.lessons).toHaveLength(5)
   })
 })

@@ -19,6 +19,7 @@ import {
   History,
   Lock,
   Mic,
+  FileText,
   LogOut,
   Play,
   RotateCw,
@@ -52,6 +53,7 @@ export const IconHeadphones = wrap(Headphones)
 export const IconWave = wrap(AudioLines)
 export const IconSlow = wrap(Turtle)
 export const IconMic = wrap(Mic)
+export const IconRead = wrap(FileText)
 export const IconLock = wrap(Lock)
 export const IconLogout = wrap(LogOut)
 export const IconPlay = wrap(Play)

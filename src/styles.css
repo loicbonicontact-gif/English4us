@@ -1557,6 +1557,62 @@ html, body { max-width: 100%; overflow-x: hidden; }
 .review-empty .btn-wide { max-width: 420px; margin-top: var(--sp-2); }
 
 /* ============================================
+   11 · COMPREHENSION ECRITE
+   Le document reste affiche pendant les questions : au TOEIC on relit
+   autant qu'on veut, et la competence est justement d'y retrouver
+   l'information, pas de la memoriser.
+   ============================================ */
+.read-docs { display: grid; gap: 12px; }
+
+.read-doc {
+  border: 1px solid var(--border); border-radius: var(--r-lg);
+  background: var(--surface);
+  overflow: hidden;
+}
+
+.read-doc-head {
+  padding: 12px 16px;
+  background: var(--surface-off);
+  border-bottom: 1px solid var(--border);
+}
+
+.read-doc-kind {
+  display: inline-block;
+  font-size: 11.5px; font-weight: 700; letter-spacing: .05em;
+  text-transform: uppercase;
+  color: var(--accent-dark);            /* 6.9:1 sur surface-off */
+}
+
+.read-doc-title {
+  margin: 3px 0 0;
+  font-family: var(--font); font-size: 15.5px; font-weight: 700;
+  letter-spacing: 0; line-height: 1.3;
+  color: var(--ink);
+}
+
+/* Le corps defile a l'interieur du cadre : la question reste atteignable
+   sans avoir a remonter tout le document. */
+.read-doc-body {
+  max-height: 42vh; overflow-y: auto;
+  padding: 14px 16px;
+  font-size: 15px; line-height: 1.6;
+  color: var(--ink-2);                  /* 9.8:1 sur blanc */
+}
+
+.read-doc-body p { margin: 0 0 10px; }
+.read-doc-body p:last-child { margin-bottom: 0; }
+
+/* Un e-mail et une annonce ne se presentent pas pareil : la forme du
+   document fait partie de ce qu'il faut apprendre a lire. */
+.read-doc-email .read-doc-head { background: var(--accent-tint); }
+.read-doc-notice .read-doc-head { background: var(--success-tint); }
+.read-doc-notice .read-doc-kind { color: var(--success-dark); }
+
+@media (min-width: 768px) {
+  .read-doc-body { max-height: 34vh; }
+}
+
+/* ============================================
    10 · EXPRESSION ORALE
    L'apprenant entend le modele, puis le repete au micro.
    ============================================ */
@@ -1685,21 +1741,21 @@ html, body { max-width: 100%; overflow-x: hidden; }
    09 · COMPREHENSION ORALE
    ============================================ */
 
-/* --- Ligne d'ecoute dans le parcours --- */
-/* Elle partage la ligne des lecons : c'est le meme parcours. Seule la
-   pastille change de teinte, assez pour reperer l'ecoute d'un coup d'oeil,
-   pas assez pour donner l'impression d'une rubrique separee. */
-.lesson-row.is-listening .lesson-badge {
+/* --- Lignes de mise en pratique (ecoute et lecture) dans le parcours --- */
+/* Elles partagent la ligne des lecons : c'est le meme parcours. Seule la
+   pastille change de teinte, assez pour les reperer d'un coup d'oeil, pas
+   assez pour donner l'impression d'une rubrique separee. */
+.lesson-row.is-practice .lesson-badge {
   background: var(--accent-tint);
   color: var(--accent-dark);            /* 6.9:1 sur la teinte */
 }
 
-.lesson-row.is-listening.is-done .lesson-badge {
+.lesson-row.is-practice.is-done .lesson-badge {
   background: var(--success-tint);
   color: var(--success-dark);           /* 7.1:1 sur la teinte */
 }
 
-.lesson-row.is-listening.is-locked .lesson-badge {
+.lesson-row.is-practice.is-locked .lesson-badge {
   background: var(--surface-off);
   color: var(--ink-disabled);           /* 4.6:1 sur surface-off */
 }

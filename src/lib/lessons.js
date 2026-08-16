@@ -33,10 +33,12 @@ export async function fetchProgress(userId) {
 
 // Applique la règle de déverrouillage : la première leçon est toujours
 // ouverte, les suivantes le deviennent quand la précédente est terminée.
-// Nombre de leçons entre deux écoutes, à l'intérieur d'un niveau.
-// Deux : assez pour avoir appris du vocabulaire à reconnaître, assez peu
-// pour que l'oreille travaille régulièrement plutôt qu'en fin de niveau.
-const LESSONS_BETWEEN_LISTENINGS = 2
+// Une mise en pratique après CHAQUE leçon.
+//
+// Une leçon apprend une règle ; l'écoute et la lecture la font rencontrer
+// dans un vrai document. Les espacer davantage reviendrait à empiler les
+// règles avant de s'en servir — l'ordre inverse de ce qui fait apprendre.
+const LESSONS_BETWEEN_PRACTICE = 1
 
 // Renvoie le parcours regroupé par niveau, prêt à l'affichage.
 //
@@ -44,7 +46,14 @@ const LESSONS_BETWEEN_LISTENINGS = 2
 // la compréhension orale fait partie de l'apprentissage, elle n'est pas une
 // annexe. Ils ne bloquent jamais la suite, en revanche — rater une écoute
 // est normal quand on progresse, et cela ne doit pas arrêter le parcours.
-export function buildPath(lessons, progress, passages = [], listeningProgress = {}) {
+export function buildPath(
+  lessons,
+  progress,
+  listeningPassages = [],
+  listeningProgress = {},
+  readingPassages = [],
+  readingProgress = {}
+) {
   let previousCompleted = true
   const decorated = lessons.map((lesson) => {
     const done = Boolean(progress[lesson.id]?.completed)
@@ -60,47 +69,76 @@ export function buildPath(lessons, progress, passages = [], listeningProgress = 
   })
 
   // La leçon courante = la première ouverte mais pas encore terminée.
-  // Toujours une leçon, jamais une écoute : c'est la leçon qui fait avancer.
+  // Toujours une leçon, jamais une mise en pratique : c'est la leçon qui
+  // fait avancer le parcours.
   const current = decorated.find((l) => l.unlocked && !l.completed) || null
 
   const byLevel = LEVELS.map((level) => {
     const levelLessons = decorated.filter((l) => l.level === level)
-    const levelPassages = passages
+
+    const decorate = (list, kind, done) => list
       .filter((p) => p.level === level)
       .map((p) => ({
         ...p,
-        kind: 'listening',
-        completed: listeningProgress[p.id] != null,
-        score: listeningProgress[p.id]?.score ?? null
+        kind,
+        completed: done[p.id] != null,
+        score: done[p.id]?.score ?? null
       }))
 
-    return { level, lessons: levelLessons, items: interleave(levelLessons, levelPassages) }
+    const listenings = decorate(listeningPassages, 'listening', listeningProgress)
+    const readings = decorate(readingPassages, 'reading', readingProgress)
+
+    return {
+      level,
+      lessons: levelLessons,
+      items: interleave(levelLessons, listenings, readings)
+    }
   }).filter((group) => group.lessons.length > 0)
 
   return { byLevel, current, decorated }
 }
 
-// Intercale les écoutes entre les leçons d'un niveau.
+// Intercale les mises en pratique entre les leçons d'un niveau.
 //
-// Une écoute s'ouvre dès que la leçon qui la précède est terminée. Les
-// écoutes restantes sont ajoutées à la fin si le niveau compte moins de
-// leçons que prévu : aucune ne doit disparaître silencieusement.
-function interleave(levelLessons, levelPassages) {
+// Les deux files alternent — une écoute, puis une lecture, puis une écoute —
+// pour qu'un niveau ne devienne pas un bloc d'écoutes suivi d'un bloc de
+// lectures. On travaille les deux compétences en parallèle.
+//
+// Chacune s'ouvre dès que la leçon qui la précède est terminée, et ne bloque
+// JAMAIS la leçon suivante : rater une mise en pratique est normal, cela ne
+// doit pas arrêter le parcours.
+function interleave(levelLessons, listenings, readings) {
   const items = []
-  const queue = [...levelPassages]
+  const queues = [[...listenings], [...readings]]
+  let turn = 0
+
+  // Prend l'élément suivant en alternant les files, en sautant celles qui
+  // sont vides — sinon un niveau sans lecture perdrait un tour sur deux.
+  function nextPractice() {
+    for (let tried = 0; tried < queues.length; tried += 1) {
+      const queue = queues[turn]
+      turn = (turn + 1) % queues.length
+      if (queue.length > 0) return queue.shift()
+    }
+    return null
+  }
 
   levelLessons.forEach((lesson, i) => {
     items.push(lesson)
 
-    const isBreakpoint = (i + 1) % LESSONS_BETWEEN_LISTENINGS === 0
-    if (isBreakpoint && queue.length > 0) {
-      items.push({ ...queue.shift(), unlocked: lesson.completed })
-    }
+    if ((i + 1) % LESSONS_BETWEEN_PRACTICE !== 0) return
+    const practice = nextPractice()
+    if (practice) items.push({ ...practice, unlocked: lesson.completed })
   })
 
-  // Le reste en fin de niveau, ouvert si la dernière leçon est terminée.
+  // Le reste en fin de niveau, ouvert si la dernière leçon est terminée :
+  // aucune mise en pratique ne doit disparaître silencieusement.
   const lastDone = levelLessons[levelLessons.length - 1]?.completed ?? false
-  queue.forEach((passage) => items.push({ ...passage, unlocked: lastDone }))
+  let leftover = nextPractice()
+  while (leftover) {
+    items.push({ ...leftover, unlocked: lastDone })
+    leftover = nextPractice()
+  }
 
   return items
 }

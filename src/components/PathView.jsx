@@ -1,4 +1,4 @@
-import { IconCheck, IconChevron, IconHeadphones, IconPlay, IconRedo } from './Icons'
+import { IconCheck, IconChevron, IconHeadphones, IconPlay, IconRead, IconRedo } from './Icons'
 import Mascot from './Mascot'
 
 // Description courte de chaque niveau : donne un but, au lieu d'un simple code.
@@ -14,7 +14,7 @@ export const LEVEL_BLURB = {
 // Affichage pur du parcours : aucune requete, tout arrive en props.
 // Le chargement vit dans LessonPath.jsx — cette separation permet de
 // verifier l'ecran avec des donnees de test (voir dev/preview.jsx).
-export default function PathView({ path, onOpen, onOpenListening = () => {} }) {
+export default function PathView({ path, onOpen, onOpenListening = () => {}, onOpenReading = () => {} }) {
   const done = path.decorated.filter((l) => l.completed).length
   const total = path.decorated.length
   const percent = total > 0 ? Math.round((done / total) * 100) : 0
@@ -88,20 +88,26 @@ export default function PathView({ path, onOpen, onOpenListening = () => {} }) {
                   // le meme parcours, pas deux rubriques separees. Seuls
                   // l'icone et le libelle changent.
                   const isListening = item.kind === 'listening'
-                  const isCurrent = !isListening && current?.id === item.id
+                  const isReading = item.kind === 'reading'
+                  const isPractice = isListening || isReading
+                  const isCurrent = !isPractice && current?.id === item.id
                   const state = item.completed ? 'done' : item.unlocked ? 'current' : 'locked'
-                  const noun = isListening ? 'Écoute' : 'Leçon'
+                  const noun = isListening ? 'Écoute' : isReading ? 'Lecture' : 'Leçon'
 
                   return (
                     <li
                       key={`${item.kind}-${item.id}`}
-                      className={`lesson-row is-${state} ${isCurrent ? 'is-active' : ''} ${isListening ? 'is-listening' : ''}`}
+                      className={`lesson-row is-${state} ${isCurrent ? 'is-active' : ''} ${isPractice ? 'is-practice' : ''}`}
                     >
                       <button
                         type="button"
                         className="lesson-hit"
                         disabled={!item.unlocked}
-                        onClick={() => (isListening ? onOpenListening(item.id) : onOpen(item.id))}
+                        onClick={() => {
+                          if (isListening) return onOpenListening(item.id)
+                          if (isReading) return onOpenReading(item.id)
+                          return onOpen(item.id)
+                        }}
                         aria-label={
                           item.unlocked
                             ? `${noun} ${item.title}${item.completed ? ', terminée' : ', à faire'}`
@@ -111,7 +117,9 @@ export default function PathView({ path, onOpen, onOpenListening = () => {} }) {
                         <span className="lesson-badge" aria-hidden="true">
                           {isListening
                             ? <IconHeadphones size={20} />
-                            : item.completed
+                            : isReading
+                              ? <IconRead size={20} />
+                              : item.completed
                               ? <IconCheck size={22} strokeWidth={2.5} />
                               : item.unlocked
                                 ? <IconPlay size={20} fill="currentColor" strokeWidth={0} />
@@ -122,9 +130,9 @@ export default function PathView({ path, onOpen, onOpenListening = () => {} }) {
                           <span className="lesson-title">{item.title}</span>
                           <span className="lesson-meta">
                             {item.completed
-                              ? `${isListening ? 'Écouté' : 'Réussi'} · ${item.score ?? 0} %`
+                              ? `${isPractice ? 'Fait' : 'Réussi'} · ${item.score ?? 0} %`
                               : item.unlocked
-                                ? `${isListening ? 'Compréhension orale' : 'En cours'} · +${item.xp_reward} XP`
+                                ? `${isListening ? 'Compréhension orale' : isReading ? 'Compréhension écrite' : 'En cours'} · +${item.xp_reward} XP`
                                 : 'Verrouillé'}
                           </span>
                         </span>

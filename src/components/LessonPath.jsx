@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { fetchLessons, fetchProgress, buildPath } from '../lib/lessons'
 import { fetchListeningProgress, fetchPassages } from '../lib/listening'
+import { fetchReadingPassages, fetchReadingProgress } from '../lib/reading'
 import PathView from './PathView'
 import Mascot from './Mascot'
 
@@ -21,16 +22,25 @@ export default function LessonPath({ userId }) {
     // Les ecoutes ne doivent jamais empecher le parcours de s'afficher : si
     // leurs tables n'existent pas encore, on montre les lecons seules plutot
     // qu'un ecran d'erreur. D'ou le `catch` qui renvoie une liste vide.
-    const passagesOrEmpty = fetchPassages().catch(() => [])
+    const listeningOrEmpty = fetchPassages().catch(() => [])
     const listeningDoneOrEmpty = fetchListeningProgress(userId).catch(() => ({}))
+    const readingOrEmpty = fetchReadingPassages().catch(() => [])
+    const readingDoneOrEmpty = fetchReadingProgress(userId).catch(() => ({}))
 
-    Promise.all([fetchLessons(), fetchProgress(userId), passagesOrEmpty, listeningDoneOrEmpty])
-      .then(([lessons, progress, passages, listeningDone]) => {
+    Promise.all([
+      fetchLessons(),
+      fetchProgress(userId),
+      listeningOrEmpty,
+      listeningDoneOrEmpty,
+      readingOrEmpty,
+      readingDoneOrEmpty
+    ])
+      .then(([lessons, progress, passages, listeningDone, readings, readingDone]) => {
         if (!active) return
         if (lessons.length === 0) {
           setError("Aucune leçon en base. Le script supabase/seed.sql n'a pas encore été exécuté.")
         } else {
-          setPath(buildPath(lessons, progress, passages, listeningDone))
+          setPath(buildPath(lessons, progress, passages, listeningDone, readings, readingDone))
         }
       })
       .catch((err) => { if (active) setError(err.message) })
@@ -56,6 +66,7 @@ export default function LessonPath({ userId }) {
       path={path}
       onOpen={(id) => navigate(`/lesson/${id}`)}
       onOpenListening={(id) => navigate(`/listening/${id}`)}
+      onOpenReading={(id) => navigate(`/reading/${id}`)}
     />
   )
 }

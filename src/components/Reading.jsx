@@ -1,22 +1,19 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { completeListening, fetchPassage } from '../lib/listening'
-import { PASS_SCORE } from '../lib/passageProgress'
+import { completeReading, fetchReadingPassage } from '../lib/reading'
 import { recordAnswer } from '../lib/reviews'
-import { stopSpeaking } from '../lib/speech'
 import { isMissingTable, missingTableMessage } from '../lib/dbErrors'
+import { PASS_SCORE } from '../lib/passageProgress'
 import { soundComplete, soundCorrect, soundTap, soundWrong } from '../lib/sounds'
 import Mascot from './Mascot'
-import ListeningView from './ListeningView'
+import ReadingView from './ReadingView'
 import PassageEnd from './PassageEnd'
 
-// Conteneur d'un passage de comprehension orale : chargement, score,
-// enregistrement. L'affichage est delegue a ListeningView.
+// Conteneur d'un texte de comprehension ecrite.
 //
-// Aucun coeur n'est perdu ici. Rater une question de comprehension orale
-// est le cas normal quand on progresse : la sanction ferait fuir avant que
-// l'oreille ait eu le temps de se faire.
-export default function Listening({ profile, onProfileChange }) {
+// Aucun coeur n'est perdu : comme pour l'ecoute, se tromper en cherchant
+// une information dans un document est le cas normal quand on apprend.
+export default function Reading({ profile, onProfileChange }) {
   const { id } = useParams()
   const navigate = useNavigate()
 
@@ -36,26 +33,23 @@ export default function Listening({ profile, onProfileChange }) {
     let active = true
     setLoading(true)
 
-    fetchPassage(id)
+    fetchReadingPassage(id)
       .then(({ passage: p, questions: q }) => {
         if (!active) return
-        if (!q.length) throw new Error('Ce passage ne contient aucune question.')
+        if (!q.length) throw new Error('Ce document ne contient aucune question.')
         setPassage(p)
         setQuestions(q)
       })
       .catch((err) => {
         if (!active) return
         setError(isMissingTable(err)
-          ? missingTableMessage('migration-listening.sql puis seed-listening.sql')
+          ? missingTableMessage('migration-reading.sql puis seed-reading.sql')
           : err.message)
       })
       .finally(() => { if (active) setLoading(false) })
 
     return () => { active = false }
   }, [id])
-
-  // Quitter l'ecran coupe toute lecture en cours.
-  useEffect(() => stopSpeaking, [])
 
   const current = questions[index]
 
@@ -73,8 +67,6 @@ export default function Listening({ profile, onProfileChange }) {
       setVerdict('wrong')
     }
 
-    // Une question d'ecoute ratee rejoint la file de revision, au meme titre
-    // qu'un exercice de lecon : c'est le meme oubli qui la guette.
     if (profile) {
       recordAnswer(profile.id, current.id, right).catch(() => { /* silencieux */ })
     }
@@ -94,7 +86,7 @@ export default function Listening({ profile, onProfileChange }) {
 
     if (!profile) return
     try {
-      const result = await completeListening(profile.id, passage, score, profile)
+      const result = await completeReading(profile.id, passage, score, profile)
       setEarned(result.earned)
       onProfileChange?.()
     } catch (err) {
@@ -106,7 +98,7 @@ export default function Listening({ profile, onProfileChange }) {
     return (
       <div className="lesson-screen lesson-screen-center">
         <Mascot mood="thinking" size={90} />
-        <p className="path-status">Chargement du passage…</p>
+        <p className="path-status">Chargement du document…</p>
       </div>
     )
   }
@@ -128,7 +120,7 @@ export default function Listening({ profile, onProfileChange }) {
       <>
         {error && <p className="alert alert-error" role="alert">{error}</p>}
         <PassageEnd
-          kind="listening"
+          kind="reading"
           score={score}
           correctCount={correctCount}
           total={questions.length}
@@ -140,7 +132,7 @@ export default function Listening({ profile, onProfileChange }) {
   }
 
   return (
-    <ListeningView
+    <ReadingView
       passage={passage}
       questions={questions}
       started={started}
