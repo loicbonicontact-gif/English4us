@@ -1,4 +1,4 @@
-import { IconCheck, IconPlay } from './Icons'
+import { IconCheck, IconChevron, IconPlay, IconRedo } from './Icons'
 import Mascot from './Mascot'
 
 // Description courte de chaque niveau : donne un but, au lieu d'un simple code.
@@ -121,7 +121,7 @@ export default function PathView({ path, hearts = 0, onOpen }) {
 
                         {lesson.unlocked && (
                           <span className="lesson-chevron" aria-hidden="true">
-                            {lesson.completed ? '↻' : '›'}
+                            {lesson.completed ? <IconRedo size={18} /> : <IconChevron size={20} />}
                           </span>
                         )}
                       </button>

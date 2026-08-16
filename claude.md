@@ -57,15 +57,24 @@ a aucun concurrent existant : c'est un enjeu commercial et juridique.
 INTERDIT : reprendre les couleurs de Duolingo (#58cc02 et derives), son hibou,
 sa mise en page ou ses formulations. Aucune couleur de marque tierce.
 
-Palette English4us (toutes les paires texte/fond verifiees >= 4.5:1 WCAG AA) :
-- Indigo  #4338CA  marque, actions principales, bandeaux
-- Sarcelle #0F766E  reussite, progression
-- Ambre   #B45309  recompense, serie, XP
-- Rose    #BE123C  erreur, coeurs
-- Violet  #6D28D9  degrade du bandeau
-- Niveaux CECRL : A1 sarcelle, A2 bleu, B1 indigo, B2 violet, C1 magenta, C2 rose
+Palette English4us, direction « App moderne » (handoff de design du 15/08/2026).
+La source de verite est le bloc :root de src/styles.css, qui porte le ratio de
+contraste mesure en commentaire pour chaque valeur.
 
-Polices : Nunito 800/900 (titres) + DM Sans 400/500/700 (texte).
+- Bleu    #4276C8  marque, actions principales, bandeaux (#2F57A8 pour le texte)
+- Vert    #347F57  reussite (#1F5B3F pour le texte)
+- Framboise #D1435B  erreur, coeurs (#C53D54 pour le texte)
+- Fond d'app #F6F7F9, surfaces blanches, encre #14161A
+
+Certaines valeurs sont dedoublees : une teinte decorative (fonds, pastilles,
+bordures) et une teinte plus foncee porteuse de texte. Trois couleurs de la
+maquette echouaient au seuil 4.5:1 et ont ete assombries — ne pas les ramener
+aux valeurs du handoff sans refaire le calcul.
+
+Polices : Barlow 400/500/600/700 (texte) + Barlow Condensed 600 (titres et
+grands chiffres). Ne pas demander un poids non charge : le navigateur
+fabriquerait un faux gras.
+Icones : Lucide (lucide-react), trait 1,75 px, via src/components/Icons.jsx.
 Mascotte : elephant SVG maison (src/components/Mascot.jsx), 4 expressions.
 
 ## REGLES D'INTERFACE (verifiees a chaque livraison)

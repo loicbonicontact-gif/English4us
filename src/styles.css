@@ -26,7 +26,8 @@
   --ink-3: #6b7280;        /* labels, meta       4.8:1 sur surface */
   --ink-disabled: #676e7a; /* texte desactive    4.6:1 sur surface-off
                               (maquette : #9aa1ad, 2.3:1 — refuse) */
-  --chevron: #b9bec8;      /* deco : chevrons et glyphes, jamais de texte */
+  --chevron: #868d99;      /* deco : chevrons et glyphes  3.3:1 sur surface
+                              (maquette : #b9bec8, 1.9:1 — refuse) */
 
   /* --- Traits --- */
   --border: #e7e9ee;
@@ -683,7 +684,7 @@ html, body { max-width: 100%; overflow-x: hidden; }
 .lesson-text { display: grid; min-width: 0; }
 .lesson-title { font-size: 15px; font-weight: 600; color: var(--ink); }
 .lesson-meta { font-size: 13px; }
-.lesson-chevron { font-size: 20px; color: var(--chevron); }
+.lesson-chevron { display: grid; place-items: center; color: var(--chevron); }
 
 /* Terminee */
 .lesson-row.is-done .lesson-badge { background: var(--success-tint); color: var(--success-dark); }
@@ -697,7 +698,7 @@ html, body { max-width: 100%; overflow-x: hidden; }
 /* Verrouillee */
 .lesson-row.is-locked .lesson-hit { background: var(--surface-off); box-shadow: none; cursor: default; }
 .lesson-row.is-locked .lesson-badge { background: #e2e5ea; }
-.lesson-row.is-locked .lesson-title { color: var(--ink-3); font-weight: 500; }
+.lesson-row.is-locked .lesson-title { color: var(--ink-disabled); font-weight: 500; }
 .lesson-row.is-locked .lesson-meta { color: var(--ink-disabled); }
 .lesson-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--ink-disabled); }
 
@@ -963,7 +964,7 @@ html, body { max-width: 100%; overflow-x: hidden; }
   width: 30px; height: 30px;
   display: grid; place-items: center;
   border-radius: 10px;
-  background: #eef0f4; color: var(--ink-3);
+  background: #eef0f4; color: var(--ink-disabled);
   font-size: 14px; font-weight: 700;
 }
 
@@ -1368,6 +1369,9 @@ html, body { max-width: 100%; overflow-x: hidden; }
   box-shadow: 0 6px 16px rgba(74,127,208,.18);
 }
 .board-row.is-me { background: var(--accent-tint); border-radius: var(--r-md); padding-inline: 8px; }
+/* Sur fond teinte, le gris des rangs tombe a 4.1:1 : il passe en bleu fonce */
+.board-row.is-me .board-rank,
+.board-me .board-rank { color: var(--accent-dark); }
 .board-you { color: var(--accent-dark); font-weight: 600; }
 
 .board-note { margin: 0; font-size: 13.5px; color: var(--ink-3); text-align: center; }

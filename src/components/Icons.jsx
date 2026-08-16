@@ -10,12 +10,14 @@
 
 import {
   Check,
+  ChevronRight,
   Flame,
   Heart,
   GraduationCap,
   Lock,
   LogOut,
   Play,
+  RotateCw,
   Route,
   Trophy,
   User,
@@ -35,6 +37,8 @@ function wrap(Component) {
 }
 
 export const IconCheck = wrap(Check)
+export const IconChevron = wrap(ChevronRight)
+export const IconRedo = wrap(RotateCw)
 export const IconFlame = wrap(Flame)
 export const IconHeart = wrap(Heart)
 export const IconCap = wrap(GraduationCap)
