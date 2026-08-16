@@ -114,8 +114,8 @@ export default function Listening({ profile, onProfileChange }) {
     return (
       <div className="lesson-screen lesson-screen-center">
         <p className="alert alert-error" role="alert">{error}</p>
-        <button type="button" className="btn-wide is-dark" onClick={() => navigate('/listening')}>
-          Retour aux écoutes
+        <button type="button" className="btn-wide is-dark" onClick={() => navigate('/dashboard')}>
+          Retour au parcours
         </button>
       </div>
     )
@@ -132,7 +132,7 @@ export default function Listening({ profile, onProfileChange }) {
           correctCount={correctCount}
           total={questions.length}
           earned={earned}
-          onBack={() => navigate('/listening')}
+          onBack={() => navigate('/dashboard')}
         />
       </>
     )
@@ -150,7 +150,7 @@ export default function Listening({ profile, onProfileChange }) {
       onAnswer={(value) => { if (!verdict) { soundTap(); setAnswer(value) } }}
       onValidate={handleValidate}
       onNext={handleNext}
-      onQuit={() => navigate('/listening')}
+      onQuit={() => navigate('/dashboard')}
     />
   )
 }

@@ -20,7 +20,17 @@ const RAW_PROGRESS = {
   1: { lesson_id: 1, completed: true, score: 89 }
 }
 
-export const demoPath = buildPath(RAW_LESSONS, RAW_PROGRESS)
+// Les ecoutes s'intercalent dans le parcours, une toutes les deux lecons.
+const RAW_PASSAGES = [
+  { id: 101, level: 'A1', format: 'question_response', title: 'Une question simple', position: 1, xp_reward: 10 },
+  { id: 102, level: 'A1', format: 'conversation', title: 'Au café', position: 2, xp_reward: 15 },
+  { id: 103, level: 'A1', format: 'talk', title: 'Annonce à la gare', position: 3, xp_reward: 15 },
+  { id: 104, level: 'A2', format: 'conversation', title: 'Demander son chemin', position: 4, xp_reward: 15 }
+]
+
+const RAW_LISTENING_PROGRESS = {}
+
+export const demoPath = buildPath(RAW_LESSONS, RAW_PROGRESS, RAW_PASSAGES, RAW_LISTENING_PROGRESS)
 
 export const demoProfile = {
   id: 'demo',

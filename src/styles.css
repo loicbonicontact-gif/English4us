@@ -1547,71 +1547,24 @@ html, body { max-width: 100%; overflow-x: hidden; }
    09 · COMPREHENSION ORALE
    ============================================ */
 
-/* --- Entree depuis le parcours --- */
-.listen-entry {
-  display: flex; align-items: center; gap: 12px; width: 100%;
-  min-height: 44px; padding: 14px 16px;
-  border: 1px solid var(--border); border-radius: var(--r-lg);
-  background: var(--surface);
-  box-shadow: var(--e-rest);
-  cursor: pointer; text-align: left;
-  transition: transform .18s ease, box-shadow .18s ease;
-}
-
-.listen-entry-icon {
-  flex: 0 0 auto;
-  display: grid; place-items: center;
-  width: 42px; height: 42px;
-  border-radius: var(--r-md);
+/* --- Ligne d'ecoute dans le parcours --- */
+/* Elle partage la ligne des lecons : c'est le meme parcours. Seule la
+   pastille change de teinte, assez pour reperer l'ecoute d'un coup d'oeil,
+   pas assez pour donner l'impression d'une rubrique separee. */
+.lesson-row.is-listening .lesson-badge {
   background: var(--accent-tint);
   color: var(--accent-dark);            /* 6.9:1 sur la teinte */
 }
 
-.listen-entry-text { flex: 1; display: grid; gap: 2px; min-width: 0; }
-.listen-entry-title { font-size: 15.5px; font-weight: 700; color: var(--ink); }
-.listen-entry-sub { font-size: 13px; color: var(--ink-3); }
-.listen-entry-chevron { flex: 0 0 auto; color: var(--chevron); }
-
-/* --- Liste des passages --- */
-.listen-list { display: grid; gap: var(--sp-5); padding-bottom: var(--sp-4); }
-
-.listen-list-head h1 {
-  margin: 0 0 var(--sp-2);
-  font-family: var(--font-title); font-size: 32px;
+.lesson-row.is-listening.is-done .lesson-badge {
+  background: var(--success-tint);
+  color: var(--success-dark);           /* 7.1:1 sur la teinte */
 }
 
-.listen-list-head p {
-  margin: 0; max-width: 60ch;
-  font-size: 14.5px; color: var(--ink-2);   /* 9.8:1 sur le fond d'app */
+.lesson-row.is-listening.is-locked .lesson-badge {
+  background: var(--surface-off);
+  color: var(--ink-disabled);           /* 4.6:1 sur surface-off */
 }
-
-.listen-group { display: grid; gap: var(--sp-3); }
-.listen-items { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
-
-.listen-item {
-  display: flex; align-items: center; gap: 12px; width: 100%;
-  min-height: 44px; padding: 13px 15px;
-  border: 1px solid var(--border); border-radius: var(--r-md);
-  background: var(--surface);
-  cursor: pointer; text-align: left;
-  transition: transform .18s ease, background .18s ease;
-}
-
-.listen-item.is-done { background: var(--success-tint); border-color: var(--success); }
-.listen-item.is-done .listen-item-icon { background: var(--surface); color: var(--success-dark); }
-
-.listen-item-icon {
-  flex: 0 0 auto;
-  display: grid; place-items: center;
-  width: 38px; height: 38px;
-  border-radius: var(--r-sm);
-  background: var(--accent-tint); color: var(--accent-dark);
-}
-
-.listen-item-text { flex: 1; display: grid; gap: 1px; min-width: 0; }
-.listen-item-title { font-size: 15px; font-weight: 600; color: var(--ink); }
-.listen-item-meta { font-size: 12.5px; color: var(--ink-3); }
-.listen-item-chevron { flex: 0 0 auto; color: var(--chevron); }
 
 /* --- Mise en situation, avant l'ecoute --- */
 .listen-intro {
@@ -1702,12 +1655,6 @@ html, body { max-width: 100%; overflow-x: hidden; }
 /* Partie 2 du TOEIC : les propositions n'ont pas de texte, le bouton n'a
    donc pas besoin de toute la largeur d'une reponse ecrite. */
 .answer.is-letter-only .answer-label { color: var(--ink-3); font-weight: 600; }
-
-@media (hover: hover) {
-  .listen-entry:hover { transform: translateY(-2px); }
-  .listen-item:hover { transform: translateY(-1px); background: var(--surface-off); }
-  .listen-item.is-done:hover { background: var(--success-tint); }
-}
 
 /* ============================================
    BARRE DE PREVISUALISATION (developpement seulement)

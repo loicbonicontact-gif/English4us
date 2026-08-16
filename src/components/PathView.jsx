@@ -67,25 +67,11 @@ export default function PathView({ path, hearts = 0, onOpen, onOpenListening = (
           </section>
         )}
 
-        {/* Acces a la comprehension orale. Elle n'a pas d'onglet a elle :
-            cinq onglets ne tiennent pas a 375 px. Elle vit donc ici, juste
-            sous la lecon en cours, la ou le regard passe deja. */}
-        <button type="button" className="listen-entry" onClick={onOpenListening}>
-          <span className="listen-entry-icon"><IconHeadphones size={22} /></span>
-          <span className="listen-entry-text">
-            <span className="listen-entry-title">Compréhension orale</span>
-            <span className="listen-entry-sub">
-              Conversations et annonces, sans texte à l'écran
-            </span>
-          </span>
-          <IconChevron size={18} className="listen-entry-chevron" />
-        </button>
-
         {/* La progression apparait ici sur telephone, dans la colonne de
             droite sur grand ecran — d'ou le duplicata masque en CSS. */}
         <ProgressCard done={done} total={total} percent={percent} className="progress-card-inline" />
 
-        {path.byLevel.map(({ level, lessons }) => {
+        {path.byLevel.map(({ level, lessons, items = lessons }) => {
           const levelDone = lessons.filter((l) => l.completed).length
 
           return (
@@ -97,45 +83,55 @@ export default function PathView({ path, hearts = 0, onOpen, onOpenListening = (
               </header>
 
               <ol className="lesson-list">
-                {lessons.map((lesson) => {
-                  const isCurrent = current?.id === lesson.id
-                  const state = lesson.completed ? 'done' : lesson.unlocked ? 'current' : 'locked'
+                {items.map((item) => {
+                  // Une ecoute et une lecon partagent la meme ligne : c'est
+                  // le meme parcours, pas deux rubriques separees. Seuls
+                  // l'icone et le libelle changent.
+                  const isListening = item.kind === 'listening'
+                  const isCurrent = !isListening && current?.id === item.id
+                  const state = item.completed ? 'done' : item.unlocked ? 'current' : 'locked'
+                  const noun = isListening ? 'Écoute' : 'Leçon'
 
                   return (
-                    <li key={lesson.id} className={`lesson-row is-${state} ${isCurrent ? 'is-active' : ''}`}>
+                    <li
+                      key={`${item.kind}-${item.id}`}
+                      className={`lesson-row is-${state} ${isCurrent ? 'is-active' : ''} ${isListening ? 'is-listening' : ''}`}
+                    >
                       <button
                         type="button"
                         className="lesson-hit"
-                        disabled={!lesson.unlocked}
-                        onClick={() => onOpen(lesson.id)}
+                        disabled={!item.unlocked}
+                        onClick={() => (isListening ? onOpenListening(item.id) : onOpen(item.id))}
                         aria-label={
-                          lesson.unlocked
-                            ? `Leçon ${lesson.title}${lesson.completed ? ', terminée' : ', à faire'}`
-                            : `Leçon ${lesson.title}, verrouillée`
+                          item.unlocked
+                            ? `${noun} ${item.title}${item.completed ? ', terminée' : ', à faire'}`
+                            : `${noun} ${item.title}, verrouillée`
                         }
                       >
                         <span className="lesson-badge" aria-hidden="true">
-                          {lesson.completed
-                            ? <IconCheck size={22} strokeWidth={2.5} />
-                            : lesson.unlocked
-                              ? <IconPlay size={20} fill="currentColor" strokeWidth={0} />
-                              : <span className="lesson-dot" />}
+                          {isListening
+                            ? <IconHeadphones size={20} />
+                            : item.completed
+                              ? <IconCheck size={22} strokeWidth={2.5} />
+                              : item.unlocked
+                                ? <IconPlay size={20} fill="currentColor" strokeWidth={0} />
+                                : <span className="lesson-dot" />}
                         </span>
 
                         <span className="lesson-text">
-                          <span className="lesson-title">{lesson.title}</span>
+                          <span className="lesson-title">{item.title}</span>
                           <span className="lesson-meta">
-                            {lesson.completed
-                              ? `Réussi · ${lesson.score ?? 0} %`
-                              : lesson.unlocked
-                                ? `En cours · +${lesson.xp_reward} XP`
+                            {item.completed
+                              ? `${isListening ? 'Écouté' : 'Réussi'} · ${item.score ?? 0} %`
+                              : item.unlocked
+                                ? `${isListening ? 'Compréhension orale' : 'En cours'} · +${item.xp_reward} XP`
                                 : 'Verrouillé'}
                           </span>
                         </span>
 
-                        {lesson.unlocked && (
+                        {item.unlocked && (
                           <span className="lesson-chevron" aria-hidden="true">
-                            {lesson.completed ? <IconRedo size={18} /> : <IconChevron size={20} />}
+                            {item.completed ? <IconRedo size={18} /> : <IconChevron size={20} />}
                           </span>
                         )}
                       </button>

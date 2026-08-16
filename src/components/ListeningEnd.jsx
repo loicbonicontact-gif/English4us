@@ -55,7 +55,7 @@ export default function ListeningEnd({ passage, score, correctCount, total, earn
 
       <div className="review-end-actions">
         <button type="button" className="btn-wide is-primary" onClick={onBack}>
-          Retour aux écoutes
+          Retour au parcours
         </button>
       </div>
 

@@ -11,7 +11,6 @@ import Exercise from './components/Exercise'
 import Profile from './components/Profile'
 import Leaderboard from './components/Leaderboard'
 import Review from './components/Review'
-import ListeningList from './components/ListeningList'
 import Listening from './components/Listening'
 
 export default function App() {
@@ -138,7 +137,6 @@ export default function App() {
             path="/reviews"
             element={<Review profile={profile} onProfileChange={refreshProfile} />}
           />
-          <Route path="/listening" element={<ListeningList profile={profile} />} />
           <Route
             path="/listening/:id"
             element={<Listening profile={profile} onProfileChange={refreshProfile} />}
