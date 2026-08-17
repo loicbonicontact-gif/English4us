@@ -15,17 +15,15 @@ Dernière mise à jour : 17 août 2026
 | Textes de lecture | 36 (108 questions) |
 | Fiches de leçon | 30 (une par leçon) |
 
-**Attention à ne pas confondre deux séries de cinq.** Celle de la section
-« RIEN EN ATTENTE » plus bas est passée le 17/08. Celle-ci, différente, ne
-l'est pas.
+**Ces chiffres décrivent la base RÉELLE, et non un état à venir.** Tous les
+scripts de contenu sont passés, confirmé par Loïc le 17/08 — les cinq du
+Bureau (`6-vocabulaire-2.sql`, `7-lecture-2.sql`, `8-vocabulaire-3.sql`,
+`9-lecture-3.sql`, `10-ecoute-2.sql`) comme les cinq du dépôt listés plus
+bas. Il n'y a plus aucun écart entre les fichiers et la base.
 
-**Cinq scripts de contenu sont écrits mais pas encore passés en base** — ils
-sont sur le Bureau, à exécuter dans cet ordre : `6-vocabulaire-2.sql`,
-`7-lecture-2.sql`, `8-vocabulaire-3.sql`, `9-lecture-3.sql`,
-`10-ecoute-2.sql`. Les chiffres
-ci-dessus décrivent donc la base **une fois ces scripts passés**.
-`4-verification.sql` affiche l'inventaire réel et compte désormais les trois
-séries séparément.
+`4-verification.sql` affiche l'inventaire réel et compte les trois séries de
+vocabulaire séparément : c'est lui qui fait foi si un doute revient, pas ce
+tableau.
 
 **Examen blanc** (`/exam`) : n'a aucun contenu propre, il assemble une
 épreuve **au format réel — 100 questions d'écoute, 99 de lecture, environ
