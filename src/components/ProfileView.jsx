@@ -17,7 +17,10 @@ export default function ProfileView({
   onOpenPlacement = () => {},
   rating = null,
   onDeleteRating = () => {},
-  onOpenPrivacy = () => {}
+  onOpenPrivacy = () => {},
+  pushAvailable = false,
+  pushOn = false,
+  onTogglePush = () => {}
 }) {
   const initial = (username || '?').charAt(0).toUpperCase()
 
@@ -87,6 +90,32 @@ export default function ProfileView({
             </span>
             <button type="button" className="settings-action" onClick={onOpenPlacement}>
               {placementLevel ? 'Refaire le test' : 'Passer le test'}
+            </button>
+          </div>
+        </section>
+      )}
+
+      {/* Rappels : la ligne n'apparait que si le navigateur sait faire.
+          Sur iPhone, cela veut dire « application installee sur l'ecran
+          d'accueil » — ailleurs, un interrupteur mort serait un mensonge. */}
+      {pushAvailable && (
+        <section className="settings-card">
+          <div className="settings-row">
+            <span className="settings-label">
+              Rappel quotidien
+              <span className="settings-hint">
+                Un message a 18 h, seulement s'il y a quelque chose a dire
+              </span>
+            </span>
+            <button
+              type="button"
+              className={`toggle ${pushOn ? 'is-on' : ''}`}
+              onClick={onTogglePush}
+              role="switch"
+              aria-checked={pushOn}
+              aria-label="Rappel quotidien"
+            >
+              <span className="toggle-knob" />
             </button>
           </div>
         </section>

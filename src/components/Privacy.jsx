@@ -62,6 +62,10 @@ export default function Privacy() {
               <td>Ta voix, pendant un exercice de prononciation</td>
               <td>Comparer ce que tu prononces à la phrase attendue. Voir la section « Ta voix » ci-dessous.</td>
             </tr>
+            <tr>
+              <td>Une adresse d'abonnement, si tu actives les rappels (facultatif)</td>
+              <td>T'envoyer un rappel par jour. Supprimée dès que tu coupes les rappels.</td>
+            </tr>
           </tbody>
         </table>
         <p>
@@ -94,6 +98,22 @@ export default function Privacy() {
           propres serveurs pour le reconnaître. Si cela te gêne, n'utilise pas
           les exercices de prononciation, ou utilise un navigateur qui traite la
           voix localement. Les exercices oraux ne sont jamais obligatoires.
+        </p>
+      </section>
+
+      <section className="legal-block">
+        <h2>Les rappels quotidiens</h2>
+        <p>
+          Si tu actives les rappels, ton navigateur crée une adresse
+          d'abonnement que nous conservons pour pouvoir t'envoyer un message
+          par jour, à 18 h. Cette adresse ne contient ni ton nom ni ton
+          e-mail, mais elle permet d'écrire sur ton écran : nous la protégeons
+          comme le reste.
+        </p>
+        <p>
+          Rien n'est envoyé les jours où tu t'es déjà entraîné. Tu peux couper
+          les rappels à tout moment depuis ton profil : l'abonnement est alors
+          supprimé, pas seulement désactivé.
         </p>
       </section>
 

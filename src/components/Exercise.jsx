@@ -7,10 +7,12 @@ import { recordAnswer } from '../lib/reviews'
 import { speak, stopSpeaking } from '../lib/speech'
 import { usableExercises } from '../lib/exercises'
 import { markFeedbackAsked, saveRating, shouldAskFeedback } from '../lib/feedback'
+import { enablePush, isPushSupported, markPushAsked, shouldAskPush } from '../lib/push'
 import Mascot from './Mascot'
 import ExerciseView from './ExerciseView'
 import LessonEnd from './LessonEnd'
 import FeedbackPrompt from './FeedbackPrompt'
+import PushPrompt from './PushPrompt'
 import { soundComplete, soundCorrect, soundHeart, soundTap, soundWrong } from '../lib/sounds'
 
 // Conteneur de la lecon : chargement, score, coeurs, enregistrement.
@@ -39,6 +41,9 @@ export default function Exercise({ profile, onProfileChange }) {
   // Demande de note : posee une seule fois dans la vie d'un compte,
   // apres l'ecran de fin — jamais pendant les questions.
   const [askFeedback, setAskFeedback] = useState(false)
+  // Rappels quotidiens : proposes apres la 3e lecon, la note apres la 5e.
+  // Les deux ne peuvent donc jamais s'afficher en meme temps.
+  const [askPush, setAskPush] = useState(false)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
 
@@ -175,9 +180,17 @@ export default function Exercise({ profile, onProfileChange }) {
         .eq('user_id', profile.id)
         .eq('completed', true)
 
+      const lessonsDone = count ?? 0
+
       setAskFeedback(shouldAskFeedback({
-        lessonsDone: count ?? 0,
+        lessonsDone,
         feedbackAskedAt: profile.feedback_asked_at
+      }))
+
+      setAskPush(shouldAskPush({
+        lessonsDone,
+        pushAskedAt: profile.push_asked_at,
+        supported: isPushSupported()
       }))
     } catch (err) {
       setError(`Progression non enregistrée : ${err.message}`)
@@ -227,6 +240,27 @@ export default function Exercise({ profile, onProfileChange }) {
     return (
       <>
         {error && <p className="alert alert-error" role="alert">{error}</p>}
+
+        {askPush && (
+          <PushPrompt
+            onAccept={() => {
+              // La demande d'autorisation du navigateur DOIT partir d'un
+              // clic : lancee autrement, elle est rejetee sans rien afficher.
+              enablePush(profile.id).catch(() => { /* refus ou echec : silencieux */ })
+              markPushAsked(profile.id).catch(() => { /* silencieux */ })
+              setAskPush(false)
+              onProfileChange?.()
+            }}
+            onDecline={() => {
+              // Refuser ICI ne ferme aucune porte : le navigateur n'a rien
+              // demande, donc les rappels restent activables depuis le
+              // profil. C'est tout l'interet de cet ecran intermediaire.
+              markPushAsked(profile.id).catch(() => { /* silencieux */ })
+              setAskPush(false)
+              onProfileChange?.()
+            }}
+          />
+        )}
 
         {askFeedback && (
           <FeedbackPrompt

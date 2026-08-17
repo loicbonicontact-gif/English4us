@@ -4,6 +4,7 @@ import { supabase } from '../supabaseClient'
 import { levelProgress } from '../lib/gamification'
 import { isSoundOn, setSoundOn } from '../lib/sounds'
 import { deleteRating, fetchRating } from '../lib/feedback'
+import { disablePush, enablePush, isPushEnabled, isPushSupported } from '../lib/push'
 import ProfileView from './ProfileView'
 
 // Met en forme la date d'inscription : « août 2026 ».
@@ -23,6 +24,7 @@ export default function Profile({ profile, onSignOut }) {
   // `null` = pas de note, ou table absente (migration pas passee). Dans les
   // deux cas la ligne ne s'affiche pas : rien a retirer.
   const [rating, setRating] = useState(null)
+  const [pushOn, setPushOn] = useState(false)
 
   useEffect(() => {
     if (!profile?.id) return
@@ -30,6 +32,10 @@ export default function Profile({ profile, onSignOut }) {
     fetchRating(profile.id)
       .then((value) => { if (active) setRating(value) })
       .catch(() => { /* table absente : aucune note a montrer */ })
+
+    isPushEnabled()
+      .then((on) => { if (active) setPushOn(on) })
+      .catch(() => { /* navigateur incapable : l'interrupteur reste masque */ })
 
     supabase
       .from('user_progress')
@@ -83,6 +89,24 @@ export default function Profile({ profile, onSignOut }) {
         deleteRating(profile.id).catch(() => { /* silencieux */ })
       }}
       onOpenPrivacy={() => navigate('/confidentialite')}
+      // Colonne absente = migration-push.sql pas encore passe.
+      pushAvailable={isPushSupported() && profile.push_asked_at !== undefined}
+      pushOn={pushOn}
+      onTogglePush={async () => {
+        try {
+          if (pushOn) {
+            await disablePush(profile.id)
+            setPushOn(false)
+          } else {
+            // `enablePush` renvoie faux si l'apprenant refuse la fenetre du
+            // navigateur : l'interrupteur doit alors rester eteint, sinon il
+            // afficherait un etat faux.
+            setPushOn(await enablePush(profile.id))
+          }
+        } catch {
+          setPushOn(false)
+        }
+      }}
     />
   )
 }

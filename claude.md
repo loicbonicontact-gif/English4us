@@ -128,6 +128,13 @@ A faire, par priorite :
       Scripts PASSES le 17/08 : migration-lesson-notes.sql puis
       seed-lesson-notes.sql. A rejouer seulement si la base est recreee.
 - [ ] Recharge automatique des coeurs (1 par 4h)
+- [x] ~~Rappel quotidien par notification~~ — FAIT le 17/08. Web Push, un
+      message a 18 h, et RIEN les jours ou l'apprenant a deja travaille.
+      La phrase demandee (« tu es a peu de devenir bilingue ») a ete
+      ecartee : fausse apres cinq lecons, et un etablissement le verrait.
+      Remplacee par « 12 lecons sur 30 ». Texte decide dans
+      supabase/functions/daily-reminder/message.js, teste.
+      Necessite migration-push.sql + deploiement (voir README).
 - [ ] Objectif quotidien + defis
 - [ ] Mode enseignant : suivi d'une classe (argument cle pour les ecoles)
 

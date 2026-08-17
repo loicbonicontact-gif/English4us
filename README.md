@@ -81,7 +81,7 @@ Tous les scripts se trouvent dans `supabase/` et s'exécutent dans
 n'existe pas encore.
 
 <details>
-<summary><b>Les 23 scripts, dans l'ordre</b></summary>
+<summary><b>Les 25 scripts, dans l'ordre</b></summary>
 
 ```
 schema.sql                 (base VIDE uniquement — voir l'avertissement plus bas)
@@ -107,11 +107,13 @@ migration-word-order.sql
 seed-word-order.sql
 migration-lesson-notes.sql
 seed-lesson-notes.sql
+migration-feedback.sql
+migration-push.sql
 ```
 
 </details>
 
-Le dossier contient deux fichiers **absents de cette liste**, et c'est voulu :
+Le dossier contient trois fichiers **absents de cette liste**, et c'est voulu :
 
 - `verification.sql` — ne modifie rien, affiche l'inventaire réel de la base.
   **C'est lui qui fait foi**, pas les tableaux écrits à la main dans la
@@ -119,6 +121,9 @@ Le dossier contient deux fichiers **absents de cette liste**, et c'est voulu :
 - `correction-orthographe.sql` — une correction ponctuelle passée le 17/08 sur
   la base d'alors. Les fichiers de contenu portent déjà le texte corrigé : sur
   une base reconstruite, ce script n'a plus rien à corriger.
+- `migration-push-cron.sql` — la tâche planifiée des rappels. Il contient des
+  trous à remplir avec tes propres valeurs : voir « Rappel quotidien » plus
+  bas, et ne jamais le commiter rempli.
 
 Chaque script de la liste affiche sa propre vérification en fin d'exécution.
 
@@ -182,6 +187,72 @@ s'écrit à la main.
 
 ---
 
+## Rappel quotidien (notifications)
+
+Facultatif. Sans cette configuration, l'application fonctionne normalement :
+les rappels ne sont simplement jamais proposés.
+
+Un message par jour, à 18 h, **et seulement s'il y a quelque chose de vrai à
+dire**. Quelqu'un qui s'est déjà entraîné dans la journée ne reçoit rien.
+
+### 1. Générer la paire de clés
+
+```bash
+npx web-push generate-vapid-keys
+```
+
+Deux clés sortent. La **publique** va dans `.env` et dans Vercel
+(`VITE_VAPID_PUBLIC_KEY`) : elle est faite pour être vue. La **privée** ne
+doit apparaître nulle part dans le dépôt.
+
+### 2. Passer les migrations
+
+`migration-push.sql` d'abord, dans le SQL Editor.
+
+### 3. Déployer la fonction
+
+```bash
+npx supabase login
+npx supabase link --project-ref TON-PROJET
+npx supabase secrets set VAPID_PUBLIC_KEY=... VAPID_PRIVATE_KEY=... VAPID_SUBJECT=mailto:ton@email.fr
+npx supabase functions deploy daily-reminder
+```
+
+### 4. Programmer l'envoi
+
+`migration-push-cron.sql`, en suivant les étapes écrites dedans. Ce fichier
+contient des trous à remplir : **ne le commite jamais rempli**, il
+contiendrait une clé qui donne un accès total à ta base.
+
+### Vérifier que ça marche
+
+```bash
+npx supabase functions invoke daily-reminder
+```
+
+La réponse indique combien de notifications sont parties et combien
+d'apprenants ont été laissés tranquilles :
+
+```json
+{ "date": "2026-08-17", "envoyees": 3, "silences": 12, "abonnements_supprimes": 0 }
+```
+
+Un grand nombre de `silences` est normal : c'est le comportement voulu.
+
+### Ce qu'il faut savoir sur iPhone
+
+Les notifications ne fonctionnent **que si l'application a été installée sur
+l'écran d'accueil** (Safari → Partager → Sur l'écran d'accueil). Dans un
+onglet Safari ordinaire, iOS n'envoie rien. L'application le détecte et ne
+propose pas les rappels dans ce cas, plutôt que de promettre ce qui
+n'arrivera pas. Sur Android, aucune contrainte.
+
+### Le texte des messages
+
+Il est décidé par `supabase/functions/daily-reminder/message.js`, un fichier
+volontairement pur, importé à la fois par la fonction serveur et par les
+tests. Pour changer une phrase, c'est le seul endroit à toucher.
+
 ## Commandes
 
 | Commande | Effet |
@@ -189,7 +260,7 @@ s'écrit à la main.
 | `npm run dev` | serveur de développement |
 | `npm run build` | construction de production dans `dist/` |
 | `npm run preview` | sert le résultat de `build` en local |
-| `npm test` | la suite de tests (216 tests) |
+| `npm test` | la suite de tests (254 tests) |
 
 Deux contrôles complètent les tests :
 

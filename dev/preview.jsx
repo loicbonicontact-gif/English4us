@@ -14,6 +14,7 @@ import PathView from '../src/components/PathView'
 import ExerciseView from '../src/components/ExerciseView'
 import LessonNotesView from '../src/components/LessonNotesView'
 import FeedbackPrompt from '../src/components/FeedbackPrompt'
+import PushPrompt from '../src/components/PushPrompt'
 import Privacy from '../src/components/Privacy'
 import LessonEnd from '../src/components/LessonEnd'
 import ProfileView from '../src/components/ProfileView'
@@ -61,7 +62,8 @@ const SCREENS = [
   { key: 'ordre-corrige', label: '15 Ordre corrigé' },
   { key: 'fiche', label: '16 Fiche de leçon' },
   { key: 'note', label: '17 Demande de note' },
-  { key: 'confidentialite', label: '17 Confidentialité' }
+  { key: 'confidentialite', label: '17 Confidentialité' },
+  { key: 'rappels', label: '18 Rappels quotidiens' }
 ]
 
 function Preview() {
@@ -167,6 +169,11 @@ function Preview() {
       {screen === 'ordre' && (
         <ExerciseView {...exerciseProps} exercise={demoWordOrderExercise} answer={answer} verdict={null} />
       )}
+      {/* Invitation aux rappels : explique AVANT la fenetre du navigateur. */}
+      {screen === 'rappels' && (
+        <PushPrompt onAccept={() => setScreen('parcours')} onDecline={() => setScreen('parcours')} />
+      )}
+
       {/* Demande de note : une seule fois, refusable d'un geste. */}
       {screen === 'note' && (
         <FeedbackPrompt onRate={() => {}} onDismiss={() => setScreen('parcours')} />

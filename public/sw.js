@@ -26,7 +26,7 @@
 
 // Nom de la réserve. LE CHANGER À CHAQUE MODIFICATION DE CE FICHIER :
 // c'est ce qui déclenche le nettoyage des anciennes réserves à l'activation.
-const CACHE = 'english4us-v1'
+const CACHE = 'english4us-v2'
 
 // Le strict minimum pour que l'application s'ouvre hors ligne.
 //
@@ -142,3 +142,54 @@ function offlineFallback() {
     { headers: { 'Content-Type': 'text/html; charset=utf-8' } }
   )
 }
+
+/* ============================================
+   RAPPEL QUOTIDIEN — reception des notifications
+
+   Le service worker est le SEUL endroit qui puisse afficher une
+   notification quand l'application est fermee. C'est pour ca que ces deux
+   gestionnaires vivent ici et pas dans l'application.
+   ============================================ */
+
+self.addEventListener('push', (event) => {
+  // Message par defaut : si la charge utile est illisible (version future,
+  // envoi malformé), mieux vaut une notification generique qu'aucune.
+  let message = { title: 'English4us', body: 'C’est le moment de t’entraîner.' }
+
+  try {
+    if (event.data) message = { ...message, ...event.data.json() }
+  } catch { /* charge utile illisible : on garde le message par defaut */ }
+
+  event.waitUntil(
+    self.registration.showNotification(message.title, {
+      body: message.body,
+      icon: '/icon-192.png',
+      badge: '/icon-192.png',
+      lang: 'fr',
+      // `tag` : une notification remplace la precedente au lieu de
+      // s'empiler. Quelqu'un qui n'ouvre pas l'application pendant une
+      // semaine doit trouver UN rappel, pas sept.
+      tag: 'rappel-quotidien',
+      renotify: false
+    })
+  )
+})
+
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close()
+
+  // Si l'application est deja ouverte quelque part, on ramene cet onglet au
+  // lieu d'en ouvrir un second — sinon on se retrouve avec deux copies de
+  // l'application, dont une avec une progression perimee.
+  event.waitUntil(
+    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((windows) => {
+      for (const client of windows) {
+        if (client.url.includes(self.location.origin) && 'focus' in client) {
+          client.navigate('/dashboard')
+          return client.focus()
+        }
+      }
+      return self.clients.openWindow('/dashboard')
+    })
+  )
+})

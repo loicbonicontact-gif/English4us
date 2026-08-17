@@ -48,6 +48,105 @@ Scripts à rejouer si la base est recréée, **dans cet ordre** :
 Avec la révision espacée (5 rencontres par item), cela représente de
 l'ordre de **3 000 rencontres** étalées sur plusieurs mois.
 
+## EN ATTENTE — les rappels quotidiens ne sont pas encore branches
+
+Le code est ecrit et teste, mais **rien n'est actif** tant que quatre etapes
+ne sont pas faites par Loic (detaillees dans README.md, section « Rappel
+quotidien ») :
+
+1. generer la paire de cles VAPID (`npx web-push generate-vapid-keys`) ;
+2. passer `migration-push.sql` ;
+3. deployer la fonction `daily-reminder` avec les secrets ;
+4. passer `migration-push-cron.sql`, apres avoir rempli ses deux trous.
+
+Tant que ce n'est pas fait, l'application se comporte exactement comme
+avant : sans cle publique et sans la colonne `push_asked_at`, l'invitation
+n'apparait jamais et le reglage reste masque dans le profil.
+
+**Ce que je n'ai PAS pu verifier moi-meme** : l'envoi reel. Il demande un
+projet Supabase deploye, des secrets et une tache planifiee. Le choix du
+message, lui, est teste (14 tests) — c'est la partie ou une erreur se voit.
+
+## Ecrit le 17 aout — le rappel quotidien
+
+Demande de Loic : « chaque jour l'appli envoie une notification pour dire a
+l'utilisateur qu'il est a peu de devenir bilingue et l'inciter a s'entrainer ».
+
+### La phrase demandee a ete ecartee, et remplacee
+« Tu es a peu de devenir bilingue » apres cinq lecons est **faux**. Un eleve
+le sait, et un etablissement scolaire le verra immediatement. Une application
+qui flatte pour faire revenir perd exactement ce qui fait sa credibilite
+aupres d'une ecole.
+
+Le message retenu vise le meme sentiment — tu approches du but — avec un
+chiffre exact : « 12 lecons sur 30. Plus que 18 avant la fin du parcours. »
+Un test verrouille l'ecart : aucun message ne peut contenir « bilingue »,
+« couramment » ou « maitrise ».
+
+### La regle qui commande tout : se taire
+**On n'envoie rien a quelqu'un qui a deja travaille aujourd'hui.** C'est le
+defaut le plus courant de ce genre de fonction, et le plus cher : une seule
+occurrence suffit a faire couper les notifications, et une fois coupees elles
+ne reviennent jamais.
+
+Deuxieme silence : apres 30 jours d'absence, on arrete definitivement.
+Quelqu'un qui n'est pas revenu depuis un mois n'a pas oublie l'application,
+il a arrete. Continuer serait du harcelement.
+
+### Quatre messages, choisis selon l'etat reel
+
+| Situation | Message |
+|---|---|
+| Revisions echues | « 3 exercices t'attendent en revision. » |
+| Serie en cours (>= 2 jours) | « Ta serie de 12 jours tient encore aujourd'hui. » |
+| Absent depuis 3 jours ou plus | « Ca fait 5 jours. Une lecon de 3 minutes suffit pour reprendre. » |
+| Progression | « 12 lecons sur 30. Plus que 18 avant la fin du parcours. » |
+| **A deja travaille aujourd'hui** | **rien** |
+
+### Une seule verite pour le texte
+`supabase/functions/daily-reminder/message.js` est un fichier PUR, importe a
+la fois par la fonction Supabase (Deno) et par les tests (Node). Le dupliquer
+aurait garanti qu'une des deux copies derive. Pour changer une phrase, c'est
+le seul endroit a toucher.
+
+### L'ecran intermediaire, et pourquoi il n'est pas decoratif
+La fenetre d'autorisation du navigateur ne dit rien d'utile, et **un refus
+est definitif** : on ne peut plus jamais reposer la question sans passer par
+les reglages du telephone.
+
+D'ou l'ecran qui explique AVANT, et ne declenche la vraie demande que si
+l'apprenant accepte. Celui qui dit « Non merci » la garde la possibilite
+d'activer les rappels plus tard depuis son profil ; s'il avait refuse au
+navigateur, cette porte serait fermee pour toujours.
+
+Propose apres la **3e** lecon — la note, elle, arrive a la 5e : les deux
+boites ne peuvent jamais s'afficher ensemble.
+
+### iPhone
+Les notifications ne marchent QUE si l'application a ete installee sur
+l'ecran d'accueil. Dans un onglet Safari ordinaire, `PushManager` n'existe
+pas. `isPushSupported` le detecte et ne propose rien — un interrupteur mort
+serait un mensonge.
+
+### RGPD
+L'abonnement est une donnee personnelle : il permet d'ecrire sur l'ecran de
+quelqu'un. Il est donc consenti explicitement, supprime — et non pas
+seulement desactive — quand on coupe les rappels, et decrit dans la
+politique de confidentialite, tableau compris.
+
+### Verifications
+- **254 tests** (+25 : 14 sur le choix du message, 11 sur l'abonnement).
+- Verifie dans le navigateur : la boite, ses deux boutons, le focus, Echap.
+- `public/sw.js` verifie syntaxiquement apres modification — une erreur de
+  syntaxe y casserait tout le mode hors ligne, en silence.
+- `npm run build` passe. Un ecran ajoute a la previsualisation (18).
+
+### Ce qui n'est pas verifie
+L'envoi reel. Il faut un projet deploye, des secrets et une tache planifiee —
+rien de tout cela n'existe depuis mon poste. La commande de controle est
+dans le README : `npx supabase functions invoke daily-reminder`, qui renvoie
+le nombre d'envois et de silences.
+
 ## RIEN EN ATTENTE — migration-feedback.sql est passe le 17/08
 
 Confirme par Loic. La table `app_feedback` et la colonne
