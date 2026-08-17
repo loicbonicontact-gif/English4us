@@ -13,7 +13,7 @@ import { IconPath, IconReview, IconUser } from './Icons'
 // l'ecran d'exercice, la ou ils ont un sens.
 //
 // L'onglet actif se deduit de la route : aucun etat a maintenir ici.
-export default function AppShell({ profile, dueCount = 0, children }) {
+export default function AppShell({ profile, dueCount = 0, banner = null, children }) {
   const xp = profile?.xp ?? 0
 
   return (
@@ -70,6 +70,10 @@ export default function AppShell({ profile, dueCount = 0, children }) {
           </div>
         </div>
       </header>
+
+      {/* Bandeau hors ligne, fourni par App : il coiffe l'en-tete pour
+          etre lu avant le contenu. */}
+      {banner}
 
       <main className="app-main">{children}</main>
     </div>

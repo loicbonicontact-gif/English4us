@@ -6,6 +6,7 @@ import { countDueReviews } from './lib/reviews'
 import { primeVoices } from './lib/speech'
 import Auth from './components/Auth'
 import AppShell from './components/AppShell'
+import OfflineBanner from './components/OfflineBanner'
 import LessonPath from './components/LessonPath'
 import Exercise from './components/Exercise'
 import LessonNotes from './components/LessonNotes'
@@ -114,12 +115,20 @@ export default function App() {
     return <div className="screen-center"><p>Chargement…</p></div>
   }
 
+  // Le bandeau hors ligne coiffe TOUT, y compris l'ecran de connexion :
+  // c'est la, avant d'etre connecte, que l'absence de reseau est la plus
+  // deroutante — le formulaire s'affiche mais ne peut pas aboutir.
   if (!session) {
-    return <Auth />
+    return (
+      <>
+        <OfflineBanner />
+        <Auth />
+      </>
+    )
   }
 
   return (
-    <AppShell profile={profile} dueCount={dueCount}>
+    <AppShell profile={profile} dueCount={dueCount} banner={<OfflineBanner />}>
       {profileError && (
         <p className="alert alert-error" role="alert">Profil indisponible : {profileError}</p>
       )}

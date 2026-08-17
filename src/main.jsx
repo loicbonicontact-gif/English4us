@@ -21,3 +21,20 @@ root.render(
     )}
   </React.StrictMode>
 )
+
+// Mode hors ligne de l'interface (public/sw.js).
+//
+// UNIQUEMENT EN PRODUCTION. En développement, un service worker sert des
+// fichiers en réserve pendant que Vite en envoie de neufs : on modifie un
+// fichier, la page ne change pas, et on cherche l'erreur ailleurs pendant
+// une heure. `import.meta.env.PROD` vaut faux sous `npm run dev`.
+//
+// L'enregistrement attend `load` : lancé plus tôt, il entre en concurrence
+// avec le premier affichage sur une connexion lente.
+if (import.meta.env.PROD && 'serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    // Un échec ici n'a aucune conséquence visible : l'application fonctionne
+    // exactement comme avant, en ligne. Inutile d'en informer l'apprenant.
+    navigator.serviceWorker.register('/sw.js').catch(() => { /* silencieux */ })
+  })
+}

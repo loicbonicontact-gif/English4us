@@ -48,6 +48,63 @@ Scripts à rejouer si la base est recréée, **dans cet ordre** :
 Avec la révision espacée (5 rencontres par item), cela représente de
 l'ordre de **3 000 rencontres** étalées sur plusieurs mois.
 
+## Ecrit le 17 aout — mode hors ligne de l'interface
+
+Ajoute apres la question « comment publier sur les stores ». La reponse
+honnete etait : tu as deja une application installable (PWA), il lui manque
+juste de fonctionner sans reseau.
+
+### Ce qui est garde, et ce qui ne l'est pas
+`public/sw.js` garde en reserve l'interface — HTML, CSS, JavaScript, icones.
+Il ne garde **jamais** les reponses de Supabase. Comme Supabase est sur un
+autre domaine, la regle tient en une ligne : tout ce qui ne vient pas de
+notre domaine part au reseau sans passer par le service worker.
+
+Servir une progression vieille d'une semaine serait pire que de ne rien
+servir : l'apprenant croirait avoir perdu son travail.
+
+### Ecrit a la main, sans dependance
+Un generateur (vite-plugin-pwa) produit un fichier illisible et une
+dependance de plus. La regle tient en trente lignes commentees :
+- navigation → reseau d'abord, reserve en secours ;
+- fichiers construits → reserve d'abord (leur nom porte une empreinte unique,
+  une version perimee ne peut pas etre servie a la place d'une neuve) ;
+- Supabase → jamais touche.
+
+### Le bandeau est la contrepartie obligatoire
+Sans lui, l'application s'ouvrirait NORMALEMENT sans reseau : l'apprenant
+repondrait, rien ne s'enregistrerait, et il ne saurait pas pourquoi.
+
+### Le defaut trouve par le test reel
+Le service worker a ete verifie en **coupant vraiment le serveur** puis en
+rechargeant : l'application s'est affichee. C'est ce test qui a revele que
+l'ecran de **connexion** apparaissait hors ligne sans le moindre
+avertissement — le bandeau vivait dans `AppShell`, qui n'enveloppe que les
+ecrans d'un compte connecte. Or c'est justement avant la connexion que
+l'absence de reseau est la plus deroutante : le formulaire s'affiche mais ne
+peut pas aboutir. Le bandeau a ete remonte au-dessus de tout.
+
+Un test unitaire n'aurait pas trouve ca.
+
+### Un chiffre de contraste corrige
+Le commentaire CSS annoncait 8,1:1 pour l'encre du bandeau. La mesure donne
+**7,28:1** — toujours largement au-dessus du seuil, mais le commentaire
+mentait. Corrige : le projet ecrit des valeurs mesurees, pas estimees.
+
+### Verifications
+- **223 tests** (+7 sur `lib/network`).
+- Verifie serveur eteint : l'application se charge depuis la reserve.
+- Bandeau : apparait sur `offline`, disparait sur `online`, `role="status"`.
+- `npm run build` passe. `npm run preview` est desormais dans
+  `.claude/launch.json` (port 4173) — le service worker ne s'enregistre
+  qu'en production, donc c'est le seul moyen de le tester.
+
+### Ce que ca ne fait PAS
+Les lecons ne sont pas jouables hors ligne. Choix de Loic, et le bon : cela
+demanderait de stocker les exercices localement, de garder les reponses en
+attente et de gerer les conflits entre appareils. C'est la que naissent les
+bugs de donnees.
+
 ## Décision du 17/08 — le classement est définitivement écarté
 
 Loïc : « pas la peine pour ça, c'est inutile ».
