@@ -15,14 +15,14 @@
 delete from exercises
 where lesson_id between 1 and 10
   and type not in ('ecoute', 'oral')
-  and coalesce(explanation, '') not like '%[voc]'
+  and coalesce(explanation, '') not like '%[voc%'
   and id not in (
     select id from (
       select id, row_number() over (partition by lesson_id order by id) as rang
       from exercises
       where lesson_id between 1 and 10
         and type not in ('ecoute', 'oral')
-        and coalesce(explanation, '') not like '%[voc]'
+        and coalesce(explanation, '') not like '%[voc%'
     ) t where rang <= 3
   );
 

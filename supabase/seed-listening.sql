@@ -21,8 +21,11 @@
 -- champ — aucun code d'exercice ne changera.
 -- ============================================
 
-delete from listening_questions;
-delete from listening_passages;
+-- Suppression cadree aux positions 1 a 18, celles de cette serie, pour que
+-- l'ajout d'une seconde serie d'ecoutes ne soit pas efface par une relance.
+delete from listening_questions
+where passage_id in (select id from listening_passages where position <= 18);
+delete from listening_passages where position <= 18;
 alter sequence listening_passages_id_seq restart with 1;
 
 -- ============================================

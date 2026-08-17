@@ -18,8 +18,13 @@
 -- français : ce sont elles qui enseignent, elles doivent être comprises.
 -- ============================================
 
-delete from reading_questions;
-delete from reading_passages;
+-- Suppression CADREE aux positions 1 a 12, celles de cette serie.
+-- Un « delete from reading_passages » sans condition effacerait aussi les
+-- series suivantes : c'est exactement le piege qui a fait disparaitre les
+-- 60 exercices oraux le 17/08.
+delete from reading_questions
+where passage_id in (select id from reading_passages where position <= 12);
+delete from reading_passages where position <= 12;
 alter sequence reading_passages_id_seq restart with 1;
 
 -- ============================================
