@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { supabase } from '../supabaseClient'
 import { levelProgress } from '../lib/gamification'
 import { isSoundOn, setSoundOn } from '../lib/sounds'
@@ -15,6 +16,7 @@ function formatMonth(iso) {
 // Conteneur du profil : lit la progression pour en deduire le nombre de
 // lecons terminees et la precision moyenne, que le profil ne stocke pas.
 export default function Profile({ profile, onSignOut }) {
+  const navigate = useNavigate()
   const [stats, setStats] = useState({ lessonsDone: 0, accuracy: null })
   const [soundOn, setSound] = useState(isSoundOn())
 
@@ -60,6 +62,11 @@ export default function Profile({ profile, onSignOut }) {
       soundOn={soundOn}
       onToggleSound={toggleSound}
       onSignOut={onSignOut}
+      placementLevel={profile.placement_level ?? null}
+      // Colonne absente = migration-placement.sql pas encore passe : on
+      // masque la ligne plutot que d'offrir un bouton qui echouerait.
+      placementAvailable={profile.placement_taken_at !== undefined}
+      onOpenPlacement={() => navigate('/placement')}
     />
   )
 }

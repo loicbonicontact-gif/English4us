@@ -9,7 +9,8 @@ import Mascot from './Mascot'
 // Conteneur : charge les lecons, les ecoutes et la progression, puis delegue
 // l'affichage a PathView. Aucune mise en forme ici — c'est ce qui permet de
 // previsualiser l'ecran avec des donnees de test sans toucher a Supabase.
-export default function LessonPath({ userId }) {
+export default function LessonPath({ profile }) {
+  const userId = profile?.id
   const navigate = useNavigate()
   const [path, setPath] = useState(null)
   const [error, setError] = useState(null)
@@ -40,14 +41,22 @@ export default function LessonPath({ userId }) {
         if (lessons.length === 0) {
           setError("Aucune leçon en base. Le script supabase/seed.sql n'a pas encore été exécuté.")
         } else {
-          setPath(buildPath(lessons, progress, passages, listeningDone, readings, readingDone))
+          setPath(buildPath(lessons, progress, passages, listeningDone, readings, readingDone, {
+            placementLevel: profile?.placement_level ?? null
+          }))
         }
       })
       .catch((err) => { if (active) setError(err.message) })
       .finally(() => { if (active) setLoading(false) })
 
     return () => { active = false }
-  }, [userId])
+  }, [userId, profile?.placement_level])
+
+  // Faut-il proposer le test ? Seulement si la question n'a jamais été
+  // tranchée. La colonne ABSENTE (`undefined`) signifie que la migration
+  // n'est pas encore passée : on n'affiche alors rien, plutôt qu'un bouton
+  // qui échouerait à l'enregistrement.
+  const needsPlacement = profile?.placement_taken_at === null
 
   if (loading) {
     return (
@@ -64,6 +73,9 @@ export default function LessonPath({ userId }) {
   return (
     <PathView
       path={path}
+      needsPlacement={needsPlacement}
+      placementLevel={profile?.placement_level ?? null}
+      onOpenPlacement={() => navigate('/placement')}
       onOpen={(id) => navigate(`/lesson/${id}`)}
       onOpenListening={(id) => navigate(`/listening/${id}`)}
       onOpenReading={(id) => navigate(`/reading/${id}`)}

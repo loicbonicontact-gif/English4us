@@ -11,7 +11,10 @@ export default function ProfileView({
   accuracy,
   soundOn,
   onToggleSound,
-  onSignOut
+  onSignOut,
+  placementLevel = null,
+  placementAvailable = false,
+  onOpenPlacement = () => {}
 }) {
   const initial = (username || '?').charAt(0).toUpperCase()
 
@@ -64,6 +67,27 @@ export default function ProfileView({
           <span className="end-tile-label">Précision</span>
         </div>
       </div>
+
+      {/* Le placement se refait : quelqu'un qui progresse vite hors de
+          l'application, ou qui s'est place trop haut par optimisme, doit
+          pouvoir se recorriger sans passer par le support. */}
+      {placementAvailable && (
+        <section className="settings-card">
+          <div className="settings-row">
+            <span className="settings-label">
+              Point de départ
+              <span className="settings-hint">
+                {placementLevel
+                  ? `Tu démarres en ${placementLevel}`
+                  : 'Jamais testé — tu démarres en A1'}
+              </span>
+            </span>
+            <button type="button" className="settings-action" onClick={onOpenPlacement}>
+              {placementLevel ? 'Refaire le test' : 'Passer le test'}
+            </button>
+          </div>
+        </section>
+      )}
 
       <section className="settings-card">
         <div className="settings-row">

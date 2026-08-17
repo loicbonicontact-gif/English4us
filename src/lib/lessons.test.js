@@ -145,3 +145,98 @@ describe('buildPath — mises en pratique intercalées', () => {
     expect(group.lessons).toHaveLength(5)
   })
 })
+
+// ============================================
+// Effet du test de placement
+//
+// Un apprenant place en B1 doit trouver B1 ouvert sans avoir a traverser
+// A1 et A2 — c'etait le dernier vrai verrou du parcours. Mais il ne doit
+// PAS voir A1 et A2 marques comme termines : il ne les a pas travailles,
+// et sa progression affichee doit rester vraie.
+// ============================================
+
+const MULTI = [
+  { id: 1, level: 'A1', unit_order: 1, title: 'A1.1', xp_reward: 10 },
+  { id: 2, level: 'A1', unit_order: 2, title: 'A1.2', xp_reward: 10 },
+  { id: 3, level: 'A2', unit_order: 1, title: 'A2.1', xp_reward: 10 },
+  { id: 4, level: 'A2', unit_order: 2, title: 'A2.2', xp_reward: 10 },
+  { id: 5, level: 'B1', unit_order: 1, title: 'B1.1', xp_reward: 10 },
+  { id: 6, level: 'B1', unit_order: 2, title: 'B1.2', xp_reward: 10 }
+]
+
+const placed = (level) => buildPath(MULTI, {}, [], {}, [], {}, { placementLevel: level })
+
+describe('buildPath — test de placement', () => {
+  it('ouvre la première leçon du niveau de placement', () => {
+    const path = placed('B1')
+    expect(path.decorated.find((l) => l.id === 5).unlocked).toBe(true)
+  })
+
+  it('désigne cette leçon comme courante, et non A1.1', () => {
+    // Le cœur du chantier : sans cela, la carte d'accueil afficherait
+    // « Reprendre : A1.1 » et le placement ne servirait à rien.
+    expect(placed('B1').current.id).toBe(5)
+  })
+
+  it('ouvre les niveaux inférieurs pour révision libre', () => {
+    const path = placed('B1')
+    expect(path.decorated.find((l) => l.id === 2).unlocked).toBe(true)
+    expect(path.decorated.find((l) => l.id === 4).unlocked).toBe(true)
+  })
+
+  it('ne marque AUCUNE leçon comme terminée', () => {
+    // Le placement ouvre, il ne fait pas à la place de l'apprenant.
+    // Marquer A1 et A2 « terminés » gonflerait la progression, l'XP et
+    // les statistiques avec du travail qui n'a jamais eu lieu.
+    expect(placed('B1').decorated.every((l) => l.completed === false)).toBe(true)
+  })
+
+  it('garde la chaîne classique DANS le niveau de placement', () => {
+    // B1.2 reste fermée tant que B1.1 n'est pas faite : le placement
+    // ouvre une porte d'entrée, il ne déverrouille pas tout le niveau.
+    expect(placed('B1').decorated.find((l) => l.id === 6).unlocked).toBe(false)
+  })
+
+  it('laisse les niveaux supérieurs fermés', () => {
+    // Placé en A2 : A1 est ouvert en révision, A2.1 est la porte d'entrée,
+    // et B1 reste à mériter. Le placement ne donne pas la suite du parcours.
+    const path = buildPath(MULTI, {}, [], {}, [], {}, { placementLevel: 'A2' })
+    expect(path.decorated.find((l) => l.id === 1).unlocked).toBe(true)
+    expect(path.decorated.find((l) => l.id === 3).unlocked).toBe(true)
+    expect(path.decorated.find((l) => l.id === 5).unlocked).toBe(false)
+  })
+
+  it('ne change rien sans placement', () => {
+    const path = buildPath(MULTI, {})
+    expect(path.current.id).toBe(1)
+    expect(path.decorated.find((l) => l.id === 5).unlocked).toBe(false)
+  })
+
+  it('se comporte comme sans placement quand il vaut A1', () => {
+    const path = placed('A1')
+    expect(path.current.id).toBe(1)
+    expect(path.decorated.find((l) => l.id === 3).unlocked).toBe(false)
+  })
+
+  it('ignore un niveau inconnu plutôt que de tout ouvrir', () => {
+    const path = buildPath(MULTI, {}, [], {}, [], {}, { placementLevel: 'Z9' })
+    expect(path.current.id).toBe(1)
+    expect(path.decorated.find((l) => l.id === 3).unlocked).toBe(false)
+  })
+
+  it('ouvre aussi les mises en pratique des niveaux inférieurs', () => {
+    // Dire « A1 est derrière toi » puis verrouiller ses écoutes serait
+    // exactement le défaut corrigé le 17/08 : du contenu hors d'atteinte.
+    const path = buildPath(MULTI, {}, PASSAGES, {}, READINGS, {}, { placementLevel: 'B1' })
+    const items = path.byLevel.find((g) => g.level === 'A1').items
+    const practice = items.filter((i) => i.kind !== 'lesson')
+    expect(practice.length).toBeGreaterThan(0)
+    expect(practice.every((p) => p.unlocked)).toBe(true)
+  })
+
+  it('revient à une leçon inférieure quand tout le haut est terminé', () => {
+    const allAbove = { 5: { completed: true }, 6: { completed: true } }
+    const path = buildPath(MULTI, allAbove, [], {}, [], {}, { placementLevel: 'B1' })
+    expect(path.current.id).toBe(1)
+  })
+})

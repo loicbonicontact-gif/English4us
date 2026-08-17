@@ -2001,6 +2001,139 @@ html, body { max-width: 100%; overflow-x: hidden; }
 .answer.is-letter-only .answer-label { color: var(--ink-3); font-weight: 600; }
 
 /* ============================================
+   TEST DE PLACEMENT
+   ============================================ */
+
+/* Invitation, en tete du parcours. Teinte plutot que degrade : la carte
+   « Reprendre » juste en dessous porte le degrade, et deux blocs pleins
+   l'un sur l'autre se disputeraient le regard. */
+.placement-invite {
+  display: flex; align-items: center; gap: var(--sp-3);
+  padding: 18px;
+  border: 1px solid var(--accent);
+  border-radius: var(--r-2xl);
+  background: var(--accent-tint);
+}
+.placement-invite-mascot { flex: 0 0 auto; }
+.placement-invite-text { flex: 1; min-width: 0; }
+.placement-invite .resume-eyebrow { color: var(--accent-dark); }  /* 6.9:1 sur tinte */
+
+.placement-invite-title {
+  margin: 0 0 4px;
+  /* La famille et la graisse viennent de la regle globale h1/h2/h3 :
+     Barlow Condensed n'est chargee qu'en 600, demander 700 ferait
+     fabriquer un faux gras par le navigateur. */
+  font-size: 21px; line-height: 1.15;
+  color: var(--ink);
+}
+.placement-invite-sub {
+  margin: 0 0 12px;
+  font-size: 14px; line-height: 1.45;
+  color: var(--ink-2);
+}
+.placement-invite-btn {
+  min-height: 44px;
+  padding: 0 18px;
+  border: none; border-radius: var(--r-pill);
+  background: var(--grad-accent); color: #fff;
+  font-family: var(--font); font-size: 15px; font-weight: 600;
+  cursor: pointer;
+  box-shadow: var(--e-primary);
+}
+
+/* Action secondaire des ecrans de placement : « Je debute »,
+   « Je ne sais pas », « Refaire le test ». Volontairement discrete —
+   c'est une porte de sortie, pas le chemin principal. */
+.placement-skip {
+  width: 100%; max-width: 420px;
+  min-height: 44px;
+  margin-top: var(--sp-1);
+  padding: 0 16px;
+  border: none; border-radius: var(--r-pill);
+  background: transparent;
+  color: var(--accent-dark);                /* 6.9:1 sur blanc */
+  font-family: var(--font); font-size: 14.5px; font-weight: 600;
+  cursor: pointer;
+}
+.placement-skip:disabled { opacity: .45; cursor: not-allowed; }
+
+.placement-blurb {
+  margin: 0;
+  font-size: 15px; color: var(--ink-2);
+}
+
+/* Recapitulatif par niveau, sur l'ecran de resultat. */
+.placement-recap {
+  width: 100%; max-width: 420px;
+  margin: var(--sp-2) 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid; gap: 6px;
+}
+.placement-recap li {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 14px;
+  border-radius: var(--r-md);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  text-align: left;
+}
+.placement-recap li.is-passed { border-color: var(--success); background: var(--success-tint); }
+.placement-recap li.is-stop { border-color: var(--accent); background: var(--accent-tint); }
+
+.placement-recap-score {
+  font-size: 14px; font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+}
+.placement-recap-note {
+  margin-left: auto;
+  font-size: 12.5px;
+  color: var(--ink-2);                      /* 9.8:1 sur blanc, suffisant sur teintes */
+}
+
+/* Niveau ouvert par le placement, dans l'en-tete de bloc du parcours.
+   `white-space: nowrap` : sans lui, le badge se coupait en deux lignes a
+   375 px et poussait le compteur « 0 / 5 » hors de sa place. */
+.level-placed {
+  flex: 0 0 auto;
+  white-space: nowrap;
+  padding: 3px 9px;
+  border-radius: var(--r-pill);
+  background: var(--accent-tint);
+  color: var(--accent-dark);                /* 6.9:1 */
+  font-size: 11.5px; font-weight: 600;
+}
+/* Avec un badge de plus dans l'en-tete, le titre doit pouvoir retrecir et
+   le compteur rester sur une ligne. */
+.level-head .level-name { min-width: 0; }
+.level-head .level-count { white-space: nowrap; }
+
+/* Ligne « Point de depart » du profil. */
+.settings-hint {
+  display: block;
+  margin-top: 2px;
+  font-size: 12.5px; color: var(--ink-3);   /* 4.8:1 */
+}
+.settings-action {
+  flex: 0 0 auto;
+  min-height: 44px;
+  padding: 0 16px;
+  border: 1px solid var(--accent);
+  border-radius: var(--r-pill);
+  background: var(--surface);
+  color: var(--accent-dark);                /* 6.9:1 */
+  font-family: var(--font); font-size: 14px; font-weight: 600;
+  cursor: pointer;
+}
+
+/* Telephone : la mascotte de l'invitation prend de la place pour rien
+   sous 400 px, ou chaque ligne compte. */
+@media (max-width: 400px) {
+  .placement-invite-mascot { display: none; }
+}
+
+/* ============================================
    BARRE DE PREVISUALISATION (developpement seulement)
    Presente uniquement sur preview.html, jamais dans l'app.
    ============================================ */

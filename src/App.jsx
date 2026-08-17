@@ -13,6 +13,7 @@ import Review from './components/Review'
 import Listening from './components/Listening'
 import Reading from './components/Reading'
 import Exam from './components/Exam'
+import Placement from './components/Placement'
 
 export default function App() {
   const [session, setSession] = useState(null)
@@ -128,7 +129,11 @@ export default function App() {
         <Routes>
           <Route
             path="/dashboard"
-            element={<LessonPath userId={profile.id} />}
+            element={<LessonPath profile={profile} />}
+          />
+          <Route
+            path="/placement"
+            element={<Placement profile={profile} onProfileChange={refreshProfile} />}
           />
           <Route
             path="/lesson/:id"

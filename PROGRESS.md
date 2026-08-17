@@ -42,6 +42,81 @@ Scripts à rejouer si la base est recréée, **dans cet ordre** :
 Avec la révision espacée (5 rencontres par item), cela représente de
 l'ordre de **3 000 rencontres** étalées sur plusieurs mois.
 
+## Écrit le 17 août — le test de placement (dernier verrou levé)
+
+Le défaut annoncé la veille est corrigé : un apprenant de niveau B1 ne
+traverse plus quinze leçons connues avant d'atteindre la première qui lui
+apprenne quelque chose.
+
+### À FAIRE AVANT D'UTILISER : un script SQL
+`supabase/migration-placement.sql`, à passer dans Supabase SQL Editor.
+Il ajoute trois colonnes à `profiles` et ne sème aucun contenu.
+**Tant qu'il n'est pas passé, l'application fonctionne exactement comme
+avant** : l'invitation au test et la ligne « Point de départ » du profil
+restent masquées plutôt que d'offrir un bouton qui échouerait.
+
+### La méthode : un escalier
+Cinq questions du niveau A1. Quatre bonnes réponses ou plus, on monte d'un
+niveau et on recommence. En dessous, on s'arrête : c'est là que le parcours
+commence.
+
+| Parcours du test | Niveau retenu | Questions posées |
+|---|---|---|
+| A1 raté | A1 | 5 |
+| A1 ✓, A2 raté | A2 | 10 |
+| A1 ✓, A2 ✓, B1 raté | B1 | 15 |
+| les six réussis | C2 | 30 |
+
+Pourquoi partir du bas plutôt que du milieu : un vrai débutant répond à
+cinq questions et c'est fini en une minute. C'est lui qu'il faut ménager —
+quelqu'un qui vise C1 acceptera trente questions.
+
+Pourquoi 4 sur 5 : avec quatre propositions, réussir 4 sur 5 au hasard a
+environ une chance sur 800. À 3 sur 3, il aurait fallu un sans-faute — une
+inattention aurait coûté un niveau entier.
+
+**Aucun contenu n'a été écrit.** Le test puise dans les 840 exercices à
+choix multiple déjà en base, tirés au hasard : deux passages ne posent pas
+les mêmes questions, on ne peut donc pas apprendre les réponses par cœur.
+
+### La décision qui commande tout : ouvrir sans cocher
+Un apprenant placé en B1 n'a pas *terminé* A1 et A2. Le placement les
+**ouvre** — révision libre, écoutes et lectures comprises — sans les
+marquer faits.
+
+L'alternative aurait été de cocher les leçons sautées. Elle a été écartée :
+elle aurait gonflé la progression, l'XP et la précision moyenne avec du
+travail qui n'a jamais eu lieu. Un établissement qui regarde le tableau de
+bord d'un élève doit y lire ce que l'élève a fait, pas ce qu'on lui a
+supposé. La progression d'un apprenant placé en B1 affiche donc 0 leçon
+terminée le premier jour, et c'est la vérité.
+
+Trois conséquences, toutes visibles à l'écran :
+- la carte d'accueil pointe la première leçon du niveau de placement, pas
+  A1.1 — sans cela le test n'aurait servi à rien ;
+- les niveaux inférieurs portent le badge « Révision libre », et leurs
+  leçons disent « Révision » et non « En cours » (ce serait faux) ;
+- **dans** le niveau de placement, la chaîne classique reprend : B1.2 reste
+  fermée tant que B1.1 n'est pas faite. Le test ouvre une porte d'entrée,
+  il ne déverrouille pas un niveau entier.
+
+### Ce que le test n'est pas
+Une certification. Il s'appuie sur des questions écrites pour enseigner, pas
+pour évaluer, et l'écran de résultat le dit en toutes lettres. C'est une
+orientation, refaisable à tout moment depuis le profil — quelqu'un qui s'est
+placé trop haut par optimisme se recorrige seul.
+
+### Vérifications
+- **158 tests** au total (+11 sur `buildPath`, +22 sur `placement.js`), dont
+  celui qui verrouille la décision ci-dessus : aucune leçon n'est marquée
+  terminée par un placement.
+- `npm run build` passe.
+- Quatre écrans ajoutés à la prévisualisation (`preview.html`, entrées 13),
+  contrôlés à 375, 768, 1280 px et en paysage. Contrastes calculés : le plus
+  bas est 6,4:1, au-dessus du seuil de 4,5:1.
+- Un défaut trouvé et corrigé en chemin : le badge de niveau se coupait en
+  deux lignes à 375 px et poussait le compteur « 0 / 5 » hors de sa place.
+
 ## Écrit le 17 août — la barre passe à trois onglets
 
 Décision de Loïc, en deux temps.

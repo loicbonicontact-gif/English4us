@@ -46,6 +46,20 @@ export async function fetchProgress(userId) {
 // débutant aucune. Le contenu existait, il était hors d'atteinte.
 const LESSONS_BETWEEN_PRACTICE_MIN = 1
 
+// Effet du test de placement sur le déverrouillage.
+//
+// Un apprenant placé en B1 n'a pas « terminé » A1 et A2 : il ne les a pas
+// travaillés ici, et prétendre le contraire fausserait sa progression, son
+// XP et ses statistiques. Le placement OUVRE donc les niveaux inférieurs
+// sans les marquer faits — il peut y redescendre quand il veut, et sa
+// progression affichée reste vraie (0 leçon terminée le premier jour).
+//
+// Sans placement (`null`), rien ne change : la chaîne classique s'applique.
+function placementIndexOf(placementLevel) {
+  const index = LEVELS.indexOf(placementLevel)
+  return index === -1 ? 0 : index
+}
+
 // Renvoie le parcours regroupé par niveau, prêt à l'affichage.
 //
 // Les passages d'écoute sont insérés DANS chaque niveau, entre les leçons :
@@ -58,13 +72,35 @@ export function buildPath(
   listeningPassages = [],
   listeningProgress = {},
   readingPassages = [],
-  readingProgress = {}
+  readingProgress = {},
+  { placementLevel = null } = {}
 ) {
+  const placedAt = placementIndexOf(placementLevel)
+  const belowPlacement = (level) => LEVELS.indexOf(level) < placedAt
+
   let previousCompleted = true
+  const levelsSeen = new Set()
+
   const decorated = lessons.map((lesson) => {
     const done = Boolean(progress[lesson.id]?.completed)
+    const levelIndex = LEVELS.indexOf(lesson.level)
+
+    // Première leçon de son niveau ? Les leçons arrivent triées, donc la
+    // première rencontrée pour un niveau donné est bien la sienne.
+    const isLevelOpener = !levelsSeen.has(lesson.level)
+    levelsSeen.add(lesson.level)
+
+    // Trois raisons d'être ouverte :
+    //   - la précédente est terminée (règle historique, inchangée)
+    //   - le niveau est sous le placement : révision libre
+    //   - c'est la porte d'entrée du niveau de placement lui-même,
+    //     sinon l'apprenant placé en B1 resterait bloqué devant A2.5
     const unlocked = previousCompleted
+      || belowPlacement(lesson.level)
+      || (levelIndex === placedAt && isLevelOpener)
+
     previousCompleted = done
+
     return {
       ...lesson,
       kind: 'lesson',
@@ -77,7 +113,16 @@ export function buildPath(
   // La leçon courante = la première ouverte mais pas encore terminée.
   // Toujours une leçon, jamais une mise en pratique : c'est la leçon qui
   // fait avancer le parcours.
-  const current = decorated.find((l) => l.unlocked && !l.completed) || null
+  //
+  // Avec un placement, on cherche d'abord AU NIVEAU DE PLACEMENT ou
+  // au-dessus : sans cela, un apprenant placé en B1 verrait « Reprendre :
+  // A1 leçon 1 » sur sa carte d'accueil, ce qui annulerait tout l'intérêt
+  // du test. Les niveaux inférieurs restent ouverts, simplement ils ne
+  // commandent plus la carte.
+  const atOrAbove = (l) => LEVELS.indexOf(l.level) >= placedAt
+  const current = decorated.find((l) => l.unlocked && !l.completed && atOrAbove(l))
+    || decorated.find((l) => l.unlocked && !l.completed)
+    || null
 
   const byLevel = LEVELS.map((level) => {
     const levelLessons = decorated.filter((l) => l.level === level)
@@ -97,7 +142,7 @@ export function buildPath(
     return {
       level,
       lessons: levelLessons,
-      items: interleave(levelLessons, listenings, readings)
+      items: interleave(levelLessons, listenings, readings, belowPlacement(level))
     }
   }).filter((group) => group.lessons.length > 0)
 
@@ -113,7 +158,11 @@ export function buildPath(
 // Chacune s'ouvre dès que la leçon qui la précède est terminée, et ne bloque
 // JAMAIS la leçon suivante : rater une mise en pratique est normal, cela ne
 // doit pas arrêter le parcours.
-function interleave(levelLessons, listenings, readings) {
+// `levelBelowPlacement` : tout un niveau situé sous le placement est ouvert,
+// mises en pratique comprises. Les laisser fermées reviendrait à dire à
+// l'apprenant « ces niveaux sont derrière toi » puis à lui verrouiller
+// l'écoute et la lecture qui s'y trouvent.
+function interleave(levelLessons, listenings, readings, levelBelowPlacement = false) {
   const items = []
   const queues = [[...listenings], [...readings]]
   let turn = 0
@@ -146,13 +195,13 @@ function interleave(levelLessons, listenings, readings) {
       if (!practice) break
       // Règle inchangée : une mise en pratique s'ouvre quand la leçon qui
       // la précède est terminée. On apprend d'abord, on pratique ensuite.
-      items.push({ ...practice, unlocked: lesson.completed })
+      items.push({ ...practice, unlocked: lesson.completed || levelBelowPlacement })
     }
   })
 
   // Filet de sécurité : si un arrondi laissait quelque chose de côté, on
   // l'ajoute plutôt que de le faire disparaître silencieusement.
-  const lastDone = levelLessons[lessonCount - 1]?.completed ?? false
+  const lastDone = (levelLessons[lessonCount - 1]?.completed ?? false) || levelBelowPlacement
   let leftover = nextPractice()
   while (leftover) {
     items.push({ ...leftover, unlocked: lastDone })

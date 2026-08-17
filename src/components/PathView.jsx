@@ -1,5 +1,6 @@
 import { IconCap, IconCheck, IconChevron, IconHeadphones, IconPlay, IconRead, IconRedo } from './Icons'
 import Mascot from './Mascot'
+import { LEVELS } from '../data/curriculum'
 
 // Description courte de chaque niveau : donne un but, au lieu d'un simple code.
 export const LEVEL_BLURB = {
@@ -14,7 +15,16 @@ export const LEVEL_BLURB = {
 // Affichage pur du parcours : aucune requete, tout arrive en props.
 // Le chargement vit dans LessonPath.jsx — cette separation permet de
 // verifier l'ecran avec des donnees de test (voir dev/preview.jsx).
-export default function PathView({ path, onOpen, onOpenListening = () => {}, onOpenReading = () => {}, onOpenExam = () => {} }) {
+export default function PathView({
+  path,
+  onOpen,
+  onOpenListening = () => {},
+  onOpenReading = () => {},
+  onOpenExam = () => {},
+  needsPlacement = false,
+  placementLevel = null,
+  onOpenPlacement = () => {}
+}) {
   const done = path.decorated.filter((l) => l.completed).length
   const total = path.decorated.length
   const percent = total > 0 ? Math.round((done / total) * 100) : 0
@@ -41,6 +51,27 @@ export default function PathView({ path, onOpen, onOpenListening = () => {}, onO
 
       {/* --- Colonne centrale --- */}
       <div className="path-main">
+        {/* Invitation au test de placement, avant tout le reste.
+            Elle disparait des que la question a ete tranchee — y compris
+            si l'apprenant se declare debutant. Une banniere qui revient
+            chaque jour se lit comme un reproche. */}
+        {needsPlacement && (
+          <section className="placement-invite">
+            <Mascot mood="thinking" size={64} className="placement-invite-mascot" />
+            <div className="placement-invite-text">
+              <p className="resume-eyebrow">Avant de commencer</p>
+              <h2 className="placement-invite-title">Tu sais déjà un peu d'anglais ?</h2>
+              <p className="placement-invite-sub">
+                Cinq minutes pour trouver ton point de départ, au lieu de
+                traverser des leçons que tu connais déjà.
+              </p>
+              <button type="button" className="placement-invite-btn" onClick={onOpenPlacement}>
+                Passer le test de placement
+              </button>
+            </div>
+          </section>
+        )}
+
         {current ? (
           <section className="resume-card">
             <div className="resume-text">
@@ -87,12 +118,17 @@ export default function PathView({ path, onOpen, onOpenListening = () => {}, onO
 
         {path.byLevel.map(({ level, lessons, items = lessons }) => {
           const levelDone = lessons.filter((l) => l.completed).length
+          // Un niveau ouvert par le placement affiche « 0 / 5 » tout en
+          // etant deverrouille : sans explication, cela ressemble a un bug.
+          const openedByPlacement = placementLevel != null
+            && LEVELS.indexOf(level) < LEVELS.indexOf(placementLevel)
 
           return (
             <section key={level} className="level-block">
               <header className="level-head">
                 <span className="level-pill">{level}</span>
                 <h2 className="level-name">{LEVEL_BLURB[level]}</h2>
+                {openedByPlacement && <span className="level-placed">Révision libre</span>}
                 <span className="level-count">{levelDone} / {lessons.length}</span>
               </header>
 
@@ -143,10 +179,14 @@ export default function PathView({ path, onOpen, onOpenListening = () => {}, onO
                         <span className="lesson-text">
                           <span className="lesson-title">{item.title}</span>
                           <span className="lesson-meta">
+                            {/* « En cours » serait faux pour une leçon d'un
+                                niveau ouvert par le placement : l'apprenant
+                                ne l'a pas commencée, elle lui est offerte
+                                en révision. */}
                             {item.completed
                               ? `${isPractice ? 'Fait' : 'Réussi'} · ${item.score ?? 0} %`
                               : item.unlocked
-                                ? `${isListening ? 'Compréhension orale' : isReading ? 'Compréhension écrite' : 'En cours'} · +${item.xp_reward} XP`
+                                ? `${isListening ? 'Compréhension orale' : isReading ? 'Compréhension écrite' : openedByPlacement ? 'Révision' : 'En cours'} · +${item.xp_reward} XP`
                                 : 'Verrouillé'}
                           </span>
                         </span>

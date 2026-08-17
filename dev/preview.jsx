@@ -19,9 +19,11 @@ import ListeningView from '../src/components/ListeningView'
 import ReadingView from '../src/components/ReadingView'
 import ExamView from '../src/components/ExamView'
 import ExamResult from '../src/components/ExamResult'
+import PlacementView from '../src/components/PlacementView'
+import PlacementResult from '../src/components/PlacementResult'
 import { gradeExam } from '../src/lib/exam'
 import Mascot from '../src/components/Mascot'
-import { demoDictation, demoExercise, demoLesson, demoListeningQuestions, demoPassage, demoReading, demoReadingQuestions, demoSpeaking, demoPath, demoProfile, demoResults } from './fixtures'
+import { demoDictation, demoExercise, demoLesson, demoListeningQuestions, demoPassage, demoReading, demoReadingQuestions, demoSpeaking, demoPath, demoPathFresh, demoPathPlaced, demoPlacementBlocks, demoPlacementQuestion, demoProfile, demoResults } from './fixtures'
 
 const SCREENS = [
   { key: 'parcours', label: '01 Parcours' },
@@ -43,7 +45,11 @@ const SCREENS = [
   { key: 'lecture-intro', label: '11 Lecture intro' },
   { key: 'lecture', label: '11 Lecture question' },
   { key: 'examen', label: '12 Examen' },
-  { key: 'examen-fin', label: '12 Examen score' }
+  { key: 'examen-fin', label: '12 Examen score' },
+  { key: 'placement-invite', label: '13 Invitation placement' },
+  { key: 'placement-question', label: '13 Placement question' },
+  { key: 'placement-fin', label: '13 Placement résultat' },
+  { key: 'parcours-place', label: '13 Parcours placé B1' }
 ]
 
 function Preview() {
@@ -93,6 +99,40 @@ function Preview() {
       {screen === 'parcours' && (
         <AppShell profile={demoProfile}>
           <PathView path={demoPath} onOpen={() => {}} onOpenListening={() => {}} />
+        </AppShell>
+      )}
+
+      {screen === 'placement-invite' && (
+        <AppShell profile={demoProfile}>
+          <PathView path={demoPathFresh} needsPlacement onOpen={() => {}} onOpenPlacement={() => setScreen('placement-question')} />
+        </AppShell>
+      )}
+
+      {screen === 'placement-question' && (
+        <PlacementView
+          question={demoPlacementQuestion}
+          level="A2"
+          index={2}
+          blockLength={5}
+          answer={answer}
+          onAnswer={setAnswer}
+          onNext={() => setScreen('placement-fin')}
+          onQuit={() => setScreen('parcours')}
+        />
+      )}
+
+      {screen === 'placement-fin' && (
+        <PlacementResult
+          level="B1"
+          blocks={demoPlacementBlocks}
+          onStart={() => setScreen('parcours-place')}
+          onRedo={() => setScreen('placement-question')}
+        />
+      )}
+
+      {screen === 'parcours-place' && (
+        <AppShell profile={demoProfile}>
+          <PathView path={demoPathPlaced} placementLevel="B1" onOpen={() => {}} />
         </AppShell>
       )}
 
@@ -240,6 +280,9 @@ function Preview() {
             soundOn={sound}
             onToggleSound={() => setSound((v) => !v)}
             onSignOut={() => {}}
+            placementLevel="B1"
+            placementAvailable
+            onOpenPlacement={() => setScreen('placement-question')}
           />
         </AppShell>
       )}

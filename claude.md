@@ -95,8 +95,12 @@ Mascotte : elephant SVG maison (src/components/Mascot.jsx), 4 expressions.
 Fait : auth, navbar, parcours, moteur d'exercices, 30 lecons / 90 exercices,
 responsive, installable, mascotte animee, sons, palette propre.
 
+Fait aussi : test de placement (escalier A1 -> C2, ouvre les niveaux
+inferieurs sans les marquer termines). Necessite migration-placement.sql.
+
 A faire, par priorite :
-- [ ] Onboarding : 3 ecrans (niveau de depart, objectif quotidien, presentation)
+- [ ] Onboarding : 2 ecrans restants (objectif quotidien, presentation) —
+      le niveau de depart est desormais couvert par le test de placement
 - [ ] Prononciation : lecture audio des phrases anglaises (SpeechSynthesis, gratuit)
 - [ ] Exercice "remets les mots dans l'ordre" (etiquettes a cliquer)
 - [ ] Fiche de lecon consultable avant de commencer (regle + exemples)

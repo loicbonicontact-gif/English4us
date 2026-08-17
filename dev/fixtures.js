@@ -49,6 +49,44 @@ export const demoPath = buildPath(
   RAW_READING_PROGRESS
 )
 
+// Le meme parcours vu par un apprenant place en B1 : A1 et A2 ouverts en
+// revision, B1.1 comme point de depart, et aucune lecon marquee terminee.
+export const demoPathPlaced = buildPath(
+  RAW_LESSONS,
+  {},
+  RAW_PASSAGES,
+  RAW_LISTENING_PROGRESS,
+  RAW_READINGS,
+  RAW_READING_PROGRESS,
+  { placementLevel: 'B1' }
+)
+
+// Le parcours d'un nouvel arrivant : rien de fait, l'invitation au test
+// s'affiche au-dessus de tout.
+export const demoPathFresh = buildPath(
+  RAW_LESSONS,
+  {},
+  RAW_PASSAGES,
+  RAW_LISTENING_PROGRESS,
+  RAW_READINGS,
+  RAW_READING_PROGRESS
+)
+
+export const demoPlacementQuestion = {
+  id: 501,
+  question: 'Choisis la forme correcte : « She ___ to work every day. »',
+  options: ['goes', 'go', 'going', 'gone'],
+  correct_answer: 'goes'
+}
+
+// Un apprenant qui reussit A1 et A2 puis bute sur B1 : le cas le plus
+// courant, et celui qui justifie tout le chantier.
+export const demoPlacementBlocks = [
+  { level: 'A1', correct: 5, total: 5 },
+  { level: 'A2', correct: 4, total: 5 },
+  { level: 'B1', correct: 2, total: 5 }
+]
+
 export const demoProfile = {
   id: 'demo',
   username: 'malo',
