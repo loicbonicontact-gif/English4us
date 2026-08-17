@@ -42,6 +42,88 @@ Scripts à rejouer si la base est recréée, **dans cet ordre** :
 Avec la révision espacée (5 rencontres par item), cela représente de
 l'ordre de **3 000 rencontres** étalées sur plusieurs mois.
 
+## Écrit le 17 août — prononciation : deux fuites bouchées
+
+Le chantier annoncé était « lecture audio des phrases anglaises ». En
+ouvrant le dossier, la synthèse vocale était déjà là (dictées, oral,
+écoutes). Le vrai travail était ailleurs : **le bouton « Écouter » lisait
+ce qu'il ne fallait pas.**
+
+### Défaut 1 — du français lu par une voix anglaise
+`ExerciseView` lisait `exercise.question` dès que l'exercice n'était pas
+une dictée. Or l'énoncé d'un QCM est en français. Vérifié en conditions
+réelles avant correction, la console du navigateur affichait :
+
+    lire : Comment dit-on « ma tante » ?
+
+Prononcé avec la voix anglaise. Incompréhensible — et trompeur dans une
+application qui prétend justement enseigner la prononciation.
+
+### Défaut 2 — la réponse donnée avant validation
+Sur une traduction, la phrase lue était `correct_answer`, et le bouton
+s'affichait **avant** de répondre. « Traduis : "J'ai vingt ans." » puis, en
+un appui, « I am twenty years old ». L'exercice se résolvait sans être fait.
+Trouvé en auditant le premier défaut, pas cherché.
+
+### La règle : ne lire que ce dont on est sûr
+`src/lib/spoken.js` décide quoi lire, et quand :
+
+| Type | Avant validation | Après |
+|---|---|---|
+| dictée, oral | la phrase (elle **est** l'exercice) | idem |
+| traduction | rien | la réponse |
+| texte à trous | rien (le trou trahirait) | la phrase, trou comblé |
+| QCM | l'anglais cité, s'il y en a | idem |
+
+Le point délicat est le QCM : entre guillemets on trouve tantôt de
+l'anglais (« She ___ a new car. »), tantôt du français (« Je m'appelle
+Marie »). Un test de langue tranche, volontairement **asymétrique** : il
+faut au moins un indice anglais ET aucun indice français. Le coût des deux
+erreurs n'est pas le même — se taire prive d'un bouton, parler faux
+enseigne une prononciation fausse.
+
+Le piège évité : « Je m'appelle Marie » ne porte aucun accent. Ce sont
+l'élision « m' » et le mot « je » qui la trahissent. À l'inverse « on »,
+« son », « pas », « note » existent dans les deux langues et sont exclus
+des indices — sinon « Put the bags on the seats » passerait pour du
+français.
+
+### Mesuré sur les 840 exercices réels, pas supposé
+Avant de faire confiance à la règle, elle a été passée sur tout le contenu :
+
+| Type | Total | Lisible avant | Lisible après |
+|---|---|---|---|
+| QCM | 270 | 112 | 130 |
+| Texte à trous | 270 | 0 | 262 |
+| Traduction | 180 | 0 | 180 |
+| Dictée | 60 | 60 | 60 |
+| Oral | 60 | 60 | 60 |
+
+**692 exercices sur 840** (82 %) offrent une phrase anglaise après
+validation, et les 148 restants n'en offrent aucune — c'est voulu :
+« Quelle heure est-il ? — 10:45 » n'a rien à prononcer, « Quel est le
+prétérit de "buy" ? » cite un mot isolé, qui pourrait appartenir aux deux
+langues. Le bouton disparaît au lieu de deviner.
+
+### Un défaut de contraste trouvé en passant
+`.listen-btn` était en `--ink-3` : **4,46:1** sur le fond d'app, sous le
+seuil de 4,5. Le gris le faisait aussi passer pour désactivé. Passé à
+l'encre d'accent : 6,4:1, et il se voit enfin comme un bouton.
+
+### Vérifications
+- **180 tests** (+22 sur `spoken.js`), dont le cas d'origine : l'énoncé
+  français d'un QCM ne doit jamais ressortir.
+- `npm run build` passe.
+- Contrôlé dans le navigateur, console à l'appui : `lire : My parents are
+  John and Mary.` (trou comblé), `lire : I am twenty years old` (après
+  validation seulement), et plus aucun français.
+- Quatre écrans ajoutés à la prévisualisation (entrées 14).
+
+### Pas fait, et pourquoi
+Les documents de compréhension écrite restent muets. Ce n'est pas un
+oubli : au TOEIC, la partie lecture se passe sans audio, et entendre les
+textes fausserait l'entraînement.
+
 ## Écrit le 17 août — le test de placement (dernier verrou levé)
 
 Le défaut annoncé la veille est corrigé : un apprenant de niveau B1 ne

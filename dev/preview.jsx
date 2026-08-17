@@ -23,7 +23,7 @@ import PlacementView from '../src/components/PlacementView'
 import PlacementResult from '../src/components/PlacementResult'
 import { gradeExam } from '../src/lib/exam'
 import Mascot from '../src/components/Mascot'
-import { demoDictation, demoExercise, demoLesson, demoListeningQuestions, demoPassage, demoReading, demoReadingQuestions, demoSpeaking, demoPath, demoPathFresh, demoPathPlaced, demoPlacementBlocks, demoPlacementQuestion, demoProfile, demoResults } from './fixtures'
+import { demoDictation, demoExercise, demoLesson, demoListeningQuestions, demoPassage, demoReading, demoReadingQuestions, demoSpeaking, demoGapExercise, demoTranslationExercise, demoPath, demoPathFresh, demoPathPlaced, demoPlacementBlocks, demoPlacementQuestion, demoProfile, demoResults } from './fixtures'
 
 const SCREENS = [
   { key: 'parcours', label: '01 Parcours' },
@@ -49,7 +49,11 @@ const SCREENS = [
   { key: 'placement-invite', label: '13 Invitation placement' },
   { key: 'placement-question', label: '13 Placement question' },
   { key: 'placement-fin', label: '13 Placement résultat' },
-  { key: 'parcours-place', label: '13 Parcours placé B1' }
+  { key: 'parcours-place', label: '13 Parcours placé B1' },
+  { key: 'trous', label: '14 Trous' },
+  { key: 'trous-corrige', label: '14 Trous corrigé' },
+  { key: 'traduction', label: '14 Traduction' },
+  { key: 'traduction-corrige', label: '14 Traduction corrigée' }
 ]
 
 function Preview() {
@@ -134,6 +138,20 @@ function Preview() {
         <AppShell profile={demoProfile}>
           <PathView path={demoPathPlaced} placementLevel="B1" onOpen={() => {}} />
         </AppShell>
+      )}
+
+      {/* Prononciation : ce qui est lisible, et a quel moment. */}
+      {screen === 'trous' && (
+        <ExerciseView {...exerciseProps} exercise={demoGapExercise} answer={answer} verdict={null} />
+      )}
+      {screen === 'trous-corrige' && (
+        <ExerciseView {...exerciseProps} exercise={demoGapExercise} answer="parents" verdict="right" />
+      )}
+      {screen === 'traduction' && (
+        <ExerciseView {...exerciseProps} exercise={demoTranslationExercise} answer={answer} verdict={null} />
+      )}
+      {screen === 'traduction-corrige' && (
+        <ExerciseView {...exerciseProps} exercise={demoTranslationExercise} answer="I am twenty years old" verdict="right" />
       )}
 
       {['question', 'juste', 'faux', 'vide'].includes(screen) && <ExerciseView {...exerciseProps} />}

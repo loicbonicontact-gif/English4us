@@ -3,6 +3,7 @@ import Mascot from './Mascot'
 import Hearts from './Hearts'
 import DictationPlayer from './DictationPlayer'
 import SpeakingPanel from './SpeakingPanel'
+import { englishToSpeak } from '../lib/spoken'
 
 const LETTERS = ['A', 'B', 'C', 'D', 'E', 'F']
 
@@ -53,11 +54,21 @@ export default function ExerciseView({
   // retrouver mais de la prononcer — la cacher n'aurait aucun sens.
   const isSpeaking = exercise.type === 'oral'
 
-  // La phrase a lire est en anglais : c'est la reponse attendue pour une
-  // traduction et une dictee, la question elle-meme sinon.
-  const spoken = (exercise.type === 'traduction' || isDictation)
-    ? exercise.correct_answer
-    : exercise.question
+  // Quelle phrase anglaise peut-on lire a voix haute, maintenant ?
+  //
+  // Auparavant : la reponse attendue pour une traduction ou une dictee,
+  // « la question elle-meme sinon ». Deux defauts, corriges par lib/spoken :
+  //   - l'enonce d'un QCM est en FRANCAIS. Il etait lu par la voix
+  //     anglaise, donc incomprehensible — et trompeur dans une application
+  //     qui enseigne la prononciation.
+  //   - sur une traduction, le bouton disait la reponse avant validation.
+  //
+  // Renvoie null quand aucune phrase n'est surement anglaise : le bouton
+  // disparait alors, plutot que de prononcer du francais en anglais.
+  const spoken = englishToSpeak(exercise, { revealed: Boolean(verdict) })
+
+  // La dictee garde son propre lecteur, qui EST l'enonce.
+  const dictated = isDictation ? exercise.correct_answer : null
 
   return (
     <div className="lesson-screen">
@@ -115,7 +126,7 @@ export default function ExerciseView({
       {/* --- Dictee : le lecteur remplace l'enonce ecrit --- */}
       {isDictation && (
         <DictationPlayer
-          text={spoken}
+          text={dictated}
           onSpeak={onSpeak}
           disabled={Boolean(verdict)}
         />
@@ -260,11 +271,18 @@ export default function ExerciseView({
         )}
 
         {/* Une dictee a deja son lecteur en haut : ce bouton ferait doublon
-            et, avant validation, laisserait croire a une seconde phrase. */}
-        {!isDictation && (
+            et, avant validation, laisserait croire a une seconde phrase.
+
+            Ailleurs, le bouton n'apparait que si `spoken` a trouve une
+            phrase surement anglaise. Sur « Quelle heure est-il ? — 10:45 »
+            il n'y a rien a prononcer : le bouton s'efface. */}
+        {!isDictation && spoken && (
           <button type="button" className="listen-btn" onClick={() => onSpeak(spoken)}>
             <IconSoundOn size={16} />
-            Écouter la phrase
+            {/* Apres validation la phrase est complete — trou comble,
+                traduction devoilee. Le libelle le dit, sinon l'apprenant
+                croit reentendre exactement la meme chose. */}
+            {verdict ? 'Écouter la phrase complète' : 'Écouter en anglais'}
           </button>
         )}
 

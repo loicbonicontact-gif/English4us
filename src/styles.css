@@ -1127,8 +1127,12 @@ html, body { max-width: 100%; overflow-x: hidden; }
   display: inline-flex; align-items: center; gap: 6px;
   padding: 10px 14px; min-height: 44px;
   border: none; background: none;
-  color: var(--ink-3);
-  font-family: var(--font); font-size: 12.5px;
+  /* Etait --ink-3 : 4,46:1 sur le fond d'app (#6b7280 sur #f6f7f9), donc
+     sous le seuil de 4,5. Le gris le faisait aussi passer pour desactive,
+     alors que c'est le seul bouton d'ecoute de l'ecran. L'encre d'accent
+     monte a 6,4:1 et signale qu'on peut appuyer. */
+  color: var(--accent-dark);
+  font-family: var(--font); font-size: 12.5px; font-weight: 600;
   cursor: pointer;
   border-radius: var(--r-pill);
 }

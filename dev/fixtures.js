@@ -72,6 +72,29 @@ export const demoPathFresh = buildPath(
   RAW_READING_PROGRESS
 )
 
+// Texte à trous : la phrase entre guillemets est anglaise, donc lisible.
+// Avant validation le trou reste béant (lire la phrase donnerait la
+// réponse) ; après, il est comblé et la phrase s'entend en entier.
+export const demoGapExercise = {
+  id: 13,
+  type: 'trous',
+  question: 'Complète : « My ___ are John and Mary. » (Mes parents s\'appellent John et Mary.)',
+  options: null,
+  correct_answer: 'parents',
+  explanation: '« Parents » en anglais désigne uniquement le père et la mère, jamais la famille élargie.'
+}
+
+// Traduction : la réponse EST la phrase anglaise. Le bouton ne doit
+// apparaître qu'une fois l'exercice validé.
+export const demoTranslationExercise = {
+  id: 14,
+  type: 'traduction',
+  question: 'Traduis en anglais : « J\'ai vingt ans. »',
+  options: null,
+  correct_answer: 'I am twenty years old',
+  explanation: 'Piège classique : en anglais on **est** un âge (I am), on ne l\'**a** pas comme en français.'
+}
+
 export const demoPlacementQuestion = {
   id: 501,
   question: 'Choisis la forme correcte : « She ___ to work every day. »',

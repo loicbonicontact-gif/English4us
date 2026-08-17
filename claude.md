@@ -101,7 +101,10 @@ inferieurs sans les marquer termines). Necessite migration-placement.sql.
 A faire, par priorite :
 - [ ] Onboarding : 2 ecrans restants (objectif quotidien, presentation) —
       le niveau de depart est desormais couvert par le test de placement
-- [ ] Prononciation : lecture audio des phrases anglaises (SpeechSynthesis, gratuit)
+- [x] ~~Prononciation~~ — FAIT le 17/08. La synthese existait deja ; le
+      travail a ete de corriger CE QUI etait lu : l'enonce francais d'un QCM
+      passait par la voix anglaise, et une traduction livrait sa reponse
+      avant validation. Regle dans src/lib/spoken.js.
 - [ ] Exercice "remets les mots dans l'ordre" (etiquettes a cliquer)
 - [ ] Fiche de lecon consultable avant de commencer (regle + exemples)
 - [ ] Classement entre apprenants
