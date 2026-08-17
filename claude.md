@@ -48,7 +48,7 @@ Ne jamais s'arrêter pour dire "voulez-vous que je continue ?" — enchaîner ju
 - [x] ~~Intégration IA~~ — ABANDONNÉ le 16/08/2026. L'API Claude est facturée à l'appel, sans palier gratuit. `api/generate-exercise.js` et `src/lib/aiExercise.js` ont été supprimés : la fonction serveur était accessible publiquement, sans authentification ni limite d'appels, et aurait pu être utilisée par n'importe qui pour facturer le compte. **Ne pas définir `ANTHROPIC_API_KEY` sur Vercel.** Le contenu s'écrit à la main.
 - [ ] Système de coeurs : recharge automatique après un délai (ex. 1 coeur/4h) via `refillHearts()`
 - [ ] Tests manuels : parcours complet inscription → leçon → XP → streak
-- [ ] `README.md` final avec instructions de déploiement (Vercel + Supabase)
+- [x] ~~`README.md` final avec instructions de déploiement~~ — FAIT le 17/08.
 
 ## COMMANDE DE DÉMARRAGE
 
