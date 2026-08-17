@@ -9,7 +9,6 @@ import AppShell from './components/AppShell'
 import LessonPath from './components/LessonPath'
 import Exercise from './components/Exercise'
 import Profile from './components/Profile'
-import Training from './components/Training'
 import Review from './components/Review'
 import Listening from './components/Listening'
 import Reading from './components/Reading'
@@ -148,7 +147,6 @@ export default function App() {
             element={<Reading profile={profile} onProfileChange={refreshProfile} />}
           />
           <Route path="/exam" element={<Exam profile={profile} />} />
-          <Route path="/training" element={<Training userId={profile.id} />} />
           <Route path="/profile" element={<Profile profile={profile} onSignOut={handleSignOut} />} />
           <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Routes>

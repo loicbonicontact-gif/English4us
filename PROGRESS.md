@@ -42,72 +42,73 @@ Scripts à rejouer si la base est recréée, **dans cet ordre** :
 Avec la révision espacée (5 rencontres par item), cela représente de
 l'ordre de **3 000 rencontres** étalées sur plusieurs mois.
 
-## Écrit le 17 août — le classement cède sa place à « Entraînement »
+## Écrit le 17 août — la barre passe à trois onglets
 
-Décision de Loïc : le classement n'est pas utile, on le retire. Les fichiers
-`Leaderboard.jsx` et `LeaderboardView.jsx` sont supprimés, la route `/leaderboard`
-aussi.
+Décision de Loïc, en deux temps.
 
-### Trois raisons de le retirer
-1. **Il était vide.** Un classement est un mécanisme social : avec un seul
+### 1. Le classement est retiré
+`Leaderboard.jsx`, `LeaderboardView.jsx` et la route `/leaderboard` sont
+supprimés. Trois raisons :
+1. **Il était vide** — un classement est un mécanisme social ; avec un seul
    utilisateur, la page affichait une ligne.
-2. **Même rempli, il aurait mal fonctionné.** Il classait par XP **total
-   depuis toujours** : celui qui commence six mois plus tard ne rattrape
-   jamais le premier arrivé. C'est une mesure d'ancienneté, pas d'effort.
-   Duolingo utilise des ligues hebdomadaires pour cette raison exacte — et
-   le classement hebdomadaire avait été abandonné ici, la règle de sécurité
-   de `streak_log` empêchant de sommer les XP des autres.
-3. **Il occupait une des quatre places de la barre de navigation**, pendant
-   que l'écoute (42 passages) et la lecture (36 textes) n'en avaient aucune :
-   il fallait faire défiler le parcours pour les trouver.
+2. **Même rempli, il aurait mal fonctionné** : classement par XP **total
+   depuis toujours**, donc une mesure d'ancienneté plutôt que d'effort.
+   Duolingo utilise des ligues hebdomadaires pour cette raison — et le
+   classement hebdomadaire avait déjà été abandonné ici, la règle de
+   sécurité de `streak_log` empêchant de sommer les XP des autres.
+3. **Il occupait une des quatre places de la barre.**
 
-### Ce qui le remplace : `/training`
-`Training.jsx` (données) + `TrainingView.jsx` (affichage) : l'examen blanc,
-puis les deux modules à plat, chacun avec son niveau et son format.
+### 2. Son remplaçant a été retiré aussi
+Un écran « Entraînement » (`/training`) a été construit à sa place, puis
+supprimé le jour même. Loïc : « je ne trouve pas qu'il ait sa place ici ».
+Il avait raison, et l'erreur mérite d'être écrite parce qu'elle est
+instructive.
 
-Point important : cet écran passe par **`buildPath`**, comme le parcours.
-Interroger les passages directement aurait été plus court, mais aurait
-ouvert une porte dérobée vers du contenu verrouillé, et les deux écrans se
-seraient contredits. Le verrouillage reste décidé à un seul endroit.
+Un onglet permanent se mérite par une **visite quotidienne**. Le parcours et
+les révisions s'ouvrent tous les jours ; le profil porte les réglages.
+« Entraînement » était un catalogue qu'on parcourt de temps en temps.
 
-Aucun style nouveau à une exception près (`.level-sub`, la légende d'un
-module) : l'écran réutilise les classes du parcours, donc il vieillira avec
-lui. Contraste mesuré : 4,51:1 — au-dessus du seuil, de peu.
+Surtout : le problème qu'il prétendait résoudre — « l'écoute et la lecture
+sont introuvables » — n'était pas un problème de navigation mais de
+**verrouillage** (voir ci-dessous). J'avais ajouté un raccourci pour
+contourner un défaut au lieu de corriger le défaut.
 
-Vérifié dans `preview.html` (écran « 05 Entraînement ») : les deux modules
-s'affichent, un module sans contenu annonce que son script SQL n'a pas été
-passé au lieu de rester vide.
+**La règle qui en sort** : avant d'ajouter un écran d'accès à du contenu,
+vérifier que le contenu est atteignable. Un raccourci vers des portes
+fermées ne sert à rien.
 
-### Le point d'accès, mesuré le 17/08 — priorité n°1
-En simulant `buildPath` sur le contenu réel (30 leçons, 42 écoutes,
-36 lectures), voici ce qu'un apprenant peut réellement ouvrir :
+Une barre n'a pas à être remplie : trois destinations quotidiennes valent
+mieux que quatre dont une qu'on n'ouvre jamais.
 
-| État de l'apprenant | Leçons ouvertes | Écoutes + lectures ouvertes |
-|---|---|---|
-| Débutant, rien de fait | 1 / 30 | **0 / 78** |
-| A1 terminé (5 leçons) | 6 / 30 | 13 / 78 |
-| A1 à B1 terminés (15 leçons) | 16 / 30 | 39 / 78 |
+## Écrit le 17 août — le verrouillage laissait le contenu hors d'atteinte
 
-Autrement dit : le jour de son inscription, un apprenant n'a accès à
-**aucune** des 210 questions d'écoute et de lecture. L'écran
-« Entraînement » créé le même jour lui présente donc une liste entièrement
-grisée, hors l'examen blanc.
+`interleave()` plaçait UNE mise en pratique après chaque leçon et entassait
+le reste en fin de niveau, ouvert seulement une fois le niveau terminé.
+Avec 78 mises en pratique pour 30 leçons, l'essentiel attendait la fin.
 
-Deux causes distinctes, à traiter séparément :
-1. **Pas de test de placement.** Tout le monde démarre à A1 leçon 1, y
-   compris un B1. Des mois de contenu déjà su avant d'atteindre son niveau.
-2. **Les mises en pratique s'ouvrent trop tard.** Avec 78 mises en pratique
-   pour 30 leçons, la plupart tombent dans le « reste de niveau » et
-   attendent que la dernière leçon du niveau soit finie.
+Elles sont maintenant **réparties également** sur les leçons du niveau :
+13 pour 5 leçons donnent 3, 3, 3, 2, 2. Plus rien n'attend la fin.
 
-C'est le multiplicateur de tout ce qui a été écrit aujourd'hui : 360
-nouveaux exercices ne servent à rien tant qu'ils sont hors d'atteinte.
+| Leçons terminées | Écoutes + lectures ouvertes (avant → après) |
+|---|---|
+| 0 | 0 / 78 → 0 / 78 |
+| 1 | 1 / 78 → **3 / 78** |
+| 5 (A1 fini) | 13 / 78 → 13 / 78 |
+| 15 | 39 / 78 → 39 / 78 |
 
-**Incohérence à trancher au passage** : l'examen blanc, lui, puise dans
-TOUT le contenu sans regarder le verrouillage. Un débutant peut donc
-rencontrer du C2 dans l'examen mais pas dans le parcours. Défendable (le
-vrai TOEIC ne s'adapte pas au candidat), mais c'est un choix, pas un
-hasard — il doit être assumé.
+**La règle de déverrouillage elle-même n'a pas changé** : une mise en
+pratique s'ouvre quand la leçon qui la précède est terminée. On apprend
+d'abord, on pratique ensuite. C'est pourquoi la ligne « 0 leçon » reste à
+zéro : il faut faire une leçon, pas davantage.
+
+Le gain est donc réel mais modeste, et il faut le dire : **le vrai verrou
+reste l'absence de test de placement**. Un apprenant de niveau B1 démarre à
+A1 leçon 1 et doit traverser quinze leçons avant d'atteindre son niveau.
+C'est le chantier suivant, décidé avec Loïc.
+
+Deux tests de non-régression ajoutés (125 au total) : aucune mise en
+pratique ne se retrouve après la dernière leçon d'un niveau, et aucune ne
+s'ouvre avant la sienne.
 
 ## Écrit le 17 août — l'examen blanc passe au format réel
 

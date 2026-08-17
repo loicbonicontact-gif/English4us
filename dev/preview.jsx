@@ -14,7 +14,6 @@ import PathView from '../src/components/PathView'
 import ExerciseView from '../src/components/ExerciseView'
 import LessonEnd from '../src/components/LessonEnd'
 import ProfileView from '../src/components/ProfileView'
-import TrainingView from '../src/components/TrainingView'
 import ReviewEnd from '../src/components/ReviewEnd'
 import ListeningView from '../src/components/ListeningView'
 import ReadingView from '../src/components/ReadingView'
@@ -31,7 +30,6 @@ const SCREENS = [
   { key: 'faux', label: '03 Faux' },
   { key: 'vide', label: '03 Sans cœur' },
   { key: 'fin', label: '04 Fin' },
-  { key: 'entrainement', label: '05 Entraînement' },
   { key: 'profil', label: '06 Profil' },
   { key: 'revision', label: '07 Révision' },
   { key: 'revision-fin', label: '07 Fin révision' },
@@ -227,15 +225,6 @@ function Preview() {
             </p>
             <button type="button" className="btn-wide is-primary">Aller au parcours</button>
           </div>
-        </AppShell>
-      )}
-
-      {screen === 'entrainement' && (
-        <AppShell profile={demoProfile}>
-          <TrainingView
-            listening={demoPath.byLevel.flatMap((g) => g.items.filter((i) => i.kind === 'listening'))}
-            reading={demoPath.byLevel.flatMap((g) => g.items.filter((i) => i.kind === 'reading'))}
-          />
         </AppShell>
       )}
 

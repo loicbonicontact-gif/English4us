@@ -683,10 +683,6 @@ html, body { max-width: 100%; overflow-x: hidden; }
 .level-name { margin: 0; font-family: var(--font); font-size: 16px; font-weight: 700; letter-spacing: 0; }
 .level-count { margin-left: auto; font-size: 13px; color: var(--ink-3); font-variant-numeric: tabular-nums; }
 
-/* Sous-titre d'un module dans l'ecran Entrainement : il annonce ce que la
-   rubrique contient. Meme taille que les metadonnees de ligne, pour rester
-   une legende et ne pas concurrencer le titre. */
-.level-sub { margin: -4px 0 2px; font-size: 13px; color: var(--ink-3); }
 
 /* --- Lignes de lecon --- */
 .lesson-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
