@@ -6,7 +6,8 @@ Dernière mise à jour : 17 août 2026
 
 | Type | Quantité |
 |---|---|
-| Exercices de leçon | 840 (28 par leçon) |
+| Exercices de leçon | 900 (30 par leçon) |
+| dont ordre des mots | 60 (`[ordre]`) |
 | dont vocabulaire | 450 (trois séries, `[voc]`, `[voc2]`, `[voc3]`) |
 | dont dictées audio | 60 |
 | dont expression orale | 60 |
@@ -28,8 +29,8 @@ séries séparément.
 **Piège corrigé le 17/08** : `seed-extra-a/b/c.sql` supprimaient tout ce qui
 dépassait les 3 exercices d'origine de chaque leçon. Les relancer après
 `seed-speaking.sql` a effacé les 60 exercices oraux. Les trois scripts
-protègent désormais explicitement les types `ecoute`, `oral` et les
-exercices marqués `[voc]`. L'ordre reste néanmoins à respecter.
+protègent désormais explicitement les types `ecoute`, `oral`, `ordre` et
+les exercices marqués `[voc]`. L'ordre reste néanmoins à respecter.
 
 Scripts à rejouer si la base est recréée, **dans cet ordre** :
 `schema.sql` (base vide uniquement), `seed.sql`, `seed-extra-a/b/c.sql`,
@@ -37,20 +38,127 @@ Scripts à rejouer si la base est recréée, **dans cet ordre** :
 `migration-review-queue.sql`, `migration-listening.sql`,
 `seed-listening.sql`, `migration-reading.sql`, `seed-reading.sql`,
 `seed-reading-2.sql`, `seed-vocabulary-2.sql`, `seed-vocabulary-3.sql`,
-`seed-reading-3.sql`, `seed-listening-2.sql`, `migration-placement.sql`.
+`seed-reading-3.sql`, `seed-listening-2.sql`, `migration-placement.sql`,
+`migration-word-order.sql`, `seed-word-order.sql`.
 
 Avec la révision espacée (5 rencontres par item), cela représente de
 l'ordre de **3 000 rencontres** étalées sur plusieurs mois.
 
-## EN ATTENTE — un script à passer
+## EN ATTENTE — trois scripts à passer, dans cet ordre
 
-`supabase/correction-orthographe.sql` — deux UPDATE, aucun risque, aucune
-suppression. Corrige « un email formel » en « un e-mail formel » dans les
-deux questions concernées. Sans lui, la correction n'existe que dans les
+**1. `supabase/migration-word-order.sql`** — ajoute la valeur `'ordre'` à la
+liste des types d'exercices autorisés. Ne sème rien, ne supprime rien.
+
+**2. `supabase/seed-word-order.sql`** — les 60 exercices « remets les mots
+dans l'ordre ». À passer APRÈS le 1 : sans lui, la contrainte de type refuse
+les lignes, avec un message clair, et rien n'est inséré ni modifié.
+
+**3. `supabase/correction-orthographe.sql`** — deux UPDATE, aucun risque,
+aucune suppression. Corrige « un email formel » en « un e-mail formel » dans
+les deux questions concernées. Sans lui, la correction n'existe que dans les
 fichiers ; la base garde l'ancien texte.
 
-Le script affiche sa propre vérification : la première requête doit
-renvoyer 0 ligne, la seconde 2.
+Chaque script affiche sa propre vérification. Pour le 3, la première requête
+doit renvoyer 0 ligne, la seconde 2. Pour le 2, le compte doit être 60, et
+2 par leçon sur les 30 leçons.
+
+**Tant que 1 et 2 ne sont pas passés, l'application fonctionne exactement
+comme avant** : le nouveau format n'existe qu'en base. Sans exercice de type
+`ordre`, aucun écran ne change.
+
+## Écrit le 17 août — l'ordre des mots, premier format vraiment nouveau
+
+Jusqu'ici les cinq types d'exercices partageaient un moteur : une question,
+une réponse, un bouton « Vérifier ». Celui-ci change le geste — on ne tape
+plus, on clique des étiquettes.
+
+### Pourquoi ce format n'est pas un doublon de la traduction
+Une traduction libre mélange trois difficultés : le vocabulaire,
+l'orthographe et l'ordre des mots. Quand l'apprenant se trompe, **on ne sait
+pas laquelle a lâché — et lui non plus.** Ici le vocabulaire est donné,
+l'orthographe est donnée : il ne reste QUE l'ordre. C'est le point où le
+français trahit l'anglais le plus mécaniquement — « a car red », « I like
+very much this film », « Where you are going? ».
+
+Les 60 exercices ciblent ces pièges, du plus mécanique au plus subtil :
+
+| Niveau | Piège travaillé |
+|---|---|
+| A1-A2 | l'adverbe de fréquence avant le verbe, l'auxiliaire `do/does`, « there is » pour « il y a » |
+| B1 | « very much » en fin de phrase, le double objet (send me the report), « never » entre l'auxiliaire et le participe |
+| B2 | pas de `will` après `if`, la voix passive, la place du complément de temps |
+| C1-C2 | l'inversion après un adverbe négatif en tête (« Never had I seen… ») |
+
+### Cliquer, et non glisser
+Le glisser-déposer est le réflexe pour ce format. Il a été écarté : sur
+téléphone il entre en conflit avec le défilement de la page, et il est
+inutilisable au clavier comme au lecteur d'écran. Deux clics — un pour
+poser, un pour reprendre — font le même travail et fonctionnent partout.
+
+Les mots posés laissent dans la réserve un **vide de la même taille** plutôt
+que de disparaître : sans cela la réserve se réorganise sous le doigt, et on
+ne retrouve plus un mot là où on l'avait vu.
+
+### Les étiquettes en trop
+La colonne `options` change de sens pour ce type : elle ne porte pas des
+propositions de QCM mais des **mots intrus**. Sans intrus, il suffit de
+vider la réserve pour réussir sans rien comprendre. Avec un intrus, il faut
+décider qu'un mot ne sert pas — le « to » de « you should to see », le
+« do » de « we do not are late ».
+
+### La décision la plus discutable : accepter le bon anglais non demandé
+Les mêmes étiquettes que « Never had I seen such a thing » forment aussi
+« I had never seen such a thing », qui est de l'anglais correct. Fallait-il
+la refuser pour forcer l'inversion ?
+
+Non. **Refuser une phrase juste apprendrait à l'apprenant que l'application
+se trompe** — la leçon la plus coûteuse qu'un exercice puisse donner. Les
+deux ordres sont acceptés (sept exercices du C1-C2, dix-huit sur soixante
+toutes causes confondues), et c'est l'explication affichée après validation
+qui enseigne la différence : l'inversion n'est pas plus correcte, elle est
+d'un autre registre.
+
+### Deux défauts trouvés en construisant, pas cherchés
+
+**Le mélange sautait à chaque clic.** Avec `Math.random`, React recalculait
+l'ordre des étiquettes à chaque rendu : impossible de viser un mot. Le
+mélange est désormais semé sur l'identifiant de l'exercice — fixe pour un
+exercice donné, différent d'un exercice à l'autre. Un garde-fou décale d'un
+cran si le hasard retombe sur l'ordre correct : sur une phrase de deux mots,
+cela arrive une fois sur deux.
+
+**Deux clics rapprochés n'en faisaient qu'un.** React regroupe les mises à
+jour d'état : deux étiquettes cliquées coup sur coup lisaient toutes les
+deux la même valeur, et la seconde effaçait la première. Le mot posé
+disparaissait sans explication. Vérifié dans le navigateur, cinq clics dans
+la même tâche donnent bien « You should see a doctor ».
+
+### Le piège de suppression, évité cette fois
+`seed-extra-a/b/c.sql` avaient déjà effacé les 60 exercices oraux par le
+passé. Le type `ordre` a été ajouté à leur liste de protection **avant** que
+le contenu n'existe en base, pas après l'avoir perdu.
+
+### Vérifications
+- **204 tests** (+24), dont un banc d'essai qui relit `seed-word-order.sql`
+  et vérifie, pour chacun des 60 exercices réels : que les étiquettes ne
+  s'affichent jamais déjà dans l'ordre, que la phrase remise dans l'ordre
+  est acceptée, et que **chaque variante acceptée est constructible** avec
+  les étiquettes affichées. Ce dernier contrôle a immédiatement débusqué
+  deux variantes impossibles à saisir — une tolérance promise mais
+  inexistante.
+- `scripts/check-seeds.py` connaît le nouveau type : il ne cherche plus la
+  bonne réponse parmi les `options` (ce serait faux ici) et vérifie qu'aucun
+  intrus ne fait plus d'un mot.
+- `npm run build` passe.
+- Contrôlé dans le navigateur à 375 px et 1280 px : étiquettes à 45 px de
+  haut (seuil 44), texte à 17 px, anneau de focus au clavier, aucun
+  débordement horizontal, aucune erreur en console.
+- Deux écrans ajoutés à la prévisualisation (entrées 15).
+
+### Pas fait, et pourquoi
+Le format ne remplace aucune traduction existante. Les 180 traductions
+libres restent : elles font travailler l'orthographe, que les étiquettes
+donnent. Les deux formats se complètent au lieu de se substituer.
 
 ## Écrit le 17 août — prononciation : deux fuites bouchées
 

@@ -116,11 +116,14 @@ export function fillBlank(sentence, answer) {
 //   'oral'             d'exercice. Elle se lit donc à tout moment.
 //
 //   'traduction'       la phrase est la RÉPONSE. Avant validation, le
-//                      bouton la donnait à voix haute : « Traduis : "J'ai
+//   'ordre'            bouton la donnait à voix haute : « Traduis : "J'ai
 //                      vingt ans" » puis, en un appui, « I am twenty years
 //                      old ». L'exercice se résolvait sans être fait.
+//                      « Remets les mots dans l'ordre » est encore plus
+//                      fragile : entendre la phrase donnerait l'ordre, qui
+//                      EST tout l'exercice.
 const ALWAYS_SPOKEN = new Set(['ecoute', 'oral'])
-const SPOKEN_ONCE_ANSWERED = new Set(['traduction'])
+const SPOKEN_ONCE_ANSWERED = new Set(['traduction', 'ordre'])
 
 // Renvoie la phrase anglaise à lire, ou null s'il n'y en a pas de sûre.
 //

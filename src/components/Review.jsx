@@ -184,7 +184,7 @@ export default function Review({ profile, onProfileChange }) {
       hearts={profile?.hearts ?? 0}
       breakingIndex={null}
       isLast={isLast}
-      onAnswer={(value) => { if (!verdict) { if (current.type === 'qcm') soundTap(); setAnswer(value) } }}
+      onAnswer={(value) => { if (!verdict) { if (current.type === 'qcm' || current.type === 'ordre') soundTap(); setAnswer(value) } }}
       onValidate={handleValidate}
       onNext={handleNext}
       onQuit={() => navigate('/dashboard')}

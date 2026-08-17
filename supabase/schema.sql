@@ -30,8 +30,11 @@ create table lessons (
 create table exercises (
   id serial primary key,
   lesson_id integer references lessons(id) on delete cascade,
-  type text check (type in ('qcm','traduction','ecoute','trous','oral')),
+  type text check (type in ('qcm','traduction','ecoute','trous','oral','ordre')),
   question text not null,
+  -- options : pour un QCM, les propositions. Pour un exercice 'ordre',
+  -- les etiquettes EN TROP (mots intrus) — la phrase, elle, se decoupe
+  -- depuis correct_answer. Null quand il n'y a ni l'un ni l'autre.
   options jsonb,
   correct_answer text not null,
   explanation text

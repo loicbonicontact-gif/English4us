@@ -71,6 +71,45 @@ def split_top(t):
     parts.append(buf.strip());return parts
 def unq(x): return x.strip()[1:-1].replace("''","'")
 
+def norm_words(text):
+    """Les mots d'une phrase, comme les compare lib/answers (casse et
+    ponctuation ignorees)."""
+    out=[]
+    for w in text.lower().split():
+        w=''.join(c for c in w if c.isalnum() or c=="'")
+        if w: out.append(w)
+    return out
+
+def check_order(d,unq):
+    """Controles propres au type 'ordre' (remets les mots dans l'ordre).
+
+    Le plus important est le dernier : une variante acceptee doit etre
+    CONSTRUCTIBLE avec les etiquettes affichees. Une variante qui emploie un
+    mot absent de la reserve ne peut jamais etre saisie — elle donne
+    l'illusion d'une tolerance qui n'existe pas.
+    """
+    bad=[]
+    answer=unq(d['correct_answer'])
+    variants=[v.strip() for v in answer.split('/')]
+    decoys=[]
+    if d.get('options','null').strip()!='null':
+        decoys=json.loads(unq(d['options']))
+
+    for w in decoys:
+        if len(w.split())!=1:
+            bad.append(('ordre-intrus-multi-mots',w,answer))
+
+    first=norm_words(variants[0])
+    if len(first)<3:
+        bad.append(('ordre-phrase-trop-courte',answer))
+
+    pool=collections.Counter(first)+collections.Counter(norm_words(' '.join(decoys)))
+    for v in variants[1:]:
+        manque=collections.Counter(norm_words(v))-pool
+        if manque:
+            bad.append(('ordre-variante-inconstructible',v,sorted(manque)))
+    return bad
+
 for path in sys.argv[1:]:
     s=open(path,encoding='utf-8').read()
     sql='\n'.join(l for l in s.split('\n') if not l.strip().startswith('--'))
@@ -91,8 +130,14 @@ for path in sys.argv[1:]:
                     except Exception as e: bad.append(('json',table,k,str(e)[:60]))
             if 'options' in d and d['options'].strip()!='null':
                 o=json.loads(unq(d['options'])); a=unq(d['correct_answer'])
-                if a not in o: bad.append(('answer',a,o))
-                if len(set(o))!=len(o): bad.append(('dup-options',o))
+                # Pour un exercice 'ordre', `options` ne porte PAS des
+                # propositions de QCM mais des etiquettes en trop (mots
+                # intrus) : la bonne reponse n'a aucune raison d'y figurer.
+                if d.get('type','').strip("'")!='ordre':
+                    if a not in o: bad.append(('answer',a,o))
+                    if len(set(o))!=len(o): bad.append(('dup-options',o))
+            if d.get('type','').strip("'")=='ordre':
+                bad += check_order(d,unq)
             if table in ('reading_passages','listening_passages'): passages[int(d['position'])]=unq(d['level'])
             if table in ('reading_questions','listening_questions'): qcount[int(d['passage_id'])]+=1
             if table=='exercises': exo[int(d['lesson_id'])]+=1

@@ -23,7 +23,7 @@ import PlacementView from '../src/components/PlacementView'
 import PlacementResult from '../src/components/PlacementResult'
 import { gradeExam } from '../src/lib/exam'
 import Mascot from '../src/components/Mascot'
-import { demoDictation, demoExercise, demoLesson, demoListeningQuestions, demoPassage, demoReading, demoReadingQuestions, demoSpeaking, demoGapExercise, demoTranslationExercise, demoPath, demoPathFresh, demoPathPlaced, demoPlacementBlocks, demoPlacementQuestion, demoProfile, demoResults } from './fixtures'
+import { demoDictation, demoExercise, demoLesson, demoListeningQuestions, demoPassage, demoReading, demoReadingQuestions, demoSpeaking, demoGapExercise, demoTranslationExercise, demoWordOrderExercise, demoPath, demoPathFresh, demoPathPlaced, demoPlacementBlocks, demoPlacementQuestion, demoProfile, demoResults } from './fixtures'
 
 const SCREENS = [
   { key: 'parcours', label: '01 Parcours' },
@@ -53,7 +53,9 @@ const SCREENS = [
   { key: 'trous', label: '14 Trous' },
   { key: 'trous-corrige', label: '14 Trous corrigé' },
   { key: 'traduction', label: '14 Traduction' },
-  { key: 'traduction-corrige', label: '14 Traduction corrigée' }
+  { key: 'traduction-corrige', label: '14 Traduction corrigée' },
+  { key: 'ordre', label: '15 Ordre des mots' },
+  { key: 'ordre-corrige', label: '15 Ordre corrigé' }
 ]
 
 function Preview() {
@@ -152,6 +154,15 @@ function Preview() {
       )}
       {screen === 'traduction-corrige' && (
         <ExerciseView {...exerciseProps} exercise={demoTranslationExercise} answer="I am twenty years old" verdict="right" />
+      )}
+
+      {/* Remets les mots dans l'ordre : la reserve vide, puis la phrase
+          reconstruite et validee. */}
+      {screen === 'ordre' && (
+        <ExerciseView {...exerciseProps} exercise={demoWordOrderExercise} answer={answer} verdict={null} />
+      )}
+      {screen === 'ordre-corrige' && (
+        <ExerciseView {...exerciseProps} exercise={demoWordOrderExercise} answer="You should see a doctor" verdict="right" />
       )}
 
       {['question', 'juste', 'faux', 'vide'].includes(screen) && <ExerciseView {...exerciseProps} />}

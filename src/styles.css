@@ -1065,6 +1065,65 @@ html, body { max-width: 100%; overflow-x: hidden; }
 .answer-input.is-right { border-color: var(--success); background: var(--success-tint); }
 .answer-input.is-wrong { border-color: var(--error); background: var(--error-tint); }
 
+/* --- Remets les mots dans l'ordre --- */
+.wordbank { display: grid; gap: 14px; }
+
+/* La phrase en construction. `min-height` la reserve AVANT la premiere
+   etiquette : sans elle, poser un mot ferait sauter toute la page. */
+.wordbank-line {
+  list-style: none; margin: 0; padding: 12px;
+  display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
+  min-height: 68px;
+  background: var(--surface);
+  border: 2px solid transparent; border-radius: var(--r-lg);
+  box-shadow: var(--e-rest);
+}
+.wordbank-line.is-right { border-color: var(--success); background: var(--success-tint); }
+.wordbank-line.is-wrong { border-color: var(--error); background: var(--error-tint); }
+
+.wordbank-empty { font-size: 15px; color: var(--ink-3); padding: 0 4px; }
+.wordbank-note { font-size: 14px; color: var(--ink-3); padding: 4px; }
+
+/* La reserve. Les mots poses y laissent un vide de la meme taille plutot
+   que de disparaitre : la reserve ne se reorganise pas sous le doigt, et
+   on retrouve un mot la ou on l'avait vu. */
+.wordbank-pool {
+  list-style: none; margin: 0; padding: 0;
+  display: flex; flex-wrap: wrap; gap: 8px;
+}
+
+.word-tile {
+  min-height: 44px;                /* cible tactile */
+  padding: 10px 14px;
+  font-family: var(--font); font-size: 17px; font-weight: 500;
+  color: var(--ink);
+  background: var(--surface);
+  border: 2px solid var(--border); border-radius: 12px;
+  box-shadow: var(--e-rest);
+  cursor: pointer;
+  transition: transform .15s ease, border-color .15s ease;
+}
+.word-tile:hover:not(:disabled) { transform: translateY(-1px); }
+.word-tile:disabled { cursor: default; }
+
+.word-tile.is-placed { border-color: var(--accent); background: var(--accent-tint); }
+
+/* Empreinte du mot pose : la boite reste, le texte s'efface. `transparent`
+   plutot qu'un gris pale — un gris trop clair echouerait au seuil 4.5:1,
+   et il n'y a rien a lire ici (l'element est aria-hidden). */
+.word-tile.is-ghost {
+  display: inline-block;
+  color: transparent;
+  background: var(--surface-off);
+  border-color: transparent;
+  box-shadow: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .word-tile { transition: none; }
+  .word-tile:hover:not(:disabled) { transform: none; }
+}
+
 /* Secousse horizontale sur erreur : 3 allers-retours en 500 ms */
 .is-shaking { animation: shake .5s cubic-bezier(.36,.07,.19,.97); }
 

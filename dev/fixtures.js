@@ -223,3 +223,15 @@ export const demoReadingQuestions = [
     explanation: 'Le texte donne deux durées : quatre ans dans le commerce, deux ans à diriger une équipe.'
   }
 ]
+
+// « Remets les mots dans l'ordre » : les etiquettes viennent de
+// correct_answer, et `options` porte les mots INTRUS (ici « to », que le
+// francophone ajoute apres « should »).
+export const demoWordOrderExercise = {
+  id: 21,
+  type: 'ordre',
+  question: 'Construis la phrase anglaise : \u00ab Tu devrais voir un m\u00e9decin. \u00bb',
+  options: ['to'],
+  correct_answer: 'You should see a doctor',
+  explanation: 'Apres un modal (should, must, can, will), le verbe suit nu, sans \u00ab to \u00bb.'
+}

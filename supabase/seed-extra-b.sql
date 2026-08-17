@@ -7,18 +7,20 @@
 -- ATTENTION — cette suppression a deja efface du contenu par le passe.
 -- Elle ne garde que les 3 exercices d'origine de chaque lecon, donc elle
 -- effacait les dictees, les exercices oraux et le vocabulaire si ce script
--- etait relance apres eux. Les trois familles sont desormais protegees
--- explicitement, et le comptage des « 3 premiers » les ignore aussi.
+-- etait relance apres eux. Les familles concernees sont desormais
+-- protegees explicitement, et le comptage des « 3 premiers » les ignore
+-- aussi. Le type 'ordre' (remets les mots dans l'ordre) a rejoint la
+-- liste le 17/08 : il a son propre script, seed-word-order.sql.
 delete from exercises
 where lesson_id between 11 and 20
-  and type not in ('ecoute', 'oral')
+  and type not in ('ecoute', 'oral', 'ordre')
   and coalesce(explanation, '') not like '%[voc%'
   and id not in (
     select id from (
       select id, row_number() over (partition by lesson_id order by id) as rang
       from exercises
       where lesson_id between 11 and 20
-        and type not in ('ecoute', 'oral')
+        and type not in ('ecoute', 'oral', 'ordre')
         and coalesce(explanation, '') not like '%[voc%'
     ) t where rang <= 3
   );

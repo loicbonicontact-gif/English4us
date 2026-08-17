@@ -3,6 +3,7 @@ import Mascot from './Mascot'
 import Hearts from './Hearts'
 import DictationPlayer from './DictationPlayer'
 import SpeakingPanel from './SpeakingPanel'
+import WordBank from './WordBank'
 import { englishToSpeak } from '../lib/spoken'
 
 const LETTERS = ['A', 'B', 'C', 'D', 'E', 'F']
@@ -12,7 +13,8 @@ const LABELS = {
   trous: 'Complète la phrase',
   traduction: 'Traduis en anglais',
   ecoute: 'Écoute et écris ce que tu entends',
-  oral: 'Lis la phrase à voix haute'
+  oral: 'Lis la phrase à voix haute',
+  ordre: 'Remets les mots dans l’ordre'
 }
 
 // Affichage pur de l'ecran d'exercice : aucune requete, aucun calcul de score.
@@ -146,7 +148,19 @@ export default function ExerciseView({
       )}
 
       {/* --- Reponses --- */}
-      {isSpeaking ? null : exercise.type === 'qcm' ? (
+      {isSpeaking ? null : exercise.type === 'ordre' ? (
+        // Le vocabulaire est donne : il ne reste que l'ordre a trouver.
+        // `key` sur l'exercice : sans lui, les etiquettes posees a la
+        // question precedente resteraient en place a la suivante.
+        <WordBank
+          key={exercise.id}
+          exercise={exercise}
+          answer={answer}
+          onAnswer={onAnswer}
+          disabled={Boolean(verdict)}
+          verdict={verdict}
+        />
+      ) : exercise.type === 'qcm' ? (
         <ul className="answers">
           {exercise.options.map((option, i) => {
             const picked = answer === option

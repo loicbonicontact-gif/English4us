@@ -105,7 +105,13 @@ A faire, par priorite :
       travail a ete de corriger CE QUI etait lu : l'enonce francais d'un QCM
       passait par la voix anglaise, et une traduction livrait sa reponse
       avant validation. Regle dans src/lib/spoken.js.
-- [ ] Exercice "remets les mots dans l'ordre" (etiquettes a cliquer)
+- [x] ~~Exercice "remets les mots dans l'ordre"~~ — FAIT le 17/08. Nouveau
+      type `ordre` : etiquettes a cliquer, jamais de glisser-deposer
+      (inutilisable au clavier et en conflit avec le defilement sur
+      telephone). 60 exercices ecrits a la main, cibles sur les pieges
+      d'ordre des mots du francophone. `options` change de sens pour ce
+      type : ce sont les mots INTRUS, pas des propositions de QCM.
+      Necessite migration-word-order.sql puis seed-word-order.sql.
 - [ ] Fiche de lecon consultable avant de commencer (regle + exemples)
 - [ ] Classement entre apprenants
 - [ ] Recharge automatique des coeurs (1 par 4h)

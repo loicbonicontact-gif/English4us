@@ -236,7 +236,7 @@ export default function Exercise({ profile, onProfileChange }) {
       hearts={hearts}
       breakingIndex={breakingIndex}
       isLast={isLast}
-      onAnswer={(value) => { if (!verdict) { if (current.type === 'qcm') soundTap(); setAnswer(value) } }}
+      onAnswer={(value) => { if (!verdict) { if (current.type === 'qcm' || current.type === 'ordre') soundTap(); setAnswer(value) } }}
       onValidate={handleValidate}
       onNext={handleNext}
       onQuit={() => navigate('/dashboard')}
