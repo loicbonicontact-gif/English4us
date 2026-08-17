@@ -6,12 +6,15 @@ Dernière mise à jour : 17 août 2026
 
 | Type | Quantité |
 |---|---|
-| Exercices de leçon | 540 (18 par leçon) |
-| dont vocabulaire | 150 |
+| Exercices de leçon | 690 (23 par leçon) |
+| dont vocabulaire | 300 (deux séries, `[voc]` et `[voc2]`) |
 | dont dictées audio | 60 |
 | dont expression orale | 60 |
 | Passages d'écoute | 18 (42 questions) |
-| Textes de lecture | 12 (36 questions) |
+| Textes de lecture | 24 (72 questions) |
+
+**Examen blanc** (`/exam`) : n'a aucun contenu propre, il assemble une
+épreuve d'environ 150 questions à partir de ce qui précède.
 
 **Piège corrigé le 17/08** : `seed-extra-a/b/c.sql` supprimaient tout ce qui
 dépassait les 3 exercices d'origine de chaque leçon. Les relancer après
@@ -29,6 +32,17 @@ Avec la révision espacée (5 rencontres par item), cela représente de
 l'ordre de **3 000 rencontres** étalées sur plusieurs mois.
 
 ## Décisions structurantes de la session du 17 août
+
+### L'examen blanc annonce ses limites
+Le barème réel du TOEIC n'est pas public et varie d'une session à l'autre.
+Le score s'affiche donc en **fourchette de ±50 points**, jamais en nombre
+unique, avec un encadré qui explique ce que l'estimation vaut. Un chiffre
+précis serait plus flatteur et moins honnête — et une école qui
+découvrirait la limite après coup perdrait confiance.
+
+Le chronomètre compare à un instant de départ au lieu de décompter : un
+onglet en arrière-plan ralentit les minuteries, un simple compteur
+offrirait du temps gratuit à qui change d'onglet.
 
 ### L'IA payante est retirée du projet
 `api/generate-exercise.js` et `src/lib/aiExercise.js` sont supprimés.
@@ -207,13 +221,13 @@ Refonte complète de l'interface d'après le handoff de design
 Priorité pédagogique décidée le 16 août (après recherche sur les méthodes
 d'apprentissage et le format TOEIC) :
 
-- [ ] **Plus de contenu, à la main** — c'est la seule voie gratuite vers
-      le volume. 540 exercices, c'est 90 par niveau CECRL : un apprenant
-      assidu les épuise en quelques semaines. Le TOEIC suppose un socle
-      d'environ 3 000 mots. Priorité suggérée : vocabulaire, puis textes
-      de lecture (partie 7 = 54 questions sur 200).
-- [ ] **Examen blanc TOEIC** chronométré, score estimé 10-990. Suppose
-      200 questions au format réel : gros travail de contenu.
+- [ ] **Plus de contenu, à la main** — seule voie gratuite vers le volume.
+      690 exercices, c'est 115 par niveau CECRL : un apprenant assidu les
+      épuise en quelques mois. Le TOEIC suppose un socle d'environ 3 000
+      mots. Continuer par séries marquées (`[voc3]`, positions 25+) pour
+      rester rejouable sans rien écraser.
+- [ ] **Mode enseignant** — suivi d'une classe. C'est l'argument
+      commercial qui manque encore pour les établissements.
 - [ ] **Voix neuronales enregistrées** — le champ `audio_url` est prêt sur
       chaque passage. Tient dans le quota gratuit de Google Cloud ou Azure,
       mais demande un compte avec carte bancaire. En attente de décision.
