@@ -48,16 +48,11 @@ Scripts à rejouer si la base est recréée, **dans cet ordre** :
 Avec la révision espacée (5 rencontres par item), cela représente de
 l'ordre de **3 000 rencontres** étalées sur plusieurs mois.
 
-## EN ATTENTE — un script a passer
+## RIEN EN ATTENTE — migration-feedback.sql est passe le 17/08
 
-`supabase/migration-feedback.sql` — cree la table `app_feedback` et ajoute la
-colonne `profiles.feedback_asked_at`. Ne touche a aucune donnee existante.
-
-Tant qu'il n'est pas passe, **rien ne change** : `shouldAskFeedback` renvoie
-faux quand la colonne est absente, donc la question n'est jamais posee, et la
-ligne « Ta note » ne s'affiche pas dans le profil. La politique de
-confidentialite, elle, fonctionne des maintenant — elle ne depend d'aucune
-table.
+Confirme par Loic. La table `app_feedback` et la colonne
+`profiles.feedback_asked_at` existent : la demande de note s'affichera apres
+la cinquieme lecon terminee, une seule fois.
 
 ## Ecrit le 17 aout — note de l'application, et le RGPD au passage
 
