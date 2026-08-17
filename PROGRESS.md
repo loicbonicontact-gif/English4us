@@ -42,6 +42,48 @@ Scripts à rejouer si la base est recréée, **dans cet ordre** :
 Avec la révision espacée (5 rencontres par item), cela représente de
 l'ordre de **3 000 rencontres** étalées sur plusieurs mois.
 
+## Écrit le 17 août — le classement cède sa place à « Entraînement »
+
+Décision de Loïc : le classement n'est pas utile, on le retire. Les fichiers
+`Leaderboard.jsx` et `LeaderboardView.jsx` sont supprimés, la route `/leaderboard`
+aussi.
+
+### Trois raisons de le retirer
+1. **Il était vide.** Un classement est un mécanisme social : avec un seul
+   utilisateur, la page affichait une ligne.
+2. **Même rempli, il aurait mal fonctionné.** Il classait par XP **total
+   depuis toujours** : celui qui commence six mois plus tard ne rattrape
+   jamais le premier arrivé. C'est une mesure d'ancienneté, pas d'effort.
+   Duolingo utilise des ligues hebdomadaires pour cette raison exacte — et
+   le classement hebdomadaire avait été abandonné ici, la règle de sécurité
+   de `streak_log` empêchant de sommer les XP des autres.
+3. **Il occupait une des quatre places de la barre de navigation**, pendant
+   que l'écoute (42 passages) et la lecture (36 textes) n'en avaient aucune :
+   il fallait faire défiler le parcours pour les trouver.
+
+### Ce qui le remplace : `/training`
+`Training.jsx` (données) + `TrainingView.jsx` (affichage) : l'examen blanc,
+puis les deux modules à plat, chacun avec son niveau et son format.
+
+Point important : cet écran passe par **`buildPath`**, comme le parcours.
+Interroger les passages directement aurait été plus court, mais aurait
+ouvert une porte dérobée vers du contenu verrouillé, et les deux écrans se
+seraient contredits. Le verrouillage reste décidé à un seul endroit.
+
+Aucun style nouveau à une exception près (`.level-sub`, la légende d'un
+module) : l'écran réutilise les classes du parcours, donc il vieillira avec
+lui. Contraste mesuré : 4,51:1 — au-dessus du seuil, de peu.
+
+Vérifié dans `preview.html` (écran « 05 Entraînement ») : les deux modules
+s'affichent, un module sans contenu annonce que son script SQL n'a pas été
+passé au lieu de rester vide.
+
+### À surveiller
+Avec 78 mises en pratique pour 30 leçons, la plupart se retrouvent en fin de
+niveau et restent **verrouillées jusqu'à la dernière leçon du niveau**. La
+règle n'a pas changé, mais le volume la rend beaucoup plus visible. À
+rediscuter : faut-il ouvrir l'écoute et la lecture plus tôt ?
+
 ## Écrit le 17 août — l'examen blanc passe au format réel
 
 Le contenu suffit désormais à tirer un **échantillon** au lieu de tout
@@ -342,7 +384,8 @@ Refonte complète de l'interface d'après le handoff de design
    carte « À revoir » et carte « Débloqué ».
 4. **Profil** (`/profile`, nouvelle route) — identité, progression de niveau,
    trois statistiques, réglage du son, déconnexion.
-5. **Classement** (`/leaderboard`) — top 20 par XP total.
+5. ~~**Classement** (`/leaderboard`)~~ — retiré le 17/08, remplacé par
+   l'écran « Entraînement ».
 
 ## Décisions prises
 
@@ -389,7 +432,6 @@ Reste de la feuille de route :
 - [ ] Réglages « rappel quotidien à 18 h » et « objectif du jour » de la
       maquette : ce sont des fonctionnalités à part entière, pas de
       l'habillage. Volontairement laissées de côté.
-- [ ] Classement hebdomadaire, si on écrit la vue SQL.
 - [ ] Onboarding en trois écrans.
 - [ ] Exercice « remets les mots dans l'ordre ».
 - [ ] Fiche de leçon consultable avant de commencer.

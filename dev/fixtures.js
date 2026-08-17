@@ -30,7 +30,24 @@ const RAW_PASSAGES = [
 
 const RAW_LISTENING_PROGRESS = {}
 
-export const demoPath = buildPath(RAW_LESSONS, RAW_PROGRESS, RAW_PASSAGES, RAW_LISTENING_PROGRESS)
+// Les lectures s'intercalent de la meme facon. Sans elles, l'ecran
+// « Entrainement » n'affichait qu'un module sur deux en previsualisation.
+const RAW_READINGS = [
+  { id: 201, level: 'A1', format: 'text_completion', title: 'Une liste de courses', position: 1, xp_reward: 10 },
+  { id: 202, level: 'A1', format: 'passage', title: 'Un horaire de bus', position: 2, xp_reward: 15 },
+  { id: 203, level: 'A2', format: 'passage', title: 'Un message au propriétaire', position: 3, xp_reward: 15 }
+]
+
+const RAW_READING_PROGRESS = { 201: { passage_id: 201, score: 100 } }
+
+export const demoPath = buildPath(
+  RAW_LESSONS,
+  RAW_PROGRESS,
+  RAW_PASSAGES,
+  RAW_LISTENING_PROGRESS,
+  RAW_READINGS,
+  RAW_READING_PROGRESS
+)
 
 export const demoProfile = {
   id: 'demo',
@@ -60,14 +77,6 @@ export const demoResults = [
   { question: 'mes parents', answer: 'My parents', right: false }
 ]
 
-export const demoBoard = [
-  { id: 'a', username: 'clara', xp: 1240 },
-  { id: 'b', username: 'yanis', xp: 980 },
-  { id: 'c', username: 'ines', xp: 760 },
-  { id: 'demo', username: 'malo', xp: 610 },
-  { id: 'e', username: 'noah', xp: 430 },
-  { id: 'f', username: 'lina', xp: 220 }
-]
 
 // --- Comprehension orale ---
 export const demoPassage = {

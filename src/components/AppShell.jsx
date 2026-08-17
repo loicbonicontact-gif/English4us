@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom'
-import { IconPath, IconReview, IconTrophy, IconUser } from './Icons'
+import { IconCap, IconPath, IconReview, IconUser } from './Icons'
 
 // Coque de l'application : en-tete de marque en haut, barre d'onglets en bas.
 //
@@ -49,9 +49,14 @@ export default function AppShell({ profile, dueCount = 0, children }) {
                 <span className="sr-only">{dueCount} exercices à revoir</span>
               )}
             </NavLink>
-            <NavLink to="/leaderboard" className="tab">
-              <IconTrophy size={20} />
-              <span className="tab-label">Classement</span>
+            {/* Cet onglet portait un classement par XP total. Il a ete
+                retire le 17/08 : avec un seul utilisateur il affichait une
+                ligne, et un classement cumule depuis toujours mesure
+                l'anciennete plutot que l'effort. La place revient aux deux
+                modules qui portent les 200 questions du TOEIC. */}
+            <NavLink to="/training" className="tab">
+              <IconCap size={20} />
+              <span className="tab-label">Entraînement</span>
             </NavLink>
             <NavLink to="/profile" className="tab">
               <IconUser size={20} />

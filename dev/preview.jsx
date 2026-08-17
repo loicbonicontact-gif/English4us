@@ -14,7 +14,7 @@ import PathView from '../src/components/PathView'
 import ExerciseView from '../src/components/ExerciseView'
 import LessonEnd from '../src/components/LessonEnd'
 import ProfileView from '../src/components/ProfileView'
-import LeaderboardView from '../src/components/LeaderboardView'
+import TrainingView from '../src/components/TrainingView'
 import ReviewEnd from '../src/components/ReviewEnd'
 import ListeningView from '../src/components/ListeningView'
 import ReadingView from '../src/components/ReadingView'
@@ -22,7 +22,7 @@ import ExamView from '../src/components/ExamView'
 import ExamResult from '../src/components/ExamResult'
 import { gradeExam } from '../src/lib/exam'
 import Mascot from '../src/components/Mascot'
-import { demoBoard, demoDictation, demoExercise, demoLesson, demoListeningQuestions, demoPassage, demoReading, demoReadingQuestions, demoSpeaking, demoPath, demoProfile, demoResults } from './fixtures'
+import { demoDictation, demoExercise, demoLesson, demoListeningQuestions, demoPassage, demoReading, demoReadingQuestions, demoSpeaking, demoPath, demoProfile, demoResults } from './fixtures'
 
 const SCREENS = [
   { key: 'parcours', label: '01 Parcours' },
@@ -31,7 +31,7 @@ const SCREENS = [
   { key: 'faux', label: '03 Faux' },
   { key: 'vide', label: '03 Sans cœur' },
   { key: 'fin', label: '04 Fin' },
-  { key: 'classement', label: '05 Classement' },
+  { key: 'entrainement', label: '05 Entraînement' },
   { key: 'profil', label: '06 Profil' },
   { key: 'revision', label: '07 Révision' },
   { key: 'revision-fin', label: '07 Fin révision' },
@@ -230,9 +230,12 @@ function Preview() {
         </AppShell>
       )}
 
-      {screen === 'classement' && (
+      {screen === 'entrainement' && (
         <AppShell profile={demoProfile}>
-          <LeaderboardView rows={demoBoard} me={demoBoard[3]} myRank={4} total={128} />
+          <TrainingView
+            listening={demoPath.byLevel.flatMap((g) => g.items.filter((i) => i.kind === 'listening'))}
+            reading={demoPath.byLevel.flatMap((g) => g.items.filter((i) => i.kind === 'reading'))}
+          />
         </AppShell>
       )}
 
