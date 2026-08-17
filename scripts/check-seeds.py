@@ -86,15 +86,15 @@ for path in sys.argv[1:]:
             if len(p)!=len(cols): bad.append(('arity',table,len(p),len(cols),t[:50])); continue
             d=dict(zip(cols,p))
             for k,v in d.items():
-                if k in ('options','documents') and v.strip()!='null':
+                if k in ('options','documents','script') and v.strip()!='null':
                     try: json.loads(unq(v))
                     except Exception as e: bad.append(('json',table,k,str(e)[:60]))
             if 'options' in d and d['options'].strip()!='null':
                 o=json.loads(unq(d['options'])); a=unq(d['correct_answer'])
                 if a not in o: bad.append(('answer',a,o))
                 if len(set(o))!=len(o): bad.append(('dup-options',o))
-            if table=='reading_passages': passages[int(d['position'])]=unq(d['level'])
-            if table=='reading_questions': qcount[int(d['passage_id'])]+=1
+            if table in ('reading_passages','listening_passages'): passages[int(d['position'])]=unq(d['level'])
+            if table in ('reading_questions','listening_questions'): qcount[int(d['passage_id'])]+=1
             if table=='exercises': exo[int(d['lesson_id'])]+=1
     print('===',path)
     if passages: print(' passages:',len(passages),sorted(passages),' questions:',sum(qcount.values()),dict(sorted(qcount.items())))

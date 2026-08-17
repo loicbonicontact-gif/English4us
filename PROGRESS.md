@@ -10,12 +10,13 @@ Dernière mise à jour : 17 août 2026
 | dont vocabulaire | 450 (trois séries, `[voc]`, `[voc2]`, `[voc3]`) |
 | dont dictées audio | 60 |
 | dont expression orale | 60 |
-| Passages d'écoute | 18 (42 questions) |
+| Passages d'écoute | 42 (102 questions) |
 | Textes de lecture | 36 (108 questions) |
 
-**Quatre scripts sont écrits mais pas encore passés en base** — ils sont sur
+**Cinq scripts sont écrits mais pas encore passés en base** — ils sont sur
 le Bureau, à exécuter dans cet ordre : `6-vocabulaire-2.sql`,
-`7-lecture-2.sql`, `8-vocabulaire-3.sql`, `9-lecture-3.sql`. Les chiffres
+`7-lecture-2.sql`, `8-vocabulaire-3.sql`, `9-lecture-3.sql`,
+`10-ecoute-2.sql`. Les chiffres
 ci-dessus décrivent donc la base **une fois ces scripts passés**.
 `4-verification.sql` affiche l'inventaire réel et compte désormais les trois
 séries séparément.
@@ -35,10 +36,49 @@ Scripts à rejouer si la base est recréée, **dans cet ordre** :
 `migration-review-queue.sql`, `migration-listening.sql`,
 `seed-listening.sql`, `migration-reading.sql`, `seed-reading.sql`,
 `seed-reading-2.sql`, `seed-vocabulary-2.sql`, `seed-vocabulary-3.sql`,
-`seed-reading-3.sql`.
+`seed-reading-3.sql`, `seed-listening-2.sql`.
 
 Avec la révision espacée (5 rencontres par item), cela représente de
 l'ordre de **3 000 rencontres** étalées sur plusieurs mois.
+
+## Écrit le 17 août — l'écoute rattrape son retard
+
+24 passages et 60 questions de plus (`seed-listening-2.sql`, positions 19
+à 42). L'écoute passe de 42 à 102 questions.
+
+### Pourquoi l'écoute et pas une quatrième série de vocabulaire
+Au TOEIC, l'écoute pèse **100 questions sur 200**, exactement autant que la
+lecture. L'application comptait 42 questions d'écoute contre 108 de lecture :
+le pilier le plus lourd de l'épreuve était le plus léger de l'app. C'est
+aussi la partie où les francophones perdent le plus de points — on lit un
+texte à son rythme, on n'écoute pas au sien.
+
+Répartition par niveau, calquée sur l'épreuve : 1 question-réponse
+(partie 2), 2 conversations et 1 annonce (parties 3 et 4), avec **trois
+questions par passage** comme au TOEIC réel.
+
+### Ce que la deuxième série ajoute
+La première entraînait la compréhension du sens explicite. Celle-ci place à
+chaque niveau au moins une question qui ne se résout pas en réentendant une
+phrase : l'inférence (la réponse n'est dite par personne), l'identification
+du locuteur, et l'intention — un « that could work » enthousiaste et un
+« that could work » résigné n'annoncent pas la même suite.
+
+### Deux limites à connaître
+- **La voix reste une voix de synthèse.** Elle ne reproduit ni les accents
+  (australien, indien) que le TOEIC fait entendre, ni le débit naturel. Les
+  scripts anglais évitent les apostrophes, que la synthèse rend mal.
+- **Il n'y a pas d'équivalent à la partie 1** (décrire une photo) : il
+  faudrait des images, donc des droits ou des photos maison.
+
+Le champ `audio_url` reste vide sur les 42 passages : le jour où des voix
+enregistrées seront générées, il suffira de le remplir.
+
+### Le contrôleur a servi dès sa deuxième utilisation
+Les mêmes cinq blocs `insert` se terminaient par une virgule au lieu d'un
+point-virgule — la faute que `scripts/check-seeds.py` avait été écrit pour
+attraper. Elle aurait fait rejeter le fichier entier par Postgres, sans
+qu'aucun passage ne soit inséré.
 
 ## Écrit le 17 août — troisième série de contenu
 
@@ -279,7 +319,7 @@ d'apprentissage et le format TOEIC) :
 - [ ] ~~**Mode enseignant**~~ — laissé de côté à la demande de Loïc le
       17/08/2026. Ne pas le relancer sans qu'il le redemande.
 - [ ] **Voix neuronales enregistrées** — le champ `audio_url` est prêt sur
-      chaque passage. Tient dans le quota gratuit de Google Cloud ou Azure,
+      les 42 passages d'écoute. Tient dans le quota gratuit de Google Cloud ou Azure,
       mais demande un compte avec carte bancaire. En attente de décision.
       Partie 7 du TOEIC : 54 questions sur 200.
 - [ ] **Réponse orale** — reconnaissance vocale du navigateur (absente de
