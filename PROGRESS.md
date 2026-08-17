@@ -10,8 +10,14 @@ Dernière mise à jour : 17 août 2026
 | dont vocabulaire | 150 |
 | dont dictées audio | 60 |
 | dont expression orale | 60 |
-| Passages d'écoute | 18 (48 questions) |
+| Passages d'écoute | 18 (42 questions) |
 | Textes de lecture | 12 (36 questions) |
+
+**Piège corrigé le 17/08** : `seed-extra-a/b/c.sql` supprimaient tout ce qui
+dépassait les 3 exercices d'origine de chaque leçon. Les relancer après
+`seed-speaking.sql` a effacé les 60 exercices oraux. Les trois scripts
+protègent désormais explicitement les types `ecoute`, `oral` et les
+exercices marqués `[voc]`. L'ordre reste néanmoins à respecter.
 
 Scripts à rejouer si la base est recréée, **dans cet ordre** :
 `schema.sql` (base vide uniquement), `seed.sql`, `seed-extra-a/b/c.sql`,

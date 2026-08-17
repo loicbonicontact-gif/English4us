@@ -7,12 +7,22 @@
 -- À exécuter dans Supabase SQL Editor APRES seed.sql
 -- ============================================
 
+-- ATTENTION — cette suppression a deja efface du contenu par le passe.
+-- Elle ne garde que les 3 exercices d'origine de chaque lecon, donc elle
+-- effacait les dictees, les exercices oraux et le vocabulaire si ce script
+-- etait relance apres eux. Les trois familles sont desormais protegees
+-- explicitement, et le comptage des « 3 premiers » les ignore aussi.
 delete from exercises
 where lesson_id between 1 and 10
+  and type not in ('ecoute', 'oral')
+  and coalesce(explanation, '') not like '%[voc]'
   and id not in (
     select id from (
       select id, row_number() over (partition by lesson_id order by id) as rang
-      from exercises where lesson_id between 1 and 10
+      from exercises
+      where lesson_id between 1 and 10
+        and type not in ('ecoute', 'oral')
+        and coalesce(explanation, '') not like '%[voc]'
     ) t where rang <= 3
   );
 
