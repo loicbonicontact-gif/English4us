@@ -50,6 +50,28 @@ Scripts à rejouer si la base est recréée, **dans cet ordre** :
 Avec la révision espacée (5 rencontres par item), cela représente de
 l'ordre de **3 000 rencontres** étalées sur plusieurs mois.
 
+## Décision du 17/08 — le classement est définitivement écarté
+
+Loïc : « pas la peine pour ça, c'est inutile ».
+
+La décision ne change rien au code : le classement avait **déjà** été
+construit puis retiré plus tôt le 17/08 (voir « la barre passe à trois
+onglets » plus bas). Ce qui restait était une ligne oubliée dans la feuille
+de route de `CLAUDE.md`, qui le remettait au programme comme s'il était à
+faire. Elle est supprimée.
+
+Les trois raisons tiennent toujours, et il est utile de les garder écrites
+pour ne pas rouvrir le sujet une troisième fois :
+1. un classement est un mécanisme social — vide avec un seul utilisateur ;
+2. classer par XP total depuis toujours mesure l'ancienneté, pas l'effort ;
+3. le classement hebdomadaire, qui serait juste, est **impossible en l'état** :
+   la règle de sécurité de `streak_log` interdit de lire les XP des autres.
+   Il faudrait une vue SQL agrégée en base pour le rétablir.
+
+Reste au programme, par ordre de valeur : recharge automatique des cœurs,
+objectif quotidien, les deux écrans d'onboarding, et le mode enseignant —
+qui est l'argument des établissements, là où le classement ne l'était pas.
+
 ## RIEN EN ATTENTE — les cinq scripts sont passés le 17/08
 
 Exécutés dans Supabase SQL Editor et confirmés par Loïc, dans cet ordre :

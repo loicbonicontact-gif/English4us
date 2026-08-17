@@ -35,14 +35,19 @@ Ne jamais s'arrêter pour dire "voulez-vous que je continue ?" — enchaîner ju
 - [ ] `src/components/LessonPath.jsx` — parcours visuel des unités par niveau (utilise `curriculum.js`), verrouillage progressif
 - [ ] `src/components/Exercise.jsx` — moteur d'exercice générique (QCM, trous, traduction), gestion des coeurs perdus, appel à `completeLesson()`
 - [ ] `src/components/StreakWidget.jsx` — affichage visuel du streak + calendrier des 7 derniers jours
-- [ ] `src/components/Leaderboard.jsx` — classement des utilisateurs par XP (requête Supabase triée)
+- [x] ~~`src/components/Leaderboard.jsx`~~ — ABANDONNE. Construit puis retire
+      le 17/08, et confirme inutile depuis. Un classement est un mecanisme
+      social : vide a un seul utilisateur, et fausse meme rempli (XP total
+      depuis toujours = anciennete, pas effort). Le classement hebdomadaire,
+      qui aurait ete juste, est impossible : la regle RLS de `streak_log`
+      interdit de lire les XP des autres.
 - [ ] `src/components/Dashboard.jsx` — écran d'accueil post-connexion, assemble Navbar + LessonPath + StreakWidget
-- [ ] `src/App.jsx` — routing complet (react-router-dom) : /login, /dashboard, /lesson/:id, /leaderboard
+- [ ] `src/App.jsx` — routing complet (react-router-dom) : /login, /dashboard, /lesson/:id
 - [ ] `src/styles.css` — design cohérent (palette, typographie), mobile-first
 - [ ] Script de seed (`supabase/seed.sql`) — remplir `lessons` et `exercises` avec un contenu réel A1→C2 (minimum 3 exercices par leçon)
 - [x] ~~Intégration IA~~ — ABANDONNÉ le 16/08/2026. L'API Claude est facturée à l'appel, sans palier gratuit. `api/generate-exercise.js` et `src/lib/aiExercise.js` ont été supprimés : la fonction serveur était accessible publiquement, sans authentification ni limite d'appels, et aurait pu être utilisée par n'importe qui pour facturer le compte. **Ne pas définir `ANTHROPIC_API_KEY` sur Vercel.** Le contenu s'écrit à la main.
 - [ ] Système de coeurs : recharge automatique après un délai (ex. 1 coeur/4h) via `refillHearts()`
-- [ ] Tests manuels : parcours complet inscription → leçon → XP → streak → leaderboard
+- [ ] Tests manuels : parcours complet inscription → leçon → XP → streak
 - [ ] `README.md` final avec instructions de déploiement (Vercel + Supabase)
 
 ## COMMANDE DE DÉMARRAGE
@@ -122,7 +127,6 @@ A faire, par priorite :
       (ce serait un exercice a livre ouvert).
       Scripts PASSES le 17/08 : migration-lesson-notes.sql puis
       seed-lesson-notes.sql. A rejouer seulement si la base est recreee.
-- [ ] Classement entre apprenants
 - [ ] Recharge automatique des coeurs (1 par 4h)
 - [ ] Objectif quotidien + defis
 - [ ] Mode enseignant : suivi d'une classe (argument cle pour les ecoles)
