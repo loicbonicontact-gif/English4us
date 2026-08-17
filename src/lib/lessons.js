@@ -33,12 +33,18 @@ export async function fetchProgress(userId) {
 
 // Applique la règle de déverrouillage : la première leçon est toujours
 // ouverte, les suivantes le deviennent quand la précédente est terminée.
-// Une mise en pratique après CHAQUE leçon.
+// Une mise en pratique après CHAQUE leçon, au minimum.
 //
 // Une leçon apprend une règle ; l'écoute et la lecture la font rencontrer
 // dans un vrai document. Les espacer davantage reviendrait à empiler les
 // règles avant de s'en servir — l'ordre inverse de ce qui fait apprendre.
-const LESSONS_BETWEEN_PRACTICE = 1
+//
+// Quand il y a plus de mises en pratique que de leçons — c'est le cas
+// depuis le 17/08, 78 pour 30 — elles sont réparties également plutôt
+// qu'entassées en fin de niveau. Mesuré avant correction : un apprenant
+// ayant terminé A1 n'ouvrait que 13 des 78 mises en pratique, et un
+// débutant aucune. Le contenu existait, il était hors d'atteinte.
+const LESSONS_BETWEEN_PRACTICE_MIN = 1
 
 // Renvoie le parcours regroupé par niveau, prêt à l'affichage.
 //
@@ -123,17 +129,30 @@ function interleave(levelLessons, listenings, readings) {
     return null
   }
 
+  // Part de chaque leçon : le total divisé par le nombre de leçons, le
+  // reste allant aux premières. Avec 13 mises en pratique pour 5 leçons,
+  // cela donne 3, 3, 3, 2, 2 — et plus rien qui attende la fin du niveau.
+  const lessonCount = levelLessons.length
+  const total = listenings.length + readings.length
+  const base = lessonCount > 0 ? Math.floor(total / lessonCount) : 0
+  const extra = lessonCount > 0 ? total % lessonCount : 0
+
   levelLessons.forEach((lesson, i) => {
     items.push(lesson)
 
-    if ((i + 1) % LESSONS_BETWEEN_PRACTICE !== 0) return
-    const practice = nextPractice()
-    if (practice) items.push({ ...practice, unlocked: lesson.completed })
+    const share = Math.max(base + (i < extra ? 1 : 0), LESSONS_BETWEEN_PRACTICE_MIN)
+    for (let k = 0; k < share; k += 1) {
+      const practice = nextPractice()
+      if (!practice) break
+      // Règle inchangée : une mise en pratique s'ouvre quand la leçon qui
+      // la précède est terminée. On apprend d'abord, on pratique ensuite.
+      items.push({ ...practice, unlocked: lesson.completed })
+    }
   })
 
-  // Le reste en fin de niveau, ouvert si la dernière leçon est terminée :
-  // aucune mise en pratique ne doit disparaître silencieusement.
-  const lastDone = levelLessons[levelLessons.length - 1]?.completed ?? false
+  // Filet de sécurité : si un arrondi laissait quelque chose de côté, on
+  // l'ajoute plutôt que de le faire disparaître silencieusement.
+  const lastDone = levelLessons[lessonCount - 1]?.completed ?? false
   let leftover = nextPractice()
   while (leftover) {
     items.push({ ...leftover, unlocked: lastDone })

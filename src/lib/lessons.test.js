@@ -69,6 +69,29 @@ describe('buildPath — mises en pratique intercalées', () => {
     expect(ids).toEqual([101, 102, 103, 201, 202, 203, 204])
   })
 
+  it('répartit les mises en pratique sur toutes les leçons du niveau', () => {
+    // Le vrai contenu compte 13 mises en pratique pour les 5 leçons d'un
+    // niveau. L'ancienne règle en plaçait UNE par leçon et entassait les 8
+    // autres à la fin, ouvertes seulement une fois le niveau terminé : un
+    // apprenant ayant fait sa première leçon n'en ouvrait qu'une seule.
+    const many = (kind, n, base) => [...Array(n)].map((_, i) => ({
+      id: base + i, level: 'A1', title: `${kind} ${i}`, position: i + 1, xp_reward: 15
+    }))
+    const items = itemsOf(buildPath(LESSONS, { 1: { completed: true } }, many('e', 7, 500), {}, many('l', 6, 600), {}))
+
+    // Aucune mise en pratique ne doit se retrouver après la dernière leçon.
+    const lastLesson = items.map((i) => i.kind).lastIndexOf('lesson')
+    expect(items.slice(lastLesson + 1).length).toBeLessThanOrEqual(2)
+
+    // La première leçon terminée en ouvre trois, pas une.
+    expect(items.filter((i) => i.kind !== 'lesson' && i.unlocked).length).toBe(3)
+  })
+
+  it('n\'ouvre jamais une mise en pratique avant sa leçon', () => {
+    const items = itemsOf(buildPath(LESSONS, {}, PASSAGES, {}, READINGS, {}))
+    expect(items.filter((i) => i.kind !== 'lesson' && i.unlocked).length).toBe(0)
+  })
+
   it('ne saute pas de tour quand une seule file est fournie', () => {
     // Sans lecture, les écoutes doivent se succéder sans laisser de trou.
     const kinds = itemsOf(buildPath(LESSONS, {}, PASSAGES)).map((i) => i.kind)
