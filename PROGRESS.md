@@ -42,6 +42,16 @@ Scripts à rejouer si la base est recréée, **dans cet ordre** :
 Avec la révision espacée (5 rencontres par item), cela représente de
 l'ordre de **3 000 rencontres** étalées sur plusieurs mois.
 
+## EN ATTENTE — un script à passer
+
+`supabase/correction-orthographe.sql` — deux UPDATE, aucun risque, aucune
+suppression. Corrige « un email formel » en « un e-mail formel » dans les
+deux questions concernées. Sans lui, la correction n'existe que dans les
+fichiers ; la base garde l'ancien texte.
+
+Le script affiche sa propre vérification : la première requête doit
+renvoyer 0 ligne, la seconde 2.
+
 ## Écrit le 17 août — prononciation : deux fuites bouchées
 
 Le chantier annoncé était « lecture audio des phrases anglaises ». En
