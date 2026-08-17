@@ -6,12 +6,19 @@ Dernière mise à jour : 17 août 2026
 
 | Type | Quantité |
 |---|---|
-| Exercices de leçon | 690 (23 par leçon) |
-| dont vocabulaire | 300 (deux séries, `[voc]` et `[voc2]`) |
+| Exercices de leçon | 840 (28 par leçon) |
+| dont vocabulaire | 450 (trois séries, `[voc]`, `[voc2]`, `[voc3]`) |
 | dont dictées audio | 60 |
 | dont expression orale | 60 |
 | Passages d'écoute | 18 (42 questions) |
-| Textes de lecture | 24 (72 questions) |
+| Textes de lecture | 36 (108 questions) |
+
+**Quatre scripts sont écrits mais pas encore passés en base** — ils sont sur
+le Bureau, à exécuter dans cet ordre : `6-vocabulaire-2.sql`,
+`7-lecture-2.sql`, `8-vocabulaire-3.sql`, `9-lecture-3.sql`. Les chiffres
+ci-dessus décrivent donc la base **une fois ces scripts passés**.
+`4-verification.sql` affiche l'inventaire réel et compte désormais les trois
+séries séparément.
 
 **Examen blanc** (`/exam`) : n'a aucun contenu propre, il assemble une
 épreuve d'environ 150 questions à partir de ce qui précède.
@@ -26,10 +33,52 @@ Scripts à rejouer si la base est recréée, **dans cet ordre** :
 `schema.sql` (base vide uniquement), `seed.sql`, `seed-extra-a/b/c.sql`,
 `seed-dictation.sql`, `seed-speaking.sql`, `seed-vocabulary.sql`,
 `migration-review-queue.sql`, `migration-listening.sql`,
-`seed-listening.sql`, `migration-reading.sql`, `seed-reading.sql`.
+`seed-listening.sql`, `migration-reading.sql`, `seed-reading.sql`,
+`seed-reading-2.sql`, `seed-vocabulary-2.sql`, `seed-vocabulary-3.sql`,
+`seed-reading-3.sql`.
 
 Avec la révision espacée (5 rencontres par item), cela représente de
 l'ordre de **3 000 rencontres** étalées sur plusieurs mois.
+
+## Écrit le 17 août — troisième série de contenu
+
+150 exercices de vocabulaire (`seed-vocabulary-3.sql`) et 12 textes de
+lecture avec 36 questions (`seed-reading-3.sql`).
+
+### Ce que la troisième série travaille, et pourquoi
+Les deux premières couvraient le socle, puis les faux amis et les verbes à
+particule. Celle-ci vise trois mécaniques qui rapportent beaucoup de mots
+d'un coup, au lieu de les apprendre un par un :
+
+1. **La dérivation** — un mot connu en donne quatre (decide, decision,
+   decisive, decisively). C'est exactement ce que teste la partie 5 du
+   TOEIC, et le seul levier réaliste pour approcher les 3 000 mots.
+2. **Les prépositions imposées** — « depend ON », « responsible FOR »,
+   « married TO ». Aucune règle ne les prédit, le français en suggère une
+   autre, et l'erreur s'entend immédiatement.
+3. **Le dénombrable** — « an advice » et « informations » n'existent pas.
+   Faute de francophone par excellence, très visible à l'écrit.
+
+Côté lecture : la conversation instantanée à plusieurs intervenants, le
+document chiffré (facture, tableau de résultats) où la réponse se **calcule**
+au lieu de se lire, la notice de sécurité, et la réclamation avec sa réponse.
+Dans chaque document, au moins une question ne peut pas se résoudre en
+repérant un mot : il faut relier deux endroits du texte ou comprendre une
+intention. C'est la différence entre lire et chercher des mots-clés.
+
+### Un piège de syntaxe trouvé par la vérification automatique
+Cinq blocs `insert` du script de lecture se terminaient par une virgule au
+lieu d'un point-virgule. Postgres aurait avalé le bloc suivant dans la même
+instruction et rejeté tout le fichier — donc aucun des 12 textes n'aurait
+été inséré. Un script de contrôle relit désormais chaque fichier SQL :
+il vérifie que chaque instruction se termine, que les listes de réponses
+sont du JSON valide, et que **la bonne réponse figure bien parmi les choix
+proposés**. Les six fichiers de contenu passent ce contrôle.
+
+    python3 scripts/check-seeds.py supabase/seed-vocabulary-3.sql supabase/seed-reading-3.sql
+
+À relancer avant de passer tout nouveau script en base : il ne se connecte
+à rien, il relit seulement le texte.
 
 ## Décisions structurantes de la session du 17 août
 
@@ -222,10 +271,11 @@ Priorité pédagogique décidée le 16 août (après recherche sur les méthodes
 d'apprentissage et le format TOEIC) :
 
 - [ ] **Plus de contenu, à la main** — seule voie gratuite vers le volume.
-      690 exercices, c'est 115 par niveau CECRL : un apprenant assidu les
-      épuise en quelques mois. Le TOEIC suppose un socle d'environ 3 000
-      mots. Continuer par séries marquées (`[voc3]`, positions 25+) pour
-      rester rejouable sans rien écraser.
+      840 exercices, c'est 140 par niveau CECRL. Le TOEIC suppose un socle
+      d'environ 3 000 mots : il en reste donc à écrire. La prochaine série
+      se marque `[voc4]` pour le vocabulaire et prend les positions 37 et
+      suivantes pour la lecture — c'est ce marquage, et lui seul, qui
+      permet de rejouer un script sans effacer les précédents.
 - [ ] ~~**Mode enseignant**~~ — laissé de côté à la demande de Loïc le
       17/08/2026. Ne pas le relancer sans qu'il le redemande.
 - [ ] **Voix neuronales enregistrées** — le champ `audio_url` est prêt sur
