@@ -106,7 +106,7 @@ insert into exercises (lesson_id, type, question, options, correct_answer, expla
 
 -- ---------- B2.5 Anglais professionnel ----------
 insert into exercises (lesson_id, type, question, options, correct_answer, explanation) values
-(20, 'qcm', 'Comment ouvrir un email formel sans connaître le destinataire ?', '["Dear Sir or Madam,","Hey there,","Hello you,","To whom,"]', 'Dear Sir or Madam,', '« To whom it may concern » convient aussi, mais est plus impersonnel.'),
+(20, 'qcm', 'Comment ouvrir un e-mail formel sans connaître le destinataire ?', '["Dear Sir or Madam,","Hey there,","Hello you,","To whom,"]', 'Dear Sir or Madam,', '« To whom it may concern » convient aussi, mais est plus impersonnel.'),
 (20, 'trous', 'Complète : « I look forward to ___ from you. » (avoir de vos nouvelles)', null, 'hearing', 'Après « look forward to », le verbe prend -ing : « to » est ici une préposition.'),
 (20, 'traduction', 'Traduis en anglais : « Merci de votre réponse rapide. »', null, 'Thank you for your prompt reply / Thank you for your quick reply', '« Prompt » relève du registre professionnel.'),
 (20, 'qcm', 'Que signifie « Let us touch base next week » ?', '["Reprenons contact la semaine prochaine","Changeons de base","Repartons de zéro","Réservons une salle"]', 'Reprenons contact la semaine prochaine', 'Expression très courante en entreprise, empruntée au baseball.'),

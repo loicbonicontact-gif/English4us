@@ -165,7 +165,7 @@ insert into exercises (lesson_id, type, question, options, correct_answer, expla
 
 -- ---------- B2.5 Anglais professionnel ----------
 insert into exercises (lesson_id, type, question, options, correct_answer, explanation) values
-(20, 'qcm', 'Quelle formule clôt le mieux un email formel ?', '["Kind regards,","Bye!","See ya,","Love,"]', 'Kind regards,', '« Kind regards » ou « Best regards » conviennent au registre professionnel. Les autres sont familiers ou affectifs.'),
+(20, 'qcm', 'Quelle formule clôt le mieux un e-mail formel ?', '["Kind regards,","Bye!","See ya,","Love,"]', 'Kind regards,', '« Kind regards » ou « Best regards » conviennent au registre professionnel. Les autres sont familiers ou affectifs.'),
 (20, 'trous', 'Complète : « Please find ___ the report you requested. » (ci-joint)', null, 'attached', '« Please find attached » est la formule consacrée pour une pièce jointe.'),
 (20, 'traduction', 'Traduis en anglais : « Pourriez-vous confirmer votre disponibilité ? »', null, 'Could you confirm your availability', '« Could you » marque une demande polie, plus douce que « can you ».');
 

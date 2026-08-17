@@ -5,11 +5,11 @@ import Mascot from './Mascot'
 // Traduit les erreurs Supabase (anglais) en messages clairs en français.
 function translateAuthError(message = '') {
   const m = message.toLowerCase()
-  if (m.includes('invalid login credentials')) return 'Email ou mot de passe incorrect.'
-  if (m.includes('user already registered')) return 'Un compte existe déjà avec cet email. Essaie de te connecter.'
+  if (m.includes('invalid login credentials')) return 'E-mail ou mot de passe incorrect.'
+  if (m.includes('user already registered')) return 'Un compte existe déjà avec cet e-mail. Essaie de te connecter.'
   if (m.includes('password should be at least')) return 'Le mot de passe doit contenir au moins 6 caractères.'
-  if (m.includes('unable to validate email')) return "Cette adresse email n'est pas valide."
-  if (m.includes('email not confirmed')) return 'Confirme ton email avant de te connecter (vérifie ta boîte de réception).'
+  if (m.includes('unable to validate email')) return "Cette adresse e-mail n'est pas valide."
+  if (m.includes('email not confirmed')) return 'Confirme ton e-mail avant de te connecter (vérifie ta boîte de réception).'
   if (m.includes('rate limit') || m.includes('too many')) return 'Trop de tentatives. Patiente une minute avant de réessayer.'
   if (m.includes('failed to fetch') || m.includes('networkerror')) return 'Connexion au serveur impossible. Vérifie ta connexion internet.'
   return message || 'Une erreur inattendue est survenue.'
@@ -92,12 +92,12 @@ export default function Auth() {
                 autoComplete="nickname"
                 maxLength={20}
               />
-              <span className="field-hint">Visible dans le classement. Laisse vide pour en générer un.</span>
+              <span className="field-hint">Ton nom dans l'application. Laisse vide pour en générer un.</span>
             </label>
           )}
 
           <label className="field">
-            <span className="field-label">Email</span>
+            <span className="field-label">E-mail</span>
             <input
               type="email"
               value={email}

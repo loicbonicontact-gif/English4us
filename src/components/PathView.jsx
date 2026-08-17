@@ -60,7 +60,10 @@ export default function PathView({
             <Mascot mood="thinking" size={64} className="placement-invite-mascot" />
             <div className="placement-invite-text">
               <p className="resume-eyebrow">Avant de commencer</p>
-              <h2 className="placement-invite-title">Tu sais déjà un peu d'anglais ?</h2>
+              {/* « savoir un peu d'anglais » est un calque de l'anglais
+                  (to know some English). En francais on PARLE une langue,
+                  ou on en a des bases. */}
+              <h2 className="placement-invite-title">Tu parles déjà un peu anglais ?</h2>
               <p className="placement-invite-sub">
                 Cinq minutes pour trouver ton point de départ, au lieu de
                 traverser des leçons que tu connais déjà.
