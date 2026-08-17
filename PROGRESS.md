@@ -1,8 +1,55 @@
 # Où on en est — English4us
 
-Dernière mise à jour : 16 août 2026
+Dernière mise à jour : 17 août 2026
 
-## Fait dans cette session (3/3) — expression orale
+## Contenu en base — état au 17 août 2026
+
+| Type | Quantité |
+|---|---|
+| Exercices de leçon | 540 (18 par leçon) |
+| dont vocabulaire | 150 |
+| dont dictées audio | 60 |
+| dont expression orale | 60 |
+| Passages d'écoute | 18 (48 questions) |
+| Textes de lecture | 12 (36 questions) |
+
+Scripts à rejouer si la base est recréée, **dans cet ordre** :
+`schema.sql` (base vide uniquement), `seed.sql`, `seed-extra-a/b/c.sql`,
+`seed-dictation.sql`, `seed-speaking.sql`, `seed-vocabulary.sql`,
+`migration-review-queue.sql`, `migration-listening.sql`,
+`seed-listening.sql`, `migration-reading.sql`, `seed-reading.sql`.
+
+Avec la révision espacée (5 rencontres par item), cela représente de
+l'ordre de **3 000 rencontres** étalées sur plusieurs mois.
+
+## Décisions structurantes de la session du 17 août
+
+### L'IA payante est retirée du projet
+`api/generate-exercise.js` et `src/lib/aiExercise.js` sont supprimés.
+En vérifiant, la fonction serveur s'est révélée **déployée, publique et
+sans authentification** : n'importe qui trouvant l'adresse pouvait envoyer
+des requêtes facturées sur le compte Anthropic. La clé n'était pas exposée,
+mais son usage l'était. **Ne jamais définir `ANTHROPIC_API_KEY` sur
+Vercel.** Le contenu s'écrit à la main.
+
+### Les cœurs ne bloquent plus jamais dans le temps
+Ce sont les vies de la leçon en cours, remises à cinq au début de chacune.
+Cinq erreurs et la leçon repart du début, immédiatement. Raison : une
+application scolaire ne peut pas mettre un élève en attente. L'apprenant
+est maître de sa progression, jamais l'horloge.
+
+### Tout ce qui est rencontré entre en révision
+La file ne recevait que les exercices ratés : un exercice juste du premier
+coup ne revenait jamais, alors qu'un QCM à quatre choix se réussit une
+fois sur quatre au hasard. Désormais tout y entre, à un palier d'entrée
+différent (J+1 si raté, J+7 si réussi).
+
+### Routage Vercel
+`vercel.json` sert `index.html` sur toutes les routes. Sans lui, toute
+adresse tapée directement ou rechargée renvoyait une 404 — un défaut
+présent depuis le début, invisible tant qu'on partait de l'accueil.
+
+## Fait dans la session du 16 août (3/3) — expression orale
 
 Nouveau type d'exercice `oral` : la phrase anglaise est affichée ET lue
 automatiquement, l'apprenant appuie sur le micro et la répète. 60 exercices,
@@ -37,7 +84,7 @@ ce sont les **vies de la leçon en cours**, remises à cinq au début de
 chacune. Cinq erreurs et la leçon repart du début, immédiatement. Plus
 aucune attente : l'apprenant est maître de sa progression.
 
-## Fait dans cette session (2/3) — écoute et compréhension orale
+## Fait dans la session du 16 août (2/3) — écoute et compréhension orale
 
 ### Dictée audio
 Nouveau type d'exercice `ecoute` : la phrase anglaise n'existe que sous
@@ -86,7 +133,7 @@ dans le quota gratuit mensuel de Google Cloud (1 M) ou d'Azure (500 k).
 Le frein n'est pas l'argent mais l'ouverture d'un compte avec carte
 bancaire — non fait, en attente de décision.
 
-## Fait dans cette session (1/3) — révision espacée
+## Fait dans la session du 16 août (1/3) — révision espacée
 
 La plus grosse lacune pédagogique de l'app est comblée : une leçon terminée
 n'était plus jamais revue, donc ce qui était appris s'oubliait.
@@ -154,10 +201,16 @@ Refonte complète de l'interface d'après le handoff de design
 Priorité pédagogique décidée le 16 août (après recherche sur les méthodes
 d'apprentissage et le format TOEIC) :
 
-- [ ] **Voix neuronales enregistrées** — ouvrir un compte Google Cloud ou
-      Azure, générer les fichiers une fois, remplir `audio_url`. Gratuit au
-      vu du volume, mais demande une carte bancaire. Décision en attente.
-- [ ] **Lecture de passage** — email, annonce, article puis questions.
+- [ ] **Plus de contenu, à la main** — c'est la seule voie gratuite vers
+      le volume. 540 exercices, c'est 90 par niveau CECRL : un apprenant
+      assidu les épuise en quelques semaines. Le TOEIC suppose un socle
+      d'environ 3 000 mots. Priorité suggérée : vocabulaire, puis textes
+      de lecture (partie 7 = 54 questions sur 200).
+- [ ] **Examen blanc TOEIC** chronométré, score estimé 10-990. Suppose
+      200 questions au format réel : gros travail de contenu.
+- [ ] **Voix neuronales enregistrées** — le champ `audio_url` est prêt sur
+      chaque passage. Tient dans le quota gratuit de Google Cloud ou Azure,
+      mais demande un compte avec carte bancaire. En attente de décision.
       Partie 7 du TOEIC : 54 questions sur 200.
 - [ ] **Réponse orale** — reconnaissance vocale du navigateur (absente de
       Firefox). L'évaluation d'une réponse libre demanderait l'API Claude,
