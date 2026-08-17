@@ -63,6 +63,22 @@ Tant que ce n'est pas fait, l'application se comporte exactement comme
 avant : sans cle publique et sans la colonne `push_asked_at`, l'invitation
 n'apparait jamais et le reglage reste masque dans le profil.
 
+**ETAT INCERTAIN A VERIFIER EN PRIORITE** : le 17/08 au soir, Loic a colle
+`migration-push-cron.sql` d'un seul bloc dans l'editeur SQL. Consequences
+probables — l'etape du coffre a ete IGNOREE (elle est livree en commentaire),
+et une tache planifiee a ete creee avec l'adresse litterale « TON-PROJET »,
+donc qui echoue chaque jour sans rien dire.
+
+`supabase/diagnostic-push.sql` (ne modifie rien) repond en cinq blocs : table
+creee ou non, colonne presente ou non, cle dans le coffre ou non, tache
+correcte ou a refaire, dernieres executions. **A passer avant de toucher a
+quoi que ce soit d'autre sur les rappels.**
+
+Aucune fuite : verifie le 17/08, la cle n'est ni dans le dossier de travail,
+ni dans un commit, ni sur GitHub. L'editeur SQL de Supabase garde en revanche
+un historique des requetes — l'entree contenant la cle est a supprimer de la
+colonne de gauche.
+
 **Ce que je n'ai PAS pu verifier moi-meme** : l'envoi reel. Il demande un
 projet Supabase deploye, des secrets et une tache planifiee. Le choix du
 message, lui, est teste (14 tests) — c'est la partie ou une erreur se voit.
