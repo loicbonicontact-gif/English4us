@@ -48,6 +48,94 @@ Scripts à rejouer si la base est recréée, **dans cet ordre** :
 Avec la révision espacée (5 rencontres par item), cela représente de
 l'ordre de **3 000 rencontres** étalées sur plusieurs mois.
 
+## EN ATTENTE — un script a passer
+
+`supabase/migration-feedback.sql` — cree la table `app_feedback` et ajoute la
+colonne `profiles.feedback_asked_at`. Ne touche a aucune donnee existante.
+
+Tant qu'il n'est pas passe, **rien ne change** : `shouldAskFeedback` renvoie
+faux quand la colonne est absente, donc la question n'est jamais posee, et la
+ligne « Ta note » ne s'affiche pas dans le profil. La politique de
+confidentialite, elle, fonctionne des maintenant — elle ne depend d'aucune
+table.
+
+## Ecrit le 17 aout — note de l'application, et le RGPD au passage
+
+Demande de Loic : un popup apres quelques lecons pour noter l'application, et
+« verifie le RGPD pour l'appli aussi ».
+
+### Ce que la verification a trouve, et qui ne concerne pas le popup
+**L'application n'avait AUCUNE politique de confidentialite.** Aucune
+mention, aucune page, aucun lien — verifie par recherche dans tout le code.
+Or elle collecte une adresse e-mail, un pseudo, une progression complete, et
+de la voix pendant les exercices de prononciation.
+
+C'etait un manquement present avant la demande, et plus serieux qu'elle.
+Ajouter un champ de commentaire libre sans regler ca d'abord l'aurait
+aggrave : un champ libre est l'endroit exact ou l'on ecrit son nom ou son
+ecole sans y penser.
+
+### Reponses de Loic qui ont cadre le travail
+- **Public** : mineurs comme majeurs, tout le monde.
+- **Hebergement** : Supabase en Irlande, donc dans l'UE — aucun transfert
+  hors Union a documenter pour la base.
+- **Formulaire** : note seule, pas de commentaire.
+
+### La note : ce qui a ete decide, et pourquoi
+- **Une seule fois dans la vie d'un compte.** `feedback_asked_at` est rempli
+  que la personne note OU refuse. Un refus ne cree aucune ligne d'avis —
+  refuser, c'est ne rien donner, pas meme une ligne qui dirait « a refuse ».
+- **Aucune recompense.** Pas d'XP, pas de coeur, rien de debloque contre une
+  note. L'application s'adresse aussi a des mineurs : offrir quelque chose
+  contre un avis, c'est acheter l'avis d'un enfant.
+- **Le bouton dit « Non merci », pas « Plus tard ».** Ecrit « Plus tard »
+  d'abord, puis corrige : on ne redemande jamais, donc « plus tard » serait
+  faux. Un bouton qui ment sur ce qu'il fait est un piege, meme quand il
+  arrange.
+- **Retirable en un bouton** depuis le profil. Le droit a l'effacement n'a de
+  valeur que s'il tient en un geste : faire ecrire un e-mail pour retirer une
+  note sur 5 serait un refus deguise.
+- **Cinq lecons** avant de demander. Moins, on demande son avis a quelqu'un
+  qui n'en a pas ; plus, on ne demande jamais rien a la majorite, qui
+  s'arrete avant.
+
+### La politique de confidentialite
+`/confidentialite`, joignable depuis le profil **et depuis l'ecran de
+connexion** — c'est la qu'on decide de confier son adresse e-mail, informer
+apres coup n'aurait servi a rien.
+
+Elle couvre les neuf mentions obligatoires et deux points trouves en lisant
+le code :
+- **la voix part chez Google.** La reconnaissance vocale de Chrome ne traite
+  pas l'audio sur l'appareil : elle l'envoie a ses serveurs. C'est ecrit noir
+  sur blanc, avec la consequence pratique (ne pas utiliser les exercices
+  oraux, ou changer de navigateur) ;
+- **les moins de 15 ans.** En France, en dessous de 15 ans, l'accord d'un
+  parent est necessaire en plus de celui de l'enfant. Dit sur l'ecran
+  d'inscription, pas seulement dans le document.
+
+**Deux valeurs restent a completer par Loic** dans `src/components/Privacy.jsx`,
+marquees en clair : l'adresse de contact du responsable de traitement. Elles
+ne peuvent pas etre inventees — un document qui donne une fausse adresse est
+pire qu'un document absent.
+
+Ce texte n'est pas l'avis d'un juriste, et le dit.
+
+### Verifications
+- **229 tests** (+6 sur `lib/feedback`).
+- Verifie dans le navigateur : `role="dialog"`, `aria-modal`, focus a
+  l'ouverture, Echap ferme, etoiles a 48 px avec libelle « 3 sur 5 »,
+  contrastes mesures (etoile allumee 4,86:1, eteinte 5,78:1).
+- Politique lisible a 375 px sans debordement, tableau qui defile dans son
+  cadre.
+- `npm run build` passe. Deux ecrans ajoutes a la previsualisation (17).
+
+### Pas fait
+La notification quotidienne demandee en fin de session. Elle est traitee a
+part : elle demande un serveur (Web Push + VAPID + tache planifiee), et le
+message propose — « tu es a peu de devenir bilingue » — serait faux apres
+cinq lecons. Voir la reponse a Loic.
+
 ## Ecrit le 17 aout — mode hors ligne de l'interface
 
 Ajoute apres la question « comment publier sur les stores ». La reponse

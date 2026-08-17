@@ -16,6 +16,7 @@ import Listening from './components/Listening'
 import Reading from './components/Reading'
 import Exam from './components/Exam'
 import Placement from './components/Placement'
+import Privacy from './components/Privacy'
 
 export default function App() {
   const [session, setSession] = useState(null)
@@ -122,7 +123,10 @@ export default function App() {
     return (
       <>
         <OfflineBanner />
-        <Auth />
+        <Routes>
+          <Route path="/confidentialite" element={<Privacy />} />
+          <Route path="*" element={<Auth />} />
+        </Routes>
       </>
     )
   }
@@ -166,6 +170,7 @@ export default function App() {
             element={<Reading profile={profile} onProfileChange={refreshProfile} />}
           />
           <Route path="/exam" element={<Exam profile={profile} />} />
+          <Route path="/confidentialite" element={<Privacy />} />
           <Route path="/profile" element={<Profile profile={profile} onSignOut={handleSignOut} />} />
           <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Routes>

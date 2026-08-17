@@ -14,7 +14,10 @@ export default function ProfileView({
   onSignOut,
   placementLevel = null,
   placementAvailable = false,
-  onOpenPlacement = () => {}
+  onOpenPlacement = () => {},
+  rating = null,
+  onDeleteRating = () => {},
+  onOpenPrivacy = () => {}
 }) {
   const initial = (username || '?').charAt(0).toUpperCase()
 
@@ -101,6 +104,35 @@ export default function ProfileView({
             aria-label="Sons de l'application"
           >
             <span className="toggle-knob" />
+          </button>
+        </div>
+      </section>
+
+      {/* Le droit a l'effacement n'a de valeur que s'il tient en un bouton.
+          Demander d'ecrire un e-mail pour retirer une note sur 5 serait un
+          refus deguise. La ligne n'apparait que s'il y a une note. */}
+      {rating !== null && (
+        <section className="settings-card">
+          <div className="settings-row">
+            <span className="settings-label">
+              Ta note
+              <span className="settings-hint">Tu as mis {rating} sur 5</span>
+            </span>
+            <button type="button" className="settings-action" onClick={onDeleteRating}>
+              Retirer
+            </button>
+          </div>
+        </section>
+      )}
+
+      <section className="settings-card">
+        <div className="settings-row">
+          <span className="settings-label">
+            Confidentialité
+            <span className="settings-hint">Ce qu'on enregistre, et tes droits</span>
+          </span>
+          <button type="button" className="settings-action" onClick={onOpenPrivacy}>
+            Lire
           </button>
         </div>
       </section>

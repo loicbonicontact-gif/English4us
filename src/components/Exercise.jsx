@@ -6,9 +6,11 @@ import { isCorrect } from '../lib/answers'
 import { recordAnswer } from '../lib/reviews'
 import { speak, stopSpeaking } from '../lib/speech'
 import { usableExercises } from '../lib/exercises'
+import { markFeedbackAsked, saveRating, shouldAskFeedback } from '../lib/feedback'
 import Mascot from './Mascot'
 import ExerciseView from './ExerciseView'
 import LessonEnd from './LessonEnd'
+import FeedbackPrompt from './FeedbackPrompt'
 import { soundComplete, soundCorrect, soundHeart, soundTap, soundWrong } from '../lib/sounds'
 
 // Conteneur de la lecon : chargement, score, coeurs, enregistrement.
@@ -34,6 +36,9 @@ export default function Exercise({ profile, onProfileChange }) {
   const [results, setResults] = useState([])     // une entree par question, pour « A revoir »
   const [finished, setFinished] = useState(false)
   const [reward, setReward] = useState(null)
+  // Demande de note : posee une seule fois dans la vie d'un compte,
+  // apres l'ecran de fin — jamais pendant les questions.
+  const [askFeedback, setAskFeedback] = useState(false)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
 
@@ -161,6 +166,19 @@ export default function Exercise({ profile, onProfileChange }) {
       const result = await completeLesson(profile.id, lesson.id, score, lesson.xp_reward, profile)
       setReward({ ...result, score })
       onProfileChange?.()
+
+      // Compte des lecons terminees, juste apres l'avoir mis a jour. `head`
+      // ne rapatrie aucune ligne : seul le total nous interesse.
+      const { count } = await supabase
+        .from('user_progress')
+        .select('lesson_id', { count: 'exact', head: true })
+        .eq('user_id', profile.id)
+        .eq('completed', true)
+
+      setAskFeedback(shouldAskFeedback({
+        lessonsDone: count ?? 0,
+        feedbackAskedAt: profile.feedback_asked_at
+      }))
     } catch (err) {
       setError(`Progression non enregistrée : ${err.message}`)
     }
@@ -209,6 +227,29 @@ export default function Exercise({ profile, onProfileChange }) {
     return (
       <>
         {error && <p className="alert alert-error" role="alert">{error}</p>}
+
+        {askFeedback && (
+          <FeedbackPrompt
+            onRate={(rating) => {
+              // La note et la marque « deja demande » partent ensemble. Si
+              // l'enregistrement echoue, on ferme quand meme : personne ne
+              // doit rester coince devant une boite a cause du reseau.
+              saveRating(profile.id, rating).catch(() => { /* silencieux */ })
+              markFeedbackAsked(profile.id).catch(() => { /* silencieux */ })
+              setTimeout(() => setAskFeedback(false), 1400)
+              onProfileChange?.()
+            }}
+            onDismiss={() => {
+              // Un refus marque AUSSI la question comme posee : c'est ce qui
+              // garantit qu'on ne revient pas. Aucune ligne d'avis n'est
+              // creee — refuser, c'est ne rien donner.
+              markFeedbackAsked(profile.id).catch(() => { /* silencieux */ })
+              setAskFeedback(false)
+              onProfileChange?.()
+            }}
+          />
+        )}
+
         <LessonEnd
           lesson={lesson}
           score={score}

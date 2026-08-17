@@ -13,6 +13,8 @@ import AppShell from '../src/components/AppShell'
 import PathView from '../src/components/PathView'
 import ExerciseView from '../src/components/ExerciseView'
 import LessonNotesView from '../src/components/LessonNotesView'
+import FeedbackPrompt from '../src/components/FeedbackPrompt'
+import Privacy from '../src/components/Privacy'
 import LessonEnd from '../src/components/LessonEnd'
 import ProfileView from '../src/components/ProfileView'
 import ReviewEnd from '../src/components/ReviewEnd'
@@ -57,7 +59,9 @@ const SCREENS = [
   { key: 'traduction-corrige', label: '14 Traduction corrigée' },
   { key: 'ordre', label: '15 Ordre des mots' },
   { key: 'ordre-corrige', label: '15 Ordre corrigé' },
-  { key: 'fiche', label: '16 Fiche de leçon' }
+  { key: 'fiche', label: '16 Fiche de leçon' },
+  { key: 'note', label: '17 Demande de note' },
+  { key: 'confidentialite', label: '17 Confidentialité' }
 ]
 
 function Preview() {
@@ -163,6 +167,13 @@ function Preview() {
       {screen === 'ordre' && (
         <ExerciseView {...exerciseProps} exercise={demoWordOrderExercise} answer={answer} verdict={null} />
       )}
+      {/* Demande de note : une seule fois, refusable d'un geste. */}
+      {screen === 'note' && (
+        <FeedbackPrompt onRate={() => {}} onDismiss={() => setScreen('parcours')} />
+      )}
+
+      {screen === 'confidentialite' && <Privacy />}
+
       {/* La fiche : la regle avant de commencer, jamais notee. */}
       {screen === 'fiche' && (
         <LessonNotesView

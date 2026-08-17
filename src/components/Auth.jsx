@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import { useState } from 'react'
 import { supabase } from '../supabaseClient'
 import Mascot from './Mascot'
@@ -133,6 +134,15 @@ export default function Auth() {
           <button type="button" className="btn-link" onClick={switchMode}>
             {isSignup ? 'Se connecter' : "S'inscrire"}
           </button>
+        </p>
+
+        {/* Le lien doit etre ICI, avant la creation du compte : c'est le
+            moment ou l'on decide de confier son adresse e-mail. Le reporter
+            au profil reviendrait a informer apres coup. */}
+        <p className="auth-legal">
+          En créant un compte, tu acceptes que ta progression soit enregistrée.{' '}
+          <Link to="/confidentialite" className="btn-link">Confidentialité</Link>
+          {' · '}Moins de 15 ans : demande à un parent.
         </p>
       </div>
     </div>

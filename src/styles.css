@@ -2250,6 +2250,152 @@ html, body { max-width: 100%; overflow-x: hidden; }
    BARRE DE PREVISUALISATION (developpement seulement)
    Presente uniquement sur preview.html, jamais dans l'app.
    ============================================ */
+/* ============================================
+   ECRANS LEGAUX — politique de confidentialite
+
+   Un document qui se lit vraiment : largeur de ligne plafonnee, texte a
+   gauche, titres qui decoupent. Personne ne lit un pave centre.
+   ============================================ */
+.legal-screen {
+  max-width: 680px; margin: 0 auto;
+  padding: var(--sp-5) var(--sp-4) var(--sp-6);
+  display: grid; gap: var(--sp-4);
+}
+
+.legal-title {
+  margin: 0;
+  font-family: var(--font-title); font-size: 30px; font-weight: 600;
+  color: var(--ink);
+}
+
+.legal-updated { margin: -10px 0 0; font-size: 13.5px; color: var(--ink-3); }
+
+.legal-block { display: grid; gap: 8px; }
+
+.legal-block h2 {
+  margin: 0;
+  font-family: var(--font-title); font-size: 19px; font-weight: 600;
+  color: var(--accent-dark);       /* 6,9:1 sur le fond d'app */
+}
+
+.legal-block p {
+  margin: 0;
+  font-size: 15.5px; line-height: 1.55;
+  color: var(--ink-2);             /* 9,8:1 */
+}
+
+.legal-block a { color: var(--accent-dark); }
+
+/* Le tableau deborde sur telephone : il defile DANS son cadre, jamais la
+   page entiere — regle d'interface n° 8. */
+.legal-table {
+  display: block; overflow-x: auto;
+  width: 100%; border-collapse: collapse;
+  font-size: 14.5px;
+}
+
+.legal-table th, .legal-table td {
+  padding: 9px 11px;
+  border-bottom: 1px solid var(--border);
+  text-align: left; vertical-align: top;
+  color: var(--ink-2);
+}
+
+.legal-table th { color: var(--ink); font-weight: 700; white-space: nowrap; }
+
+.auth-legal {
+  margin: 12px 0 0;
+  font-size: 12.5px; line-height: 1.5; text-align: center;
+  color: var(--ink-3);             /* 4,8:1 */
+}
+
+/* ============================================
+   DEMANDE DE NOTE — posee une seule fois
+
+   Rien ici ne pousse a repondre : pas de recompense, pas de compte a
+   rebours, et le bouton de refus a exactement le meme poids visuel que les
+   etoiles. L'application s'adresse aussi a des mineurs.
+   ============================================ */
+.feedback-veil {
+  position: fixed; inset: 0; z-index: 60;
+  display: grid; place-items: center;
+  padding: var(--sp-4);
+  background: rgba(20, 22, 26, .45);
+}
+
+.feedback-box {
+  position: relative;
+  width: 100%; max-width: 380px;
+  display: grid; justify-items: center; gap: 10px;
+  padding: 26px 22px 18px;
+  background: var(--surface);
+  border-radius: var(--r-lg);
+  box-shadow: 0 18px 48px rgba(20, 22, 26, .28);
+  text-align: center;
+}
+
+.feedback-close {
+  position: absolute; top: 8px; right: 8px;
+  width: 44px; height: 44px;          /* cible tactile */
+  display: grid; place-items: center;
+  border: none; border-radius: 50%;
+  background: transparent; color: var(--ink-2);
+  cursor: pointer;
+}
+
+.feedback-title {
+  margin: 0;
+  font-family: var(--font-title); font-size: 25px; font-weight: 600;
+  color: var(--ink);
+}
+
+.feedback-sub { margin: 0; font-size: 15.5px; color: var(--ink-2); }
+
+.feedback-stars { display: flex; gap: 2px; margin: 4px 0; }
+
+.feedback-star {
+  width: 48px; height: 48px;          /* cible tactile */
+  display: grid; place-items: center;
+  border: none; border-radius: 12px;
+  background: transparent;
+  color: #5f6672;                     /* eteinte  5,78:1 sur blanc, mesure */
+  cursor: pointer;
+  transition: transform .15s ease, color .15s ease;
+}
+
+.feedback-star.is-lit { color: #96690a; }   /* allumee  4,86:1 sur blanc, mesure */
+
+@media (hover: hover) {
+  .feedback-star:hover { transform: scale(1.12); }
+}
+
+.feedback-legal {
+  margin: 2px 0 0;
+  font-size: 12.5px; line-height: 1.45;
+  color: var(--ink-3);                /* 4,8:1 */
+}
+
+/* Meme poids visuel que le reste : refuser ne doit pas etre plus difficile
+   que d'accepter. */
+.feedback-later {
+  margin-top: 2px;
+  padding: 12px 18px;
+  min-height: 44px;
+  border: none; border-radius: var(--r-pill);
+  background: transparent; color: var(--ink-2);
+  font-family: var(--font); font-size: 15px; font-weight: 600;
+  cursor: pointer;
+}
+
+@media (hover: hover) {
+  .feedback-later:hover, .feedback-close:hover { background: var(--surface-off); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .feedback-star { transition: none; }
+  .feedback-star:hover { transform: none; }
+}
+
 /* --- Bandeau hors ligne ---
    Ambre plutot que framboise : perdre le reseau dans un train n'est pas une
    erreur de l'apprenant, et la framboise est reservee aux fautes et aux

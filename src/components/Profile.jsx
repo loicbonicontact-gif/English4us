@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { supabase } from '../supabaseClient'
 import { levelProgress } from '../lib/gamification'
 import { isSoundOn, setSoundOn } from '../lib/sounds'
+import { deleteRating, fetchRating } from '../lib/feedback'
 import ProfileView from './ProfileView'
 
 // Met en forme la date d'inscription : « août 2026 ».
@@ -19,10 +20,16 @@ export default function Profile({ profile, onSignOut }) {
   const navigate = useNavigate()
   const [stats, setStats] = useState({ lessonsDone: 0, accuracy: null })
   const [soundOn, setSound] = useState(isSoundOn())
+  // `null` = pas de note, ou table absente (migration pas passee). Dans les
+  // deux cas la ligne ne s'affiche pas : rien a retirer.
+  const [rating, setRating] = useState(null)
 
   useEffect(() => {
     if (!profile?.id) return
     let active = true
+    fetchRating(profile.id)
+      .then((value) => { if (active) setRating(value) })
+      .catch(() => { /* table absente : aucune note a montrer */ })
 
     supabase
       .from('user_progress')
@@ -67,6 +74,15 @@ export default function Profile({ profile, onSignOut }) {
       // masque la ligne plutot que d'offrir un bouton qui echouerait.
       placementAvailable={profile.placement_taken_at !== undefined}
       onOpenPlacement={() => navigate('/placement')}
+      rating={rating}
+      onDeleteRating={() => {
+        // Retire de l'ecran tout de suite, puis en base. L'inverse ferait
+        // attendre le reseau pour un geste qui doit paraitre immediat — et
+        // en cas d'echec, la note reapparaitra au prochain chargement.
+        setRating(null)
+        deleteRating(profile.id).catch(() => { /* silencieux */ })
+      }}
+      onOpenPrivacy={() => navigate('/confidentialite')}
     />
   )
 }
