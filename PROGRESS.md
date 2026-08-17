@@ -81,11 +81,20 @@ c'est-à-dire uniquement de l'A1 et de l'A2, quel que soit le niveau de
 l'apprenant. La limite passe à 1 000 : les six niveaux sont maintenant
 représentés.
 
-**Non vérifié en conditions réelles** : l'examen demande un compte connecté
-et une base chargée. Les invariants sont couverts par 10 nouveaux tests
-automatiques (123 au total) — jamais plus que la cible, jamais un passage
-coupé, jamais deux examens identiques — mais l'écran lui-même n'a pas été
-ouvert depuis cette session.
+**Vérifié en conditions réelles** le 17/08 sur iPhone, base complète :
+« 199 questions · 119 minutes », 100 d'écoute et 99 de lecture. Les
+invariants sont par ailleurs couverts par 10 tests automatiques (123 au
+total) : jamais plus que la cible, jamais un passage coupé, jamais deux
+examens identiques.
+
+**À retenir pour les prochaines fois** : la première vérification a montré
+les anciens chiffres (240 questions). Ce n'était pas un bug mais le délai de
+construction de Vercel — une ou deux minutes entre le `git push` et la mise
+en ligne. Avant de conclure qu'un correctif ne marche pas, recharger la page
+une minute plus tard. En cas de doute, cette commande dit quelle version le
+site sert réellement :
+
+    curl -s https://english4us.vercel.app/ | grep -oE 'assets/index-[A-Za-z0-9_-]+\.js'
 
 ## Écrit le 17 août — l'écoute rattrape son retard
 
