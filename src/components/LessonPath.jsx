@@ -67,6 +67,7 @@ export default function LessonPath({ userId }) {
       onOpen={(id) => navigate(`/lesson/${id}`)}
       onOpenListening={(id) => navigate(`/listening/${id}`)}
       onOpenReading={(id) => navigate(`/reading/${id}`)}
+      onOpenExam={() => navigate('/exam')}
     />
   )
 }

@@ -18,6 +18,9 @@ import LeaderboardView from '../src/components/LeaderboardView'
 import ReviewEnd from '../src/components/ReviewEnd'
 import ListeningView from '../src/components/ListeningView'
 import ReadingView from '../src/components/ReadingView'
+import ExamView from '../src/components/ExamView'
+import ExamResult from '../src/components/ExamResult'
+import { gradeExam } from '../src/lib/exam'
 import Mascot from '../src/components/Mascot'
 import { demoBoard, demoDictation, demoExercise, demoLesson, demoListeningQuestions, demoPassage, demoReading, demoReadingQuestions, demoSpeaking, demoPath, demoProfile, demoResults } from './fixtures'
 
@@ -40,7 +43,9 @@ const SCREENS = [
   { key: 'ecoute-question', label: '09 Écoute question' },
   { key: 'ecoute-verdict', label: '09 Écoute verdict' },
   { key: 'lecture-intro', label: '11 Lecture intro' },
-  { key: 'lecture', label: '11 Lecture question' }
+  { key: 'lecture', label: '11 Lecture question' },
+  { key: 'examen', label: '12 Examen' },
+  { key: 'examen-fin', label: '12 Examen score' }
 ]
 
 function Preview() {
@@ -165,6 +170,35 @@ function Preview() {
             onValidate={() => {}}
             onNext={() => {}}
             onQuit={() => setScreen('parcours')}
+          />
+        </AppShell>
+      )}
+
+      {screen === 'examen' && (
+        <ExamView
+          question={{ id: 1, question: 'What is the main purpose of the email?', options: ['To confirm a booking', 'To cancel an order', 'To request a refund', 'To apply for a job'], passage: demoReading }}
+          index={44}
+          total={114}
+          section="reading"
+          answer={answer}
+          remainingMs={4 * 60 * 1000 + 12 * 1000}
+          onAnswer={setAnswer}
+          onNext={() => {}}
+          onQuit={() => setScreen('parcours')}
+        />
+      )}
+
+      {screen === 'examen-fin' && (
+        <AppShell profile={demoProfile} dueCount={0}>
+          <ExamResult
+            result={gradeExam(
+              { listening: [{ id: 1, correct_answer: 'A' }, { id: 2, correct_answer: 'B' }],
+                reading: [{ id: 3, correct_answer: 'C' }, { id: 4, correct_answer: 'D' }] },
+              { 1: 'A', 2: 'B', 3: 'C', 4: 'wrong' }
+            )}
+            timedOut={false}
+            onBack={() => {}}
+            onRetry={() => {}}
           />
         </AppShell>
       )}

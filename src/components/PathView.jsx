@@ -1,4 +1,4 @@
-import { IconCheck, IconChevron, IconHeadphones, IconPlay, IconRead, IconRedo } from './Icons'
+import { IconCap, IconCheck, IconChevron, IconHeadphones, IconPlay, IconRead, IconRedo } from './Icons'
 import Mascot from './Mascot'
 
 // Description courte de chaque niveau : donne un but, au lieu d'un simple code.
@@ -14,7 +14,7 @@ export const LEVEL_BLURB = {
 // Affichage pur du parcours : aucune requete, tout arrive en props.
 // Le chargement vit dans LessonPath.jsx — cette separation permet de
 // verifier l'ecran avec des donnees de test (voir dev/preview.jsx).
-export default function PathView({ path, onOpen, onOpenListening = () => {}, onOpenReading = () => {} }) {
+export default function PathView({ path, onOpen, onOpenListening = () => {}, onOpenReading = () => {}, onOpenExam = () => {} }) {
   const done = path.decorated.filter((l) => l.completed).length
   const total = path.decorated.length
   const percent = total > 0 ? Math.round((done / total) * 100) : 0
@@ -66,6 +66,20 @@ export default function PathView({ path, onOpen, onOpenListening = () => {}, onO
             <Mascot mood="happy" size={86} className="resume-mascot" />
           </section>
         )}
+
+        {/* Examen blanc. Il ne vit pas dans un niveau : il les traverse
+            tous, et se refait autant de fois qu'on veut pour mesurer ses
+            progres d'un essai a l'autre. */}
+        <button type="button" className="exam-entry" onClick={onOpenExam}>
+          <span className="exam-entry-icon"><IconCap size={22} /></span>
+          <span className="exam-entry-text">
+            <span className="exam-entry-title">Examen blanc TOEIC</span>
+            <span className="exam-entry-sub">
+              Chronométré, deux sections, score estimé sur 990
+            </span>
+          </span>
+          <IconChevron size={18} className="listen-entry-chevron" />
+        </button>
 
         {/* La progression apparait ici sur telephone, dans la colonne de
             droite sur grand ecran — d'ou le duplicata masque en CSS. */}

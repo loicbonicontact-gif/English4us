@@ -1557,6 +1557,150 @@ html, body { max-width: 100%; overflow-x: hidden; }
 .review-empty .btn-wide { max-width: 420px; margin-top: var(--sp-2); }
 
 /* ============================================
+   12 · EXAMEN BLANC
+   ============================================ */
+
+/* --- Entree depuis le parcours --- */
+.exam-entry {
+  display: flex; align-items: center; gap: 12px; width: 100%;
+  min-height: 44px; padding: 14px 16px;
+  border: 1px solid var(--accent); border-radius: var(--r-lg);
+  background: var(--accent-tint);
+  cursor: pointer; text-align: left;
+  transition: transform .18s ease;
+}
+
+.exam-entry-icon {
+  flex: 0 0 auto;
+  display: grid; place-items: center;
+  width: 42px; height: 42px;
+  border-radius: var(--r-md);
+  background: var(--surface);
+  color: var(--accent-dark);            /* 6.9:1 sur blanc */
+}
+
+.exam-entry-text { flex: 1; display: grid; gap: 2px; min-width: 0; }
+.exam-entry-title { font-size: 15.5px; font-weight: 700; color: var(--accent-dark); }
+.exam-entry-sub { font-size: 13px; color: var(--ink-2); }   /* 8.4:1 sur la teinte */
+
+/* --- Presentation avant le depart --- */
+.exam-brief {
+  list-style: none; margin: 0; padding: 0;
+  display: grid; gap: 10px; max-width: 44ch; width: 100%;
+  text-align: left;
+}
+
+.exam-brief li {
+  display: flex; align-items: flex-start; gap: 10px;
+  font-size: 14.5px; color: var(--ink-2);
+}
+
+.exam-brief svg { flex: 0 0 auto; margin-top: 2px; color: var(--accent-dark); }
+
+/* --- Pendant l'epreuve --- */
+.exam-section {
+  display: flex; align-items: center; gap: 7px;
+  margin: 0;
+  font-size: 12.5px; font-weight: 700; letter-spacing: .04em;
+  text-transform: uppercase;
+  color: var(--accent-dark);
+}
+
+.exam-count {
+  margin-left: auto;
+  letter-spacing: 0; text-transform: none; font-weight: 600;
+  color: var(--ink-3);                  /* 4.8:1 sur le fond d'app */
+}
+
+/* Chronometre. Il reste discret tout du long : afficher l'urgence en
+   permanence stresserait sans rien apporter. */
+.exam-clock {
+  padding: 5px 10px;
+  border-radius: var(--r-pill);
+  background: var(--surface-off);
+  color: var(--ink-2);                  /* 8.1:1 sur surface-off */
+  font-size: 14px; font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* Cinq dernieres minutes seulement. */
+.exam-clock.is-urgent {
+  background: var(--error-tint);
+  color: var(--error-dark);             /* 8.7:1 sur la teinte */
+}
+
+.exam-question {
+  margin: 0;
+  font-family: var(--font); font-size: 19px; font-weight: 700;
+  line-height: 1.35; letter-spacing: 0;
+  color: var(--ink);
+}
+
+.exam-warning {
+  margin: 8px 0 0; text-align: center;
+  font-size: 12.5px; color: var(--ink-3);
+}
+
+/* --- Resultat --- */
+.exam-result {
+  display: flex; flex-direction: column; align-items: center; text-align: center;
+  gap: 10px;
+  padding: var(--sp-6) var(--sp-4);
+}
+
+.exam-result-label {
+  margin: 0;
+  font-size: 12.5px; font-weight: 700; letter-spacing: .05em;
+  text-transform: uppercase; color: var(--ink-3);
+}
+
+/* Le score en grand : c'est ce que l'apprenant vient chercher. */
+.exam-result-score {
+  margin: 0;
+  font-family: var(--font-title); font-size: 60px; font-weight: 600;
+  line-height: 1; color: var(--accent-dark);
+  font-variant-numeric: tabular-nums;
+}
+
+.exam-result-dash { margin: 0 6px; color: var(--chevron); }
+.exam-result-scale { margin: 0; font-size: 14px; color: var(--ink-3); }
+
+.exam-result-level { margin: 4px 0 0; font-size: 15.5px; color: var(--ink-2); }
+.exam-result-level b { color: var(--ink); }
+
+.exam-result .review-tiles { max-width: 420px; grid-template-columns: 1fr 1fr; }
+.exam-result .review-end-actions { max-width: 420px; }
+
+/* L'avertissement sur la valeur du score. Encadre, jamais cache : une
+   ecole qui decouvrirait la limite apres coup perdrait confiance. */
+.exam-caveat {
+  max-width: 52ch;
+  margin-top: var(--sp-3);
+  padding: 16px 18px;
+  border: 1px solid var(--border); border-radius: var(--r-lg);
+  background: var(--surface);
+  text-align: left;
+}
+
+.exam-caveat h2 {
+  margin: 0 0 8px;
+  font-family: var(--font); font-size: 14.5px; font-weight: 700;
+  letter-spacing: 0; color: var(--ink);
+}
+
+.exam-caveat p {
+  margin: 0 0 8px;
+  font-size: 13.5px; line-height: 1.55; color: var(--ink-2);
+}
+
+.exam-caveat p:last-child { margin-bottom: 0; }
+
+@media (hover: hover) {
+  .exam-entry:hover { transform: translateY(-2px); }
+}
+
+/* ============================================
    11 · COMPREHENSION ECRITE
    Le document reste affiche pendant les questions : au TOEIC on relit
    autant qu'on veut, et la competence est justement d'y retrouver
