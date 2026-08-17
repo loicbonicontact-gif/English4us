@@ -226,8 +226,8 @@ d'apprentissage et le format TOEIC) :
       épuise en quelques mois. Le TOEIC suppose un socle d'environ 3 000
       mots. Continuer par séries marquées (`[voc3]`, positions 25+) pour
       rester rejouable sans rien écraser.
-- [ ] **Mode enseignant** — suivi d'une classe. C'est l'argument
-      commercial qui manque encore pour les établissements.
+- [ ] ~~**Mode enseignant**~~ — laissé de côté à la demande de Loïc le
+      17/08/2026. Ne pas le relancer sans qu'il le redemande.
 - [ ] **Voix neuronales enregistrées** — le champ `audio_url` est prêt sur
       chaque passage. Tient dans le quota gratuit de Google Cloud ou Azure,
       mais demande un compte avec carte bancaire. En attente de décision.
