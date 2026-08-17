@@ -17,8 +17,9 @@ import ProfileView from '../src/components/ProfileView'
 import LeaderboardView from '../src/components/LeaderboardView'
 import ReviewEnd from '../src/components/ReviewEnd'
 import ListeningView from '../src/components/ListeningView'
+import ReadingView from '../src/components/ReadingView'
 import Mascot from '../src/components/Mascot'
-import { demoBoard, demoDictation, demoExercise, demoLesson, demoListeningQuestions, demoPassage, demoSpeaking, demoPath, demoProfile, demoResults } from './fixtures'
+import { demoBoard, demoDictation, demoExercise, demoLesson, demoListeningQuestions, demoPassage, demoReading, demoReadingQuestions, demoSpeaking, demoPath, demoProfile, demoResults } from './fixtures'
 
 const SCREENS = [
   { key: 'parcours', label: '01 Parcours' },
@@ -37,7 +38,9 @@ const SCREENS = [
   { key: 'oral-verdict', label: '10 Oral verdict' },
   { key: 'ecoute-intro', label: '09 Écoute intro' },
   { key: 'ecoute-question', label: '09 Écoute question' },
-  { key: 'ecoute-verdict', label: '09 Écoute verdict' }
+  { key: 'ecoute-verdict', label: '09 Écoute verdict' },
+  { key: 'lecture-intro', label: '11 Lecture intro' },
+  { key: 'lecture', label: '11 Lecture question' }
 ]
 
 function Preview() {
@@ -142,6 +145,24 @@ function Preview() {
             onStart={() => setScreen('ecoute-question')}
             onAnswer={setAnswer}
             onValidate={() => setScreen('ecoute-verdict')}
+            onNext={() => {}}
+            onQuit={() => setScreen('parcours')}
+          />
+        </AppShell>
+      )}
+
+      {['lecture-intro', 'lecture'].includes(screen) && (
+        <AppShell profile={demoProfile} dueCount={0}>
+          <ReadingView
+            passage={demoReading}
+            questions={demoReadingQuestions}
+            started={screen === 'lecture'}
+            index={0}
+            answer={answer}
+            verdict={null}
+            onStart={() => setScreen('lecture')}
+            onAnswer={setAnswer}
+            onValidate={() => {}}
             onNext={() => {}}
             onQuit={() => setScreen('parcours')}
           />

@@ -121,3 +121,35 @@ export const demoSpeaking = {
   correct_answer: 'This is my mother and my father',
   explanation: 'Deux « th » différents : celui de « this » est sonore.'
 }
+
+// --- Comprehension ecrite ---
+export const demoReading = {
+  id: 6,
+  level: 'B1',
+  format: 'passage',
+  title: 'Une candidature',
+  context: 'Une candidate écrit à une entreprise, qui lui répond.',
+  xp_reward: 20,
+  documents: [
+    {
+      kind: 'email',
+      title: 'From: Sarah Klein — Subject: Application for Sales Assistant',
+      text: 'Dear Mr Owens,\nI am writing to apply for the position of Sales Assistant advertised on your website.\nI have worked in retail for four years, and for the last two years I have managed a small team.\nI am available from the first of October.\nYours sincerely,\nSarah Klein'
+    },
+    {
+      kind: 'email',
+      title: 'From: James Owens — Subject: Re: Application',
+      text: 'Dear Ms Klein,\nThank you for your application. We were impressed by your experience.\nWe would like to invite you to an interview on 12 September at 10 am.\nPlease confirm by Friday.'
+    }
+  ]
+}
+
+export const demoReadingQuestions = [
+  {
+    id: 1,
+    question: 'How long has Sarah managed a team?',
+    options: ['Two years', 'Four years', 'Six years', 'She has not'],
+    correct_answer: 'Two years',
+    explanation: 'Le texte donne deux durées : quatre ans dans le commerce, deux ans à diriger une équipe.'
+  }
+]
