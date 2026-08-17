@@ -37,7 +37,7 @@ Scripts à rejouer si la base est recréée, **dans cet ordre** :
 `migration-review-queue.sql`, `migration-listening.sql`,
 `seed-listening.sql`, `migration-reading.sql`, `seed-reading.sql`,
 `seed-reading-2.sql`, `seed-vocabulary-2.sql`, `seed-vocabulary-3.sql`,
-`seed-reading-3.sql`, `seed-listening-2.sql`.
+`seed-reading-3.sql`, `seed-listening-2.sql`, `migration-placement.sql`.
 
 Avec la révision espacée (5 rencontres par item), cela représente de
 l'ordre de **3 000 rencontres** étalées sur plusieurs mois.
@@ -48,9 +48,10 @@ Le défaut annoncé la veille est corrigé : un apprenant de niveau B1 ne
 traverse plus quinze leçons connues avant d'atteindre la première qui lui
 apprenne quelque chose.
 
-### À FAIRE AVANT D'UTILISER : un script SQL
-`supabase/migration-placement.sql`, à passer dans Supabase SQL Editor.
-Il ajoute trois colonnes à `profiles` et ne sème aucun contenu.
+### Script SQL — PASSÉ le 17/08
+`supabase/migration-placement.sql`, exécuté dans Supabase SQL Editor et
+confirmé par Loïc. Il ajoute trois colonnes à `profiles` et ne sème aucun
+contenu. À rejouer seulement si la base est recréée.
 **Tant qu'il n'est pas passé, l'application fonctionne exactement comme
 avant** : l'invitation au test et la ligne « Point de départ » du profil
 restent masquées plutôt que d'offrir un bouton qui échouerait.
