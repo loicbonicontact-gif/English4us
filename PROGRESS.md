@@ -13,9 +13,14 @@ Dernière mise à jour : 17 août 2026
 | dont expression orale | 60 |
 | Passages d'écoute | 42 (102 questions) |
 | Textes de lecture | 36 (108 questions) |
+| Fiches de leçon | 30 (une par leçon) |
 
-**Cinq scripts sont écrits mais pas encore passés en base** — ils sont sur
-le Bureau, à exécuter dans cet ordre : `6-vocabulaire-2.sql`,
+**Attention à ne pas confondre deux séries de cinq.** Celle de la section
+« RIEN EN ATTENTE » plus bas est passée le 17/08. Celle-ci, différente, ne
+l'est pas.
+
+**Cinq scripts de contenu sont écrits mais pas encore passés en base** — ils
+sont sur le Bureau, à exécuter dans cet ordre : `6-vocabulaire-2.sql`,
 `7-lecture-2.sql`, `8-vocabulaire-3.sql`, `9-lecture-3.sql`,
 `10-ecoute-2.sql`. Les chiffres
 ci-dessus décrivent donc la base **une fois ces scripts passés**.
@@ -45,37 +50,20 @@ Scripts à rejouer si la base est recréée, **dans cet ordre** :
 Avec la révision espacée (5 rencontres par item), cela représente de
 l'ordre de **3 000 rencontres** étalées sur plusieurs mois.
 
-## EN ATTENTE — cinq scripts à passer, dans cet ordre
+## RIEN EN ATTENTE — les cinq scripts sont passés le 17/08
 
-**1. `supabase/migration-word-order.sql`** — ajoute la valeur `'ordre'` à la
-liste des types d'exercices autorisés. Ne sème rien, ne supprime rien.
+Exécutés dans Supabase SQL Editor et confirmés par Loïc, dans cet ordre :
+`migration-word-order.sql`, `seed-word-order.sql`,
+`migration-lesson-notes.sql`, `seed-lesson-notes.sql`,
+`correction-orthographe.sql`.
 
-**2. `supabase/seed-word-order.sql`** — les 60 exercices « remets les mots
-dans l'ordre ». À passer APRÈS le 1 : sans lui, la contrainte de type refuse
-les lignes, avec un message clair, et rien n'est inséré ni modifié.
+Les deux fonctionnalités écrites ce jour sont donc **actives en base** : le
+type d'exercice `ordre` accepte ses 60 exercices, et les 30 fiches de leçon
+sont lisibles depuis le parcours. Il n'y a plus d'écart entre ce que disent
+les fichiers du dépôt et ce que contient la base.
 
-**3. `supabase/migration-lesson-notes.sql`** — crée la table `lesson_notes`.
-Ne touche à aucune table existante.
-
-**4. `supabase/seed-lesson-notes.sql`** — les 30 fiches de leçon. À passer
-APRÈS le 3. Aucune suppression : `on conflict` met à jour au lieu de
-dupliquer, donc le script est rejouable sans risque.
-
-**5. `supabase/correction-orthographe.sql`** — deux UPDATE, aucun risque,
-aucune suppression. Corrige « un email formel » en « un e-mail formel » dans
-les deux questions concernées. Sans lui, la correction n'existe que dans les
-fichiers ; la base garde l'ancien texte.
-
-Chaque script affiche sa propre vérification. Pour le 2, le compte doit être
-60, et 2 par leçon sur les 30 leçons. Pour le 4, 30 fiches, et la seconde
-requête (les leçons sans fiche) doit être vide. Pour le 5, la première
-requête doit renvoyer 0 ligne, la seconde 2.
-
-**Tant qu'ils ne sont pas passés, l'application fonctionne exactement comme
-avant.** Sans exercice de type `ordre`, aucun écran ne change ; sans la table
-`lesson_notes`, aucun bouton « Voir la fiche » n'apparaît — le parcours
-interroge la table dans un `catch` et repart d'un ensemble vide, plutôt que
-d'offrir un bouton qui mènerait à un écran vide.
+Ces cinq scripts n'ont plus à être rejoués — sauf si la base est recréée,
+auquel cas ils reprennent leur place dans la liste d'ordre ci-dessus.
 
 ## Écrit le 17 août — la fiche de leçon : la règle AVANT l'erreur
 

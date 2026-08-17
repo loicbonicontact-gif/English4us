@@ -111,7 +111,8 @@ A faire, par priorite :
       telephone). 60 exercices ecrits a la main, cibles sur les pieges
       d'ordre des mots du francophone. `options` change de sens pour ce
       type : ce sont les mots INTRUS, pas des propositions de QCM.
-      Necessite migration-word-order.sql puis seed-word-order.sql.
+      Scripts PASSES le 17/08 : migration-word-order.sql puis
+      seed-word-order.sql. A rejouer seulement si la base est recreee.
 - [x] ~~Fiche de lecon consultable avant de commencer~~ — FAIT le 17/08.
       Table `lesson_notes`, 30 fiches ecrites a la main (regle, 3 exemples
       traduits, le piege du francophone). Consultable depuis la carte
@@ -119,7 +120,8 @@ A faire, par priorite :
       Ne donne aucun XP et n'avance aucune progression : lire une regle
       n'est pas la savoir. Pas consultable PENDANT la lecon, volontairement
       (ce serait un exercice a livre ouvert).
-      Necessite migration-lesson-notes.sql puis seed-lesson-notes.sql.
+      Scripts PASSES le 17/08 : migration-lesson-notes.sql puis
+      seed-lesson-notes.sql. A rejouer seulement si la base est recreee.
 - [ ] Classement entre apprenants
 - [ ] Recharge automatique des coeurs (1 par 4h)
 - [ ] Objectif quotidien + defis
