@@ -22,7 +22,8 @@ ci-dessus décrivent donc la base **une fois ces scripts passés**.
 séries séparément.
 
 **Examen blanc** (`/exam`) : n'a aucun contenu propre, il assemble une
-épreuve d'environ 150 questions à partir de ce qui précède.
+épreuve **au format réel — 100 questions d'écoute, 99 de lecture, environ
+1 h 59** à partir de ce qui précède.
 
 **Piège corrigé le 17/08** : `seed-extra-a/b/c.sql` supprimaient tout ce qui
 dépassait les 3 exercices d'origine de chaque leçon. Les relancer après
@@ -40,6 +41,51 @@ Scripts à rejouer si la base est recréée, **dans cet ordre** :
 
 Avec la révision espacée (5 rencontres par item), cela représente de
 l'ordre de **3 000 rencontres** étalées sur plusieurs mois.
+
+## Écrit le 17 août — l'examen blanc passe au format réel
+
+Le contenu suffit désormais à tirer un **échantillon** au lieu de tout
+prendre. Trois défauts disparaissent d'un coup.
+
+### Avant : un examen unique, mal proportionné
+L'assemblage prenait la totalité des questions d'écoute et de lecture.
+Conséquences : deux examens successifs étaient **identiques** (seule la
+partie 5 variait), les proportions ne ressemblaient pas à l'épreuve, et la
+durée dérivait avec le contenu — chaque ajout de texte rallongeait l'examen.
+
+### Maintenant : le format de l'épreuve
+| Section | Cible | Obtenu |
+|---|---|---|
+| Écoute (parties 1-4) | 100 | 99 ou 100 selon le tirage |
+| Phrases à compléter (partie 5) | 30 | 30 |
+| Textes à trous (partie 6) | 16 | 15 |
+| Documents (partie 7) | 54 | 54 |
+
+Durée : environ 1 h 59, contre 2 h à l'épreuve réelle.
+
+### La règle qui commande tout : un passage ne se coupe pas
+Les trois questions d'une conversation portent sur le même enregistrement.
+En tirer une seule ferait écouter deux minutes d'anglais pour une question,
+et fausserait le minutage autant que la difficulté. L'échantillonnage
+choisit donc des **passages entiers**, et saute ceux qui ne rentrent plus
+au lieu de les tronquer.
+
+C'est aussi pourquoi 100 n'est pas toujours atteint : 100 n'est pas un
+multiple de 3. Ce sont les questions-réponses de la partie 2, qui ne
+comptent qu'une question chacune, qui permettent de tomber juste. On
+préfère 99 questions à un passage coupé en deux.
+
+### Un défaut trouvé en chemin
+La partie 5 puisait dans les 200 premiers exercices à choix multiple —
+c'est-à-dire uniquement de l'A1 et de l'A2, quel que soit le niveau de
+l'apprenant. La limite passe à 1 000 : les six niveaux sont maintenant
+représentés.
+
+**Non vérifié en conditions réelles** : l'examen demande un compte connecté
+et une base chargée. Les invariants sont couverts par 10 nouveaux tests
+automatiques (123 au total) — jamais plus que la cible, jamais un passage
+coupé, jamais deux examens identiques — mais l'écran lui-même n'a pas été
+ouvert depuis cette session.
 
 ## Écrit le 17 août — l'écoute rattrape son retard
 
@@ -325,8 +371,9 @@ d'apprentissage et le format TOEIC) :
 - [ ] **Réponse orale** — reconnaissance vocale du navigateur (absente de
       Firefox). L'évaluation d'une réponse libre demanderait l'API Claude,
       donc un coût par exercice.
-- [ ] **Examen blanc TOEIC** chronométré, score estimé 10-990. Suppose
-      200 questions au format réel : gros travail de contenu, pas de code.
+- [x] ~~**Examen blanc TOEIC** au format réel~~ — fait le 17/08. Il reste
+      une limite de fond : le barème du vrai TOEIC n'est pas public, donc
+      le score s'affiche en fourchette de ±50 points.
 
 Reste de la feuille de route :
 

@@ -115,9 +115,73 @@ export function shuffle(list) {
 // officiel.
 // ============================================
 
-// Nombre de questions de « phrases à compléter » (partie 5 du TOEIC),
-// puisées dans les exercices de leçon à choix multiple.
+// Format réel de l'épreuve, en nombre de questions :
+//   écoute  100  (parties 1 à 4)
+//   lecture 100  = 30 phrases à compléter (partie 5)
+//                + 16 textes à trous      (partie 6)
+//                + 54 documents           (partie 7)
+//
+// Tant que le contenu ne suffisait pas, l'examen prenait TOUT ce qui
+// existait : deux examens successifs étaient identiques, et les proportions
+// n'avaient rien à voir avec l'épreuve. Le contenu permet maintenant de
+// tirer un échantillon, donc de s'approcher du format et de varier.
+export const LISTENING_TARGET = 100
 export const PART5_COUNT = 30
+export const PART6_TARGET = 16
+export const PART7_TARGET = 54
+export const READING_TARGET = PART5_COUNT + PART6_TARGET + PART7_TARGET
+
+// Regroupe les questions par passage.
+//
+// Un passage ne se coupe pas : ses trois questions portent sur le même
+// enregistrement ou le même document. En tirer une seule au hasard ferait
+// écouter une conversation entière pour une question, et fausserait le
+// minutage autant que la difficulté.
+export function groupByPassage(questions) {
+  const groups = new Map()
+
+  for (const q of questions) {
+    const key = q.passage?.id
+    if (key == null) continue
+    if (!groups.has(key)) groups.set(key, [])
+    groups.get(key).push(q)
+  }
+
+  return [...groups.values()]
+}
+
+// Tire des passages entiers jusqu'à atteindre la cible, sans jamais la
+// dépasser.
+//
+// Un groupe qui ne rentre plus est sauté, pas tronqué : c'est ce qui permet
+// de tomber juste sur la cible en combinant des passages de 1 et de 3
+// questions. S'il n'y a pas assez de contenu, on rend simplement ce qui
+// existe — l'examen reste jouable, plus court.
+export function selectPassages(groups, target) {
+  const chosen = []
+  let used = 0
+
+  for (const group of shuffle(groups)) {
+    if (used >= target) break
+    if (used + group.length > target) continue
+    chosen.push(group)
+    used += group.length
+  }
+
+  return chosen.flat()
+}
+
+// Ordre des parties d'écoute, comme à l'épreuve : questions-réponses,
+// puis conversations, puis exposés.
+const LISTENING_PART_ORDER = ['question_response', 'conversation', 'talk']
+
+function byListeningPart(a, b) {
+  const rank = (q) => {
+    const i = LISTENING_PART_ORDER.indexOf(q.passage?.format)
+    return i === -1 ? LISTENING_PART_ORDER.length : i
+  }
+  return rank(a) - rank(b)
+}
 
 export async function assembleExam() {
   const [listeningRes, readingRes, part5Res] = await Promise.all([
@@ -133,28 +197,44 @@ export async function assembleExam() {
       .from('exercises')
       .select('id, question, options, correct_answer, explanation')
       .eq('type', 'qcm')
-      .limit(200)
+      // Assez haut pour couvrir les six niveaux. À 200, la limite s'arrêtait
+      // aux premières leçons : la partie 5 ne tirait que de l'A1 et de l'A2,
+      // quel que soit le niveau réel de l'apprenant.
+      .limit(1000)
   ])
 
   if (listeningRes.error) throw listeningRes.error
   if (readingRes.error) throw readingRes.error
   if (part5Res.error) throw part5Res.error
 
-  const listening = (listeningRes.data || [])
+  const listeningPool = (listeningRes.data || [])
     .filter((q) => q.passage)
     .map((q) => ({ ...q, section: 'listening' }))
 
-  // Partie 5 : des phrases isolées, sans document. On en tire un
-  // échantillon au hasard pour que deux examens ne soient pas identiques.
+  const listening = selectPassages(groupByPassage(listeningPool), LISTENING_TARGET)
+    .sort(byListeningPart)
+
+  // Partie 5 : des phrases isolées, sans document.
   const part5 = shuffle(part5Res.data || [])
     .slice(0, PART5_COUNT)
     .map((q) => ({ ...q, section: 'reading', passage: null }))
 
-  const passages = (readingRes.data || [])
+  const readingPool = (readingRes.data || [])
     .filter((q) => q.passage)
     .map((q) => ({ ...q, section: 'reading' }))
 
-  const reading = [...part5, ...passages]
+  // Partie 6 : les textes à trous. Partie 7 : les documents à lire.
+  // Les deux se distinguent par le champ `format` du passage.
+  const part6 = selectPassages(
+    groupByPassage(readingPool.filter((q) => q.passage.format === 'text_completion')),
+    PART6_TARGET
+  )
+  const part7 = selectPassages(
+    groupByPassage(readingPool.filter((q) => q.passage.format === 'passage')),
+    PART7_TARGET
+  )
+
+  const reading = [...part5, ...part6, ...part7]
 
   return {
     listening,

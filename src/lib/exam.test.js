@@ -1,7 +1,14 @@
 import { describe, expect, it } from 'vitest'
 import {
+  LISTENING_TARGET,
+  PART5_COUNT,
+  PART6_TARGET,
+  PART7_TARGET,
+  READING_TARGET,
   SECTION_MAX,
   SECTION_MIN,
+  groupByPassage,
+  selectPassages,
   examDuration,
   formatCountdown,
   gradeExam,
@@ -166,5 +173,85 @@ describe('gradeExam', () => {
     expect(r.range.low).toBeLessThanOrEqual(r.total)
     expect(r.range.high).toBeGreaterThanOrEqual(r.total)
     expect(r.level.label).toBeTruthy()
+  })
+})
+
+// ============================================
+// Assemblage : l'examen tire un échantillon au lieu de tout prendre.
+//
+// Deux exigences se contredisent presque : coller au format de l'épreuve
+// (100 questions par section) et ne jamais couper un passage en deux.
+// Ces tests vérifient que la seconde ne cède pas devant la première.
+// ============================================
+
+const makeGroup = (passageId, count) =>
+  Array.from({ length: count }, (_, i) => ({
+    id: `${passageId}-${i}`,
+    passage: { id: passageId, format: 'conversation' }
+  }))
+
+describe('groupByPassage', () => {
+  it('rassemble les questions d\'un même passage', () => {
+    const groups = groupByPassage([...makeGroup(1, 3), ...makeGroup(2, 1)])
+    expect(groups.map((g) => g.length).sort()).toEqual([1, 3])
+  })
+
+  it('écarte une question orpheline plutôt que de la garder sans passage', () => {
+    // Une question dont le passage a été supprimé arriverait sans énoncé à
+    // écouter : injouable, et le compteur du chronomètre serait faux.
+    expect(groupByPassage([{ id: 'x', passage: null }])).toEqual([])
+  })
+})
+
+describe('selectPassages', () => {
+  const groups = [...Array(40)].map((_, i) => makeGroup(i, 3))
+
+  it('ne dépasse jamais la cible', () => {
+    for (let run = 0; run < 20; run += 1) {
+      expect(selectPassages(groups, 100).length).toBeLessThanOrEqual(100)
+    }
+  })
+
+  it('tombe juste sur la cible quand les tailles le permettent', () => {
+    // 100 n'est pas un multiple de 3 : sans passage à une seule question,
+    // l'échantillon plafonnerait à 99. C'est ce que fournit la partie 2 du
+    // TOEIC, dont chaque item ne compte qu'une question.
+    const mixed = [...groups, makeGroup(99, 1)]
+    expect(selectPassages(mixed, 100).length).toBe(100)
+  })
+
+  it('garde les questions d\'un passage ensemble', () => {
+    const picked = selectPassages(groups, 30)
+    const counts = {}
+    for (const q of picked) counts[q.passage.id] = (counts[q.passage.id] || 0) + 1
+    // Chaque passage retenu l'est en entier : jamais 1 ou 2 questions sur 3.
+    expect(Object.values(counts).every((n) => n === 3)).toBe(true)
+  })
+
+  it('rend ce qui existe quand le contenu ne suffit pas', () => {
+    expect(selectPassages([makeGroup(1, 3)], 100).length).toBe(3)
+  })
+
+  it('ne rend rien plutôt que de tronquer un passage trop gros', () => {
+    expect(selectPassages([makeGroup(1, 3)], 2)).toEqual([])
+  })
+
+  it('ne tire pas deux fois le même examen', () => {
+    const ids = () => selectPassages(groups, 30).map((q) => q.passage.id).join(',')
+    const runs = new Set([ids(), ids(), ids(), ids(), ids(), ids()])
+    expect(runs.size).toBeGreaterThan(1)
+  })
+})
+
+describe('format visé', () => {
+  it('vise 100 questions de lecture réparties comme à l\'épreuve', () => {
+    expect(PART5_COUNT + PART6_TARGET + PART7_TARGET).toBe(READING_TARGET)
+    expect(READING_TARGET).toBe(100)
+    expect(LISTENING_TARGET).toBe(100)
+  })
+
+  it('accorde bien deux heures pour une épreuve complète', () => {
+    const minutes = examDuration(LISTENING_TARGET, READING_TARGET) / 60000
+    expect(minutes).toBe(120)
   })
 })
