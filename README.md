@@ -220,9 +220,18 @@ npx supabase functions deploy daily-reminder
 
 ### 4. Programmer l'envoi
 
-`migration-push-cron.sql`, en suivant les étapes écrites dedans. Ce fichier
-contient des trous à remplir : **ne le commite jamais rempli**, il
-contiendrait une clé qui donne un accès total à ta base.
+`migration-push-cron.sql`, **étape par étape — pas d'un seul bloc**. Colle une
+étape, clique Run, lis le résultat, passe à la suivante. Collé d'un coup, le
+fichier crée une tâche qui appelle l'adresse `TON-PROJET` et échoue chaque
+jour en silence.
+
+Ce fichier contient des trous à remplir : **ne le commite jamais rempli**, il
+contiendrait une clé qui donne un accès total à ta base. À savoir aussi :
+l'éditeur SQL de Supabase garde un historique des requêtes exécutées, donc
+pense à supprimer de cet historique celle qui contient la clé.
+
+Si tu ne sais plus où tu en es, `diagnostic-push.sql` ne modifie rien et
+répond : table créée ou non, clé rangée ou non, tâche correcte ou à refaire.
 
 ### Vérifier que ça marche
 

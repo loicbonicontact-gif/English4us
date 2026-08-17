@@ -12,6 +12,16 @@
 --
 -- À exécuter APRÈS `migration-push.sql` et APRÈS avoir déployé la fonction
 -- `daily-reminder` (voir README.md).
+--
+-- ⚠️ NE COLLE PAS CE FICHIER D'UN SEUL COUP.
+-- Il se lit et s'exécute ÉTAPE PAR ÉTAPE. Colle une étape, clique Run, lis le
+-- résultat, passe à la suivante. Coller l'ensemble d'un bloc a deux effets :
+-- l'étape 2 est ignorée (elle est volontairement en commentaire, pour que la
+-- clé ne traîne pas), et l'étape 3 crée une tâche qui appelle l'adresse
+-- « TON-PROJET » — donc une tâche qui échoue tous les jours en silence.
+--
+-- En cas de doute sur l'état actuel : passe `diagnostic-push.sql`, qui ne
+-- modifie rien et dit ce qui est fait et ce qui manque.
 -- ============================================
 
 -- --------------------------------------------
