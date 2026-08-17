@@ -39,12 +39,13 @@ Scripts à rejouer si la base est recréée, **dans cet ordre** :
 `seed-listening.sql`, `migration-reading.sql`, `seed-reading.sql`,
 `seed-reading-2.sql`, `seed-vocabulary-2.sql`, `seed-vocabulary-3.sql`,
 `seed-reading-3.sql`, `seed-listening-2.sql`, `migration-placement.sql`,
-`migration-word-order.sql`, `seed-word-order.sql`.
+`migration-word-order.sql`, `seed-word-order.sql`,
+`migration-lesson-notes.sql`, `seed-lesson-notes.sql`.
 
 Avec la révision espacée (5 rencontres par item), cela représente de
 l'ordre de **3 000 rencontres** étalées sur plusieurs mois.
 
-## EN ATTENTE — trois scripts à passer, dans cet ordre
+## EN ATTENTE — cinq scripts à passer, dans cet ordre
 
 **1. `supabase/migration-word-order.sql`** — ajoute la valeur `'ordre'` à la
 liste des types d'exercices autorisés. Ne sème rien, ne supprime rien.
@@ -53,18 +54,116 @@ liste des types d'exercices autorisés. Ne sème rien, ne supprime rien.
 dans l'ordre ». À passer APRÈS le 1 : sans lui, la contrainte de type refuse
 les lignes, avec un message clair, et rien n'est inséré ni modifié.
 
-**3. `supabase/correction-orthographe.sql`** — deux UPDATE, aucun risque,
+**3. `supabase/migration-lesson-notes.sql`** — crée la table `lesson_notes`.
+Ne touche à aucune table existante.
+
+**4. `supabase/seed-lesson-notes.sql`** — les 30 fiches de leçon. À passer
+APRÈS le 3. Aucune suppression : `on conflict` met à jour au lieu de
+dupliquer, donc le script est rejouable sans risque.
+
+**5. `supabase/correction-orthographe.sql`** — deux UPDATE, aucun risque,
 aucune suppression. Corrige « un email formel » en « un e-mail formel » dans
 les deux questions concernées. Sans lui, la correction n'existe que dans les
 fichiers ; la base garde l'ancien texte.
 
-Chaque script affiche sa propre vérification. Pour le 3, la première requête
-doit renvoyer 0 ligne, la seconde 2. Pour le 2, le compte doit être 60, et
-2 par leçon sur les 30 leçons.
+Chaque script affiche sa propre vérification. Pour le 2, le compte doit être
+60, et 2 par leçon sur les 30 leçons. Pour le 4, 30 fiches, et la seconde
+requête (les leçons sans fiche) doit être vide. Pour le 5, la première
+requête doit renvoyer 0 ligne, la seconde 2.
 
-**Tant que 1 et 2 ne sont pas passés, l'application fonctionne exactement
-comme avant** : le nouveau format n'existe qu'en base. Sans exercice de type
-`ordre`, aucun écran ne change.
+**Tant qu'ils ne sont pas passés, l'application fonctionne exactement comme
+avant.** Sans exercice de type `ordre`, aucun écran ne change ; sans la table
+`lesson_notes`, aucun bouton « Voir la fiche » n'apparaît — le parcours
+interroge la table dans un `catch` et repart d'un ensemble vide, plutôt que
+d'offrir un bouton qui mènerait à un écran vide.
+
+## Écrit le 17 août — la fiche de leçon : la règle AVANT l'erreur
+
+Jusqu'ici la règle n'existait qu'au singulier, dans le champ `explanation`
+d'un exercice — donc **après s'être trompé**.
+
+C'est tenable pour du vocabulaire : on ne devine pas un mot, on l'apprend en
+le rencontrant. Ça ne l'est pas pour une structure. Personne ne devine le
+present perfect, et se tromper cinq fois avant de lire la règle n'apprend pas
+la règle : ça apprend qu'on n'y arrive pas.
+
+### 30 fiches, une par leçon
+Chaque fiche tient en quatre morceaux, et rien de plus :
+
+| Morceau | Ce qu'il contient |
+|---|---|
+| Titre | la règle annoncée — « Se présenter » devient « Dire son nom et son âge » |
+| Règle | deux à quatre phrases, en français |
+| Exemples | trois phrases, anglais ET français côte à côte |
+| Le piège | la faute que le francophone VA commettre |
+
+Le format long est volontairement impossible : une fiche qu'on ne lit pas ne
+sert à rien. Un test vérifie que chaque règle tient sous 460 caractères —
+c'est vers le long qu'on dérive en écrivant.
+
+### Pourquoi la traduction est donnée à côté de chaque exemple
+Une fiche n'est pas un exercice : il n'y a rien à deviner ici. Cacher la
+traduction transformerait la lecture en devinette, alors que le but est
+justement de comprendre **avant** d'être mis à l'épreuve. C'est aussi
+pourquoi le bouton d'écoute est présent sur chaque exemple sans condition,
+là où l'écran d'exercice le retient tant que la réponse n'est pas validée.
+
+### La décision : la fiche ne compte pas
+La consulter ne donne aucun XP, n'avance aucune progression, n'entre dans
+aucune file de révision. Lire une règle n'est pas la savoir, et faire croire
+l'inverse gonflerait la progression avec du travail qui n'a pas eu lieu —
+la même règle que pour le test de placement, qui ouvre les niveaux
+inférieurs sans les cocher.
+
+### Deux accès, aucun passage obligé
+- sur la carte d'accueil, « Voir la fiche » à côté de « Commencer » ;
+- sur chaque ligne de leçon ouverte, un bouton distinct à droite.
+
+La fiche n'est jamais imposée avant la leçon. Quelqu'un qui veut seulement
+s'entraîner garde son départ en un seul appui — c'est ce qu'il fait vingt
+fois sur vingt et une.
+
+Conséquence technique : une ligne de leçon **n'est plus un seul grand
+bouton** quand une fiche existe. Un bouton dans un bouton est invalide en
+HTML et le clic partirait au mauvais des deux. Le chevron disparaît alors :
+à 375 px, trois éléments à droite serrent le titre sur trois lignes.
+
+### Ce que les tests ont attrapé
+Chaque exemple passe par le test de langue écrit en août pour la
+prononciation (`lib/spoken`) : le côté anglais doit être sûrement anglais, le
+côté français ne doit surtout pas l'être. C'est le contrôle qui repère
+l'erreur la plus bête et la plus probable — les deux colonnes inversées à la
+saisie.
+
+Une première version exigeait aussi que le français porte un indice
+français. Elle a échoué sur « On parle anglais ici. », qui n'en contient
+aucun : « on » est volontairement exclu de la liste des marqueurs, puisqu'il
+existe aussi en anglais. **C'était l'assertion qui était trop stricte, pas la
+phrase.** Elle a été corrigée, et la raison est écrite dans le test.
+
+Un défaut d'échappement a aussi été pris au passage : « avec un 's »
+s'affichait « avec un ''s », parce que le texte avait été échappé deux fois —
+une fois à la main, une fois par le générateur.
+
+### Vérifications
+- **216 tests** (+12), dont un banc d'essai qui relit `seed-lesson-notes.sql`
+  et contrôle les 30 fiches réelles : couverture des 30 leçons, longueur de
+  la règle, présence du piège, trois exemples traduits, et la langue de
+  chaque moitié.
+- `scripts/check-seeds.py` valide la colonne `examples` comme du JSON, et ne
+  se trompe plus sur les parenthèses de `on conflict`.
+- `npm run build` passe.
+- Contrôlé dans le navigateur à 375 px et 1280 px : bouton d'écoute à
+  44 × 44, bouton de fiche à 48 × 76, aucun débordement horizontal, largeur
+  de lecture plafonnée à 680 px, aucune erreur en console. Le bouton d'une
+  ligne ouvre bien la fiche et non la leçon.
+- Un écran ajouté à la prévisualisation (entrée 16).
+
+### Pas fait, et pourquoi
+La fiche n'est pas consultable **pendant** la leçon. Ce n'est pas un oubli :
+un exercice se fait de mémoire, et pouvoir rouvrir la règle au milieu d'une
+question transformerait la leçon en exercice à livre ouvert. La règle se lit
+avant, ou se relit après depuis le parcours.
 
 ## Écrit le 17 août — l'ordre des mots, premier format vraiment nouveau
 

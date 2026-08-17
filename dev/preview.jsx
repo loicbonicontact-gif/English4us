@@ -12,6 +12,7 @@ import '../src/styles.css'
 import AppShell from '../src/components/AppShell'
 import PathView from '../src/components/PathView'
 import ExerciseView from '../src/components/ExerciseView'
+import LessonNotesView from '../src/components/LessonNotesView'
 import LessonEnd from '../src/components/LessonEnd'
 import ProfileView from '../src/components/ProfileView'
 import ReviewEnd from '../src/components/ReviewEnd'
@@ -23,7 +24,7 @@ import PlacementView from '../src/components/PlacementView'
 import PlacementResult from '../src/components/PlacementResult'
 import { gradeExam } from '../src/lib/exam'
 import Mascot from '../src/components/Mascot'
-import { demoDictation, demoExercise, demoLesson, demoListeningQuestions, demoPassage, demoReading, demoReadingQuestions, demoSpeaking, demoGapExercise, demoTranslationExercise, demoWordOrderExercise, demoPath, demoPathFresh, demoPathPlaced, demoPlacementBlocks, demoPlacementQuestion, demoProfile, demoResults } from './fixtures'
+import { demoDictation, demoExercise, demoLesson, demoListeningQuestions, demoPassage, demoReading, demoReadingQuestions, demoSpeaking, demoGapExercise, demoTranslationExercise, demoWordOrderExercise, demoLessonNote, demoNoteIds, demoPath, demoPathFresh, demoPathPlaced, demoPlacementBlocks, demoPlacementQuestion, demoProfile, demoResults } from './fixtures'
 
 const SCREENS = [
   { key: 'parcours', label: '01 Parcours' },
@@ -55,7 +56,8 @@ const SCREENS = [
   { key: 'traduction', label: '14 Traduction' },
   { key: 'traduction-corrige', label: '14 Traduction corrigée' },
   { key: 'ordre', label: '15 Ordre des mots' },
-  { key: 'ordre-corrige', label: '15 Ordre corrigé' }
+  { key: 'ordre-corrige', label: '15 Ordre corrigé' },
+  { key: 'fiche', label: '16 Fiche de leçon' }
 ]
 
 function Preview() {
@@ -104,7 +106,7 @@ function Preview() {
 
       {screen === 'parcours' && (
         <AppShell profile={demoProfile}>
-          <PathView path={demoPath} onOpen={() => {}} onOpenListening={() => {}} />
+          <PathView path={demoPath} noteIds={demoNoteIds} onOpenNotes={() => setScreen('fiche')} onOpen={() => {}} onOpenListening={() => {}} />
         </AppShell>
       )}
 
@@ -161,6 +163,18 @@ function Preview() {
       {screen === 'ordre' && (
         <ExerciseView {...exerciseProps} exercise={demoWordOrderExercise} answer={answer} verdict={null} />
       )}
+      {/* La fiche : la regle avant de commencer, jamais notee. */}
+      {screen === 'fiche' && (
+        <LessonNotesView
+          lesson={{ level: 'B1', title: 'Santé et bien-être' }}
+          note={demoLessonNote}
+          examples={demoLessonNote.examples}
+          onStart={() => setScreen('question')}
+          onQuit={() => setScreen('parcours')}
+          onSpeak={() => {}}
+        />
+      )}
+
       {screen === 'ordre-corrige' && (
         <ExerciseView {...exerciseProps} exercise={demoWordOrderExercise} answer="You should see a doctor" verdict="right" />
       )}

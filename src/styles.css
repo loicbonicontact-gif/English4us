@@ -648,6 +648,24 @@ html, body { max-width: 100%; overflow-x: hidden; }
   transition: transform .18s ease, box-shadow .18s ease;
 }
 
+/* Deux boutons cote a cote sur la carte de reprise. `wrap` : a 375 px avec
+   un titre long, ils passent l'un sous l'autre plutot que de se comprimer. */
+.resume-buttons { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+
+/* Acces secondaire a la fiche. Volontairement sans fond : sur la carte
+   bleue, deux boutons pleins se disputeraient le regard. Le blanc sur le
+   degrade d'accent tient le 4.5:1. */
+.resume-notes {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 12px 14px;
+  min-height: 44px;
+  border: none; border-radius: var(--r-pill);
+  background: transparent; color: #fff;
+  font-family: var(--font); font-size: 14.5px; font-weight: 600;
+  text-decoration: underline; text-underline-offset: 3px;
+  cursor: pointer;
+}
+
 .resume-mascot { flex: 0 0 auto; }
 
 /* --- Carte de progression --- */
@@ -730,6 +748,38 @@ html, body { max-width: 100%; overflow-x: hidden; }
 .lesson-row.is-locked .lesson-title { color: var(--ink-disabled); font-weight: 500; }
 .lesson-row.is-locked .lesson-meta { color: var(--ink-disabled); }
 .lesson-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--ink-disabled); }
+
+/* --- Acces a la fiche depuis une ligne de lecon ---
+   La ligne n'est plus un seul grand bouton quand une fiche existe : elle en
+   porte deux, cote a cote. Un bouton dans un bouton est invalide en HTML et
+   le clic partirait au mauvais des deux. */
+.lesson-row.has-note { display: flex; align-items: stretch; gap: 8px; }
+.lesson-row.has-note .lesson-hit { flex: 1 1 auto; min-width: 0; }
+
+.lesson-note-btn {
+  flex: 0 0 auto;
+  width: 48px;                     /* cible tactile, 76 px de haut par la ligne */
+  display: grid; place-items: center;
+  border: none; border-radius: var(--r-lg);
+  background: var(--surface); color: var(--accent-dark);   /* 6.9:1 sur blanc */
+  box-shadow: var(--e-rest);
+  cursor: pointer;
+  transition: transform .18s ease, background .18s ease;
+}
+
+/* Le chevron devient du bruit quand un second bouton occupe la droite de la
+   ligne : sur 375 px les deux se touchent presque, et le titre se met a
+   passer sur trois lignes. */
+.lesson-row.has-note .lesson-chevron { display: none; }
+
+@media (hover: hover) {
+  .lesson-note-btn:hover { background: var(--accent-tint); transform: translateY(-2px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lesson-note-btn:hover { transform: none; }
+  .lesson-note-btn { transition: none; }
+}
 
 /* --- Carte coeurs (colonne de droite) --- */
 .hearts-card {
@@ -2200,6 +2250,125 @@ html, body { max-width: 100%; overflow-x: hidden; }
    BARRE DE PREVISUALISATION (developpement seulement)
    Presente uniquement sur preview.html, jamais dans l'app.
    ============================================ */
+/* ============================================
+   FICHE DE LECON — la regle avant de commencer
+
+   Cet ecran se LIT. Contrairement aux ecrans d'exercice, il est aligne a
+   gauche et non centre : on ne centre pas un paragraphe qu'on doit
+   parcourir des yeux, ligne apres ligne.
+   ============================================ */
+.notes-screen {
+  position: relative;
+  display: grid; gap: var(--sp-4);
+  padding: var(--sp-5) var(--sp-4) var(--sp-6);
+  max-width: 680px;                /* au-dela, la ligne devient trop longue */
+  margin: 0 auto;
+}
+
+.notes-screen-center {
+  justify-items: center; text-align: center;
+  gap: 14px;
+}
+
+.notes-top { display: flex; align-items: center; gap: 12px; }
+
+.notes-eyebrow {
+  margin: 0;
+  font-size: 12.5px; font-weight: 700; letter-spacing: .04em;
+  text-transform: uppercase;
+  color: var(--accent-dark);       /* 6.9:1 sur le fond d'app */
+}
+
+.notes-head { display: flex; align-items: flex-start; gap: 14px; }
+.notes-mascot { flex: 0 0 auto; }
+
+.notes-title {
+  margin: 0 0 8px;
+  font-family: var(--font-title); font-size: 27px; font-weight: 600;
+  color: var(--ink);
+}
+
+.notes-rule {
+  margin: 0;
+  font-size: 16.5px; line-height: 1.55;
+  color: var(--ink-2);             /* 9.8:1 */
+}
+
+.notes-block { display: grid; gap: 10px; }
+
+.notes-block-title {
+  margin: 0;
+  font-size: 13px; font-weight: 700; letter-spacing: .03em;
+  text-transform: uppercase;
+  color: var(--ink-3);             /* 4.8:1 */
+}
+
+.notes-examples { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+
+.notes-example {
+  position: relative;
+  padding: 14px 52px 14px 16px;    /* place reservee au bouton d'ecoute */
+  background: var(--surface);
+  border-radius: var(--r-lg);
+  box-shadow: var(--e-rest);
+}
+
+/* L'anglais porte le poids, le francais suit en retrait : la hierarchie dit
+   lequel des deux on vient apprendre. */
+.notes-example-en {
+  margin: 0;
+  font-size: 17px; font-weight: 600; color: var(--ink);
+}
+
+.notes-example-fr {
+  margin: 4px 0 0;
+  font-size: 15px; color: var(--ink-3);
+}
+
+.notes-example-listen {
+  position: absolute; top: 50%; right: 10px;
+  transform: translateY(-50%);
+  width: 44px; height: 44px;       /* cible tactile */
+  display: grid; place-items: center;
+  border: none; border-radius: 12px;
+  background: transparent; color: var(--accent-dark);
+  cursor: pointer;
+}
+
+@media (hover: hover) {
+  .notes-example-listen:hover { background: var(--accent-tint); }
+}
+
+/* Le piege : encadre en framboise, comme les erreurs, parce que c'est
+   exactement ce dont il parle — la faute qu'on va commettre. */
+.notes-pitfall {
+  display: grid; gap: 8px;
+  padding: 15px 16px;
+  background: var(--error-tint);
+  border-radius: var(--r-lg);
+}
+
+.notes-pitfall p {
+  margin: 0;
+  font-size: 15.5px; line-height: 1.5;
+  color: var(--error-dark);        /* 8.7:1 sur blanc, tient sur la teinte */
+}
+
+.notes-actions { display: grid; gap: 8px; margin-top: 4px; }
+
+.notes-back {
+  padding: 12px;
+  min-height: 44px;
+  border: none; border-radius: var(--r-pill);
+  background: transparent; color: var(--ink-2);
+  font-family: var(--font); font-size: 15px; font-weight: 600;
+  cursor: pointer;
+}
+
+@media (hover: hover) {
+  .notes-back:hover { background: var(--surface-off); }
+}
+
 .preview-switch {
   position: sticky; top: 0; z-index: 100;
   display: flex; gap: 4px; flex-wrap: wrap;

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { fetchLessons, fetchProgress, buildPath } from '../lib/lessons'
 import { fetchListeningProgress, fetchPassages } from '../lib/listening'
 import { fetchReadingPassages, fetchReadingProgress } from '../lib/reading'
+import { fetchLessonNoteIds } from '../lib/lessonNotes'
 import PathView from './PathView'
 import Mascot from './Mascot'
 
@@ -13,6 +14,8 @@ export default function LessonPath({ profile }) {
   const userId = profile?.id
   const navigate = useNavigate()
   const [path, setPath] = useState(null)
+  // Lecons ayant une fiche. Un Set vide fait disparaitre les boutons.
+  const [noteIds, setNoteIds] = useState(() => new Set())
   const [error, setError] = useState(null)
   const [loading, setLoading] = useState(true)
 
@@ -27,6 +30,11 @@ export default function LessonPath({ profile }) {
     const listeningDoneOrEmpty = fetchListeningProgress(userId).catch(() => ({}))
     const readingOrEmpty = fetchReadingPassages().catch(() => [])
     const readingDoneOrEmpty = fetchReadingProgress(userId).catch(() => ({}))
+    // Meme prudence que pour les ecoutes : tant que migration-lesson-notes
+    // n'est pas passee, la table n'existe pas. On repart d'un ensemble vide,
+    // donc sans aucun bouton « fiche » — plutot qu'un ecran d'erreur, ou un
+    // bouton qui menerait nulle part.
+    const notesOrEmpty = fetchLessonNoteIds().catch(() => new Set())
 
     Promise.all([
       fetchLessons(),
@@ -34,10 +42,12 @@ export default function LessonPath({ profile }) {
       listeningOrEmpty,
       listeningDoneOrEmpty,
       readingOrEmpty,
-      readingDoneOrEmpty
+      readingDoneOrEmpty,
+      notesOrEmpty
     ])
-      .then(([lessons, progress, passages, listeningDone, readings, readingDone]) => {
+      .then(([lessons, progress, passages, listeningDone, readings, readingDone, notes]) => {
         if (!active) return
+        setNoteIds(notes)
         if (lessons.length === 0) {
           setError("Aucune leçon en base. Le script supabase/seed.sql n'a pas encore été exécuté.")
         } else {
@@ -76,6 +86,8 @@ export default function LessonPath({ profile }) {
       needsPlacement={needsPlacement}
       placementLevel={profile?.placement_level ?? null}
       onOpenPlacement={() => navigate('/placement')}
+      noteIds={noteIds}
+      onOpenNotes={(id) => navigate(`/lesson/${id}/notes`)}
       onOpen={(id) => navigate(`/lesson/${id}`)}
       onOpenListening={(id) => navigate(`/listening/${id}`)}
       onOpenReading={(id) => navigate(`/reading/${id}`)}

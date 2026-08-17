@@ -1,4 +1,4 @@
-import { IconCap, IconCheck, IconChevron, IconHeadphones, IconPlay, IconRead, IconRedo } from './Icons'
+import { IconCap, IconCheck, IconChevron, IconHeadphones, IconNote, IconPlay, IconRead, IconRedo } from './Icons'
 import Mascot from './Mascot'
 import { LEVELS } from '../data/curriculum'
 
@@ -23,7 +23,12 @@ export default function PathView({
   onOpenExam = () => {},
   needsPlacement = false,
   placementLevel = null,
-  onOpenPlacement = () => {}
+  onOpenPlacement = () => {},
+  // Identifiants des lecons QUI ONT une fiche. Un Set vide — le cas quand
+  // la migration n'est pas passee — fait simplement disparaitre tous les
+  // boutons « fiche », sans rien casser ailleurs.
+  noteIds = new Set(),
+  onOpenNotes = () => {}
 }) {
   const done = path.decorated.filter((l) => l.completed).length
   const total = path.decorated.length
@@ -84,9 +89,26 @@ export default function PathView({
                 {current.exercise_count ? `${current.exercise_count} questions · ` : ''}
                 Niveau {current.level} · +{current.xp_reward} XP
               </p>
-              <button type="button" className="resume-btn" onClick={() => onOpen(current.id)}>
-                {done === 0 ? 'Commencer' : 'Reprendre'}
-              </button>
+              <div className="resume-buttons">
+                <button type="button" className="resume-btn" onClick={() => onOpen(current.id)}>
+                  {done === 0 ? 'Commencer' : 'Reprendre'}
+                </button>
+
+                {/* La fiche est proposee a cote, jamais a la place : elle se
+                    lit avant de commencer, mais rien n'oblige a la lire.
+                    Le bouton principal reste le premier de l'ordre de
+                    tabulation. */}
+                {noteIds.has(current.id) && (
+                  <button
+                    type="button"
+                    className="resume-notes"
+                    onClick={() => onOpenNotes(current.id)}
+                  >
+                    <IconNote size={16} />
+                    Voir la fiche
+                  </button>
+                )}
+              </div>
             </div>
             <Mascot mood={done === 0 ? 'idle' : 'happy'} size={86} className="resume-mascot" />
           </section>
@@ -146,11 +168,16 @@ export default function PathView({
                   const isCurrent = !isPractice && current?.id === item.id
                   const state = item.completed ? 'done' : item.unlocked ? 'current' : 'locked'
                   const noun = isListening ? 'Écoute' : isReading ? 'Lecture' : 'Leçon'
+                  // Une fiche n'existe que pour une lecon (pas pour une
+                  // ecoute ni une lecture), et seulement si elle est ouverte :
+                  // lire la regle d'une lecon verrouillee reviendrait a
+                  // contourner la progression.
+                  const hasNote = !isPractice && item.unlocked && noteIds.has(item.id)
 
                   return (
                     <li
                       key={`${item.kind}-${item.id}`}
-                      className={`lesson-row is-${state} ${isCurrent ? 'is-active' : ''} ${isPractice ? 'is-practice' : ''}`}
+                      className={`lesson-row is-${state} ${isCurrent ? 'is-active' : ''} ${isPractice ? 'is-practice' : ''} ${hasNote ? 'has-note' : ''}`}
                     >
                       <button
                         type="button"
@@ -200,6 +227,21 @@ export default function PathView({
                           </span>
                         )}
                       </button>
+
+                      {/* Bouton distinct, et non imbrique : un bouton dans un
+                          bouton est invalide en HTML, et le clic irait au
+                          mauvais des deux. C'est aussi pourquoi la ligne
+                          n'est plus un seul grand bouton. */}
+                      {hasNote && (
+                        <button
+                          type="button"
+                          className="lesson-note-btn"
+                          onClick={() => onOpenNotes(item.id)}
+                          aria-label={`Voir la fiche de la leçon ${item.title}`}
+                        >
+                          <IconNote size={20} />
+                        </button>
+                      )}
                     </li>
                   )
                 })}

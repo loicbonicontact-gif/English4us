@@ -10,6 +10,7 @@
 
 import {
   AudioLines,
+  BookOpen,
   Check,
   ChevronRight,
   Headphones,
@@ -54,6 +55,9 @@ export const IconWave = wrap(AudioLines)
 export const IconSlow = wrap(Turtle)
 export const IconMic = wrap(Mic)
 export const IconRead = wrap(FileText)
+// Fiche de lecon : la regle avant de commencer. Volontairement distincte
+// de IconRead (un document a lire) — ce n'est pas le meme geste.
+export const IconNote = wrap(BookOpen)
 export const IconLock = wrap(Lock)
 export const IconLogout = wrap(LogOut)
 export const IconPlay = wrap(Play)

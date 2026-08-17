@@ -235,3 +235,20 @@ export const demoWordOrderExercise = {
   correct_answer: 'You should see a doctor',
   explanation: 'Apres un modal (should, must, can, will), le verbe suit nu, sans \u00ab to \u00bb.'
 }
+
+// Fiche de lecon. `examples` arrive ici deja decode, comme le renvoie
+// Supabase ; readExamples accepte aussi la forme chaine.
+export const demoLessonNote = {
+  lesson_id: 14,
+  title: 'Dire comment on se sent, et conseiller',
+  rule: "Sur la sant\u00e9 on dit \u00ab well \u00bb, pas \u00ab good \u00bb : \u00ab I feel well \u00bb. Le conseil passe par \u00ab should \u00bb, et comme tous les modaux (can, must, will, may) il est suivi du verbe NU, sans \u00ab to \u00bb.",
+  examples: [
+    { en: 'I do not feel very well today.', fr: "Je ne me sens pas tr\u00e8s bien aujourd'hui." },
+    { en: 'You should see a doctor.', fr: 'Tu devrais voir un m\u00e9decin.' },
+    { en: 'You must not smoke here.', fr: 'Vous ne devez pas fumer ici.' }
+  ],
+  pitfall: "\u00ab You should to see \u00bb est une faute quasi syst\u00e9matique chez les francophones, parce que le fran\u00e7ais dit \u00ab tu devrais VOIR \u00bb avec un infinitif. En anglais, apr\u00e8s un modal, pas de \u00ab to \u00bb."
+}
+
+// Lecons ayant une fiche, pour le parcours de demonstration.
+export const demoNoteIds = new Set([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15])

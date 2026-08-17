@@ -8,6 +8,7 @@ import Auth from './components/Auth'
 import AppShell from './components/AppShell'
 import LessonPath from './components/LessonPath'
 import Exercise from './components/Exercise'
+import LessonNotes from './components/LessonNotes'
 import Profile from './components/Profile'
 import Review from './components/Review'
 import Listening from './components/Listening'
@@ -135,6 +136,10 @@ export default function App() {
             path="/placement"
             element={<Placement profile={profile} onProfileChange={refreshProfile} />}
           />
+          {/* La fiche AVANT la leçon. Elle est déclarée avant `/lesson/:id`
+              pour la lisibilité ; react-router compare les segments, l'ordre
+              ne change rien ici. */}
+          <Route path="/lesson/:id/notes" element={<LessonNotes />} />
           <Route
             path="/lesson/:id"
             element={<Exercise profile={profile} onProfileChange={refreshProfile} />}

@@ -120,12 +120,18 @@ for path in sys.argv[1:]:
         table=st.split()[2]
         cols=split_top(st[st.index('(')+1:st.index(')')])
         body=st[st.index('values')+6:]
+        # `on conflict (colonne) do update` traine des parentheses APRES
+        # les valeurs : sans cette coupe, elles passent pour une ligne de
+        # plus, avec un seul champ. C'est une fausse alerte, pas un defaut
+        # du contenu.
+        cut=body.lower().find('on conflict')
+        if cut!=-1: body=body[:cut]
         for t in tuples(body):
             p=split_top(t)
             if len(p)!=len(cols): bad.append(('arity',table,len(p),len(cols),t[:50])); continue
             d=dict(zip(cols,p))
             for k,v in d.items():
-                if k in ('options','documents','script') and v.strip()!='null':
+                if k in ('options','documents','script','examples') and v.strip()!='null':
                     try: json.loads(unq(v))
                     except Exception as e: bad.append(('json',table,k,str(e)[:60]))
             if 'options' in d and d['options'].strip()!='null':
