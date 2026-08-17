@@ -78,11 +78,36 @@ Vérifié dans `preview.html` (écran « 05 Entraînement ») : les deux modules
 s'affichent, un module sans contenu annonce que son script SQL n'a pas été
 passé au lieu de rester vide.
 
-### À surveiller
-Avec 78 mises en pratique pour 30 leçons, la plupart se retrouvent en fin de
-niveau et restent **verrouillées jusqu'à la dernière leçon du niveau**. La
-règle n'a pas changé, mais le volume la rend beaucoup plus visible. À
-rediscuter : faut-il ouvrir l'écoute et la lecture plus tôt ?
+### Le point d'accès, mesuré le 17/08 — priorité n°1
+En simulant `buildPath` sur le contenu réel (30 leçons, 42 écoutes,
+36 lectures), voici ce qu'un apprenant peut réellement ouvrir :
+
+| État de l'apprenant | Leçons ouvertes | Écoutes + lectures ouvertes |
+|---|---|---|
+| Débutant, rien de fait | 1 / 30 | **0 / 78** |
+| A1 terminé (5 leçons) | 6 / 30 | 13 / 78 |
+| A1 à B1 terminés (15 leçons) | 16 / 30 | 39 / 78 |
+
+Autrement dit : le jour de son inscription, un apprenant n'a accès à
+**aucune** des 210 questions d'écoute et de lecture. L'écran
+« Entraînement » créé le même jour lui présente donc une liste entièrement
+grisée, hors l'examen blanc.
+
+Deux causes distinctes, à traiter séparément :
+1. **Pas de test de placement.** Tout le monde démarre à A1 leçon 1, y
+   compris un B1. Des mois de contenu déjà su avant d'atteindre son niveau.
+2. **Les mises en pratique s'ouvrent trop tard.** Avec 78 mises en pratique
+   pour 30 leçons, la plupart tombent dans le « reste de niveau » et
+   attendent que la dernière leçon du niveau soit finie.
+
+C'est le multiplicateur de tout ce qui a été écrit aujourd'hui : 360
+nouveaux exercices ne servent à rien tant qu'ils sont hors d'atteinte.
+
+**Incohérence à trancher au passage** : l'examen blanc, lui, puise dans
+TOUT le contenu sans regarder le verrouillage. Un débutant peut donc
+rencontrer du C2 dans l'examen mais pas dans le parcours. Défendable (le
+vrai TOEIC ne s'adapte pas au candidat), mais c'est un choix, pas un
+hasard — il doit être assumé.
 
 ## Écrit le 17 août — l'examen blanc passe au format réel
 
