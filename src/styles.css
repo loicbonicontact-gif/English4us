@@ -542,7 +542,10 @@ html, body { max-width: 100%; overflow-x: hidden; }
 /* --- Barre d'onglets : detachee en bas de l'ecran sur telephone --- */
 .tabbar {
   position: fixed; bottom: 0; left: 0; right: 0; z-index: 40;
-  display: grid; grid-template-columns: repeat(4, 1fr);
+  /* Colonnes automatiques, toutes de largeur egale : la barre s'adapte au
+     nombre d'onglets. Avec un `repeat(4, 1fr)` en dur, passer a trois
+     onglets laissait un quart de barre vide a droite. */
+  display: grid; grid-auto-flow: column; grid-auto-columns: 1fr;
   padding: 8px 8px max(16px, env(safe-area-inset-bottom));
   background: rgba(255,255,255,.86);
   backdrop-filter: blur(14px);
@@ -839,7 +842,9 @@ html, body { max-width: 100%; overflow-x: hidden; }
   /* La barre d'onglets rejoint l'en-tete : plus rien ne flotte en bas */
   .tabbar {
     position: static;
-    grid-template-columns: repeat(4, max-content);
+    /* Sur grand ecran la barre rejoint l'en-tete : chaque onglet reprend sa
+       largeur naturelle, sans etirement. Automatique ici aussi. */
+    grid-auto-columns: max-content;
     gap: 4px;
     margin-left: var(--sp-5);
     border-top: none; background: none; backdrop-filter: none;

@@ -80,6 +80,28 @@ fermées ne sert à rien.
 Une barre n'a pas à être remplie : trois destinations quotidiennes valent
 mieux que quatre dont une qu'on n'ouvre jamais.
 
+### 3. Un défaut de mise en page découvert au passage
+La barre était figée à **quatre colonnes en dur** (`repeat(4, 1fr)`). Avec
+trois onglets, le quatrième quart restait vide et tout paraissait poussé à
+gauche. Remplacé par des colonnes automatiques de largeur égale
+(`grid-auto-flow: column; grid-auto-columns: 1fr`) : la barre s'adapte
+maintenant au nombre d'onglets, aujourd'hui et si un onglet revient un jour.
+
+Répartition sur toute la largeur plutôt que groupe centré : chaque onglet
+devient une cible plus large, et le pouce atteint les bords. Un groupe
+centré laisserait deux zones mortes là où le pouce tombe le plus souvent.
+
+Mesuré aux quatre largeurs imposées :
+
+| Largeur | Onglets | Hauteur de cible |
+|---|---|---|
+| 375 px | 120 px chacun | 55 px |
+| 768 px | 251 px chacun | 55 px |
+| 812 x 375 (paysage) | 265 px chacun | 55 px |
+| 1280 px | largeur naturelle, dans l'en-tête | 44 px |
+
+Toutes au-dessus du minimum de 44 px.
+
 ## Écrit le 17 août — le verrouillage laissait le contenu hors d'atteinte
 
 `interleave()` plaçait UNE mise en pratique après chaque leçon et entassait
